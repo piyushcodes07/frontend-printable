@@ -1,288 +1,293 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useUser } from "@clerk/nextjs";
-import {
-  HomeIcon,
-  DocumentTextIcon,
-  ClockIcon,
-  WalletIcon,
-  CloudIcon,
-  Cog6ToothIcon,
-} from "@heroicons/react/24/outline";
-
-type OrderStatus = "Shipped" | "Delivered";
-type Priority = "High" | "Normal";
+import { useState, useEffect } from 'react';
 
 interface Order {
+  id: number;
   orderDate: string;
   orderNo: string;
-  productName: string;
+  title: string;
   shop: string;
   address: string;
-  estDelivery?: string;
-  priority: Priority;
-  status: OrderStatus;
+  estDelivery: string | null;
+  priority: string;
+  priorityColor: string;
+  deliveryProgress: number;
   price: string;
   copies: number;
-  progress: number;
-  image: string;
+  pickup: boolean;
+  status: string;
+  imgSrc: string;
+  imgAlt: string;
 }
 
-const orders: Order[] = [
-  {
-    orderDate: "2025/04/22 11:15:32 am",
-    orderNo: "CNF47654448320532",
-    productName: "Business Proposal.pdf",
-    shop: "Print Master Shop",
-    address: "123 Main St, New York, NY 10001",
-    estDelivery: "12 minutes",
-    priority: "High",
-    status: "Shipped",
-    price: "2450.00",
-    copies: 20,
-    progress: 80,
-    image: "/pdf-preview.png",
-  },
-  {
-    orderDate: "2025/04/22 11:15:32 am",
-    orderNo: "CNF47654448320532",
-    productName: "Business Proposal.pdf",
-    shop: "Print Master Shop",
-    address: "123 Main St, New York, NY 10001",
-    priority: "Normal",
-    status: "Delivered",
-    price: "2450.00",
-    copies: 20,
-    progress: 100,
-    image: "/pdf-preview.png",
-  },
-];
+export default function Home() {
+  const [activeFilter, setActiveFilter] = useState('All');
+  const [expandedInvoice, setExpandedInvoice] = useState<number | null>(null);
+  const [orders, setOrders] = useState<Order[]>([
+      {
+        id: 1,
+        orderDate: "2025/04/22 11:15:32 am",
+        orderNo: "CNF47654448320532",
+        title: "Business Proposal.pdf",
+        shop: "Print Master Shop",
+        address: "123 Main St, New York, NY 10001",
+        estDelivery: "12 minutes",
+        priority: "High",
+        priorityColor: "bg-yellow-400 text-black",
+        deliveryProgress: 70,
+        price: "₹2450.00",
+        copies: 20,
+        pickup: true,
+        status: "Shipped",
+        imgSrc: "https://storage.googleapis.com/a1aa/image/97837679-a8dc-4401-2d7b-ddd77493698b.jpg",
+        imgAlt: "Thumbnail of a document titled How I structure AI Prompts for Design with text and diagrams"
+      },
+      {
+        id: 2,
+        orderDate: "2025/04/22 11:15:32 am",
+        orderNo: "CNF47654448320532",
+        title: "Business Proposal.pdf",
+        shop: "Print Master Shop",
+        address: "123 Main St, New York, NY 10001",
+        estDelivery: null,
+        priority: "Normal",
+        priorityColor: "bg-sky-500 text-white",
+        deliveryProgress: 100,
+        price: "₹2450.00",
+        copies: 20,
+        pickup: true,
+        status: "Delivered",
+        imgSrc: "https://storage.googleapis.com/a1aa/image/97837679-a8dc-4401-2d7b-ddd77493698b.jpg",
+        imgAlt: "Thumbnail of a document titled How I structure AI Prompts for Design with text and diagrams"
+      }
+  ]);
 
-export default function MyOrders() {
-  const { user } = useUser();
-  const [filterStatus, setFilterStatus] = useState<"All" | "Shipped" | "Delivered">("All");
+  const filteredOrders = orders.filter(order => {
+    if (activeFilter === 'All') return true;
+    return order.status === activeFilter;
+  });
 
-  const filteredOrders = filterStatus === "All" ? orders : orders.filter(order => order.status === filterStatus);
+  const toggleInvoice = (orderId: number) => {
+    setExpandedInvoice(expandedInvoice === orderId ? null : orderId);
+  };
 
   return (
-    <div className="min-h-screen bg-[#e9eaf0] py-10 px-10 flex flex-col">
-      <div className="flex max-w-7xl mx-auto gap-6">
-        {/* Sidebar */}
-        <aside
-          className="w-80 bg-white rounded-2xl shadow-md p-6 flex flex-col"
-          style={{ height: "calc(100vh - 5rem)" }}
-        >
-          <div className="flex flex-col border-b border-[#e9eaf0] px-4 py-2">
-            <div className="flex items-center gap-4 mb-2">
-              <img
-                src={user?.imageUrl || "/default-avatar.png"}
-                alt={`${user?.firstName || "User"}'s Avatar`}
-                className="w-12 h-12 rounded-full object-cover"
-              />
-              <div>
-                <div className="font-semibold text-gray-800 text-base">
-                  {user?.firstName} {user?.lastName}
+    <div className="bg-[#e6e7f0] min-h-screen">
+      <main className="max-w-[1440px] mx-auto flex gap-6 px-6 py-8">
+
+        {/* Content */}
+        <section className="flex-1 bg-white rounded-lg flex flex-col">
+          <h2 className="text-gray-900 font-semibold text-[25px] px-6 py-2">My Orders</h2>
+          <aside className="bg-white rounded-lg w-100% flex-shrink-0 flex flex-col border border-gray-200"></aside>
+          <div className="p-6">
+          <div className="flex gap-3 mb-6 mt-4">
+            <button 
+              className={`text-gray-900 bg-white border border-gray-300 rounded-md px-4 py-1 text-sm ${activeFilter === 'All' ? 'bg-gray-300 font-semibold' : 'font-normal'}`}
+              onClick={() => setActiveFilter('All')}
+              type="button"
+            >
+              All
+            </button>
+            <button 
+              className={`text-gray-900 bg-white border border-gray-300 rounded-md px-4 py-1 text-sm ${activeFilter === 'Shipped' ? 'bg-gray-300 font-semibold' : 'font-normal'}`}
+              onClick={() => setActiveFilter('Shipped')}
+              type="button"
+            >
+              Shipped
+            </button>
+            <button 
+              className={`text-gray-900 bg-white border border-gray-300 rounded-md px-4 py-1 text-sm ${activeFilter === 'Delivered' ? 'bg-gray-300 font-semibold' : 'font-normal'}`}
+              onClick={() => setActiveFilter('Delivered')}
+              type="button"
+            >
+              Delivered
+            </button>
+          </div>
+          
+
+          <div className="flex flex-col gap-6">
+            {filteredOrders.map(order => (
+              <article key={order.id} className="bg-[#d9dce6] rounded-lg p-4 flex flex-col gap-4">
+                <header className="flex flex-wrap justify-between text-xs text-gray-900 font-normal">
+                  <div className='flex gap-2'>
+                  <p className='text-[15px]'>Order Date & Time : {order.orderDate}</p>
+                  <aside className="bg-white rounded-lg h-50% flex-shrink-0 flex flex-col border border-gray-400"></aside>
+                  <p className='text-[15px]'>Order No: <span className="font-semibold">{order.orderNo}</span></p>
+                  </div>
+                  <div className="flex gap-2">
+                  <button 
+  className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-5 py-2 text-sm font-semibold"
+  onClick={() => toggleInvoice(order.id)}
+>
+  <i className="far fa-bookmark" /> Invoice
+</button>
+
+<button 
+  className="flex items-center gap-2 bg-[#0a0c3b] text-white rounded-lg px-5 py-2 text-sm font-semibold"
+>
+  <i className="fas fa-user-lock" /> Track order
+</button>
+
+                    </div>
+          </header>
+                <aside className="bg-white rounded-lg w-100% flex-shrink-0 flex flex-col border border-gray-400"></aside>
+                <div className="flex gap-4">
+                  <img 
+                    src={order.imgSrc} 
+                    alt={order.imgAlt} 
+                    className="w-[150px] h-[150px] object-contain rounded-sm" 
+                    width="100" 
+                    height="80"
+                  />
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div className='py-2'>
+                      <h3 className="font-semibold text-gray-900 text-[20px] mb-1 py-2">{order.title}</h3>
+                      <div className="flex items-center gap-2 text-xs text-gray-700 mb-1 py-2">
+                        <i className="fas fa-store-alt" />
+                        <span>{order.shop}</span>
+                        <span className="mx-2">|</span>
+                        <i className="fas fa-map-marker-alt" />
+                        <span>{order.address}</span>
                 </div>
-                <div className="text-xs text-gray-500">
-                  {user?.primaryEmailAddress?.emailAddress}
+                      <div className="flex gap-2 text-xs  py-2">
+                        {order.estDelivery && (
+                          <span className="bg-white rounded-full px-3 py-1 text-gray-900 font-normal">
+                            Est. Delivery Time: {order.estDelivery}
+                          </span>
+                        )}
+                        {order.status === "Delivered" && (
+                          <span className="bg-green-400 rounded-full px-3 py-1 text-white font-normal">
+                            Delivered
+                          </span>
+                        )}
+                        <span className={`${order.priorityColor} rounded-full px-3 py-1 font-semibold`}>
+                          Priority: {order.priority}
+                        </span>
                 </div>
+              </div>
+                    <div className='w-100%'>
+                    <aside className="bg-white rounded-lg w-100% flex-shrink-0 flex flex-col border border-gray-400" style={{width: '112%'}}></aside>
+                    {order.status !== "Delivered" && (
+                      <div className='py-2 w-150%' style={{width: '112%'}}>
+                        <div className="flex items-center text-xs text-gray-900 mb-1">
+                          <span className="mr-2 font-normal">Delivery Progress:</span>
+                          <div className="flex-1 h-2 rounded-full bg-white border border-gray-300 overflow-hidden">
+                            <div 
+                              className="h-2 bg-green-400 rounded-full" 
+                              style={{ width: `${order.deliveryProgress}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    </div>
+            </div>
+                  <div className="flex flex-col justify-between items-end text-gray-900 text-sm font-semibold">
+                    
+                    <div className="text-right">
+                      <p className="text-lg font-semibold py-2">{order.price}</p>
+                      <p className="text-xs font-normal text-gray-600 py-2">Copies: {order.copies}</p>
+                      <button className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-6 py-2 text-sm font-semibold text-gray-900">
+  <i className="fas fa-store-alt" /> Store Pickup
+</button>
+
+              </div>
+                  </div>
+                </div>
+                
+                {/* Invoice Accordion */}
+                {expandedInvoice === order.id && (
+                  <div className="mt-4">
+                    <div className="flex gap-4">
+                      {/* Delivery Timeline Card */}
+                      <div className="flex-1 bg-white rounded-lg p-4 border border-gray-200">
+                        <h4 className="text-lg font-semibold mb-4">Delivery Timeline</h4>
+                        <div className="relative">
+                          <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200 h-[380px]"></div>
+                          <div className="space-y-8">
+                            <div className="relative flex items-center">
+                              <div className="absolute left-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                
+                              </div>
+                              <div className="ml-12">
+                                <p className="font-semibold">Order Placed</p>
+                                <p className="text-sm text-gray-600">{order.orderDate}</p>
+                              </div>
+                            </div>
+                            <div className="relative flex items-center">
+                              <div className="absolute left-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                
+                              </div>
+                              <div className="ml-12">
+                                <p className="font-semibold">Printing</p>
+                                <p className="text-sm text-blue-500">Printing at high quality</p>
+                                <p className="text-sm text-gray-600">{order.orderDate}</p>
+                              </div>
+                            </div>
+                            <div className="relative flex items-center">
+                              <div className="absolute left-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                
+                              </div>
+                              <div className="ml-12">
+                                <p className="font-semibold">Ready for Pickup</p>
+                                <p className="text-sm text-orange-500">Available at PrintMaster Shop</p>
+                                <p className="text-sm text-gray-600">{order.orderDate}</p>
+                              </div>
+                            </div>
+                            <div className="relative flex items-center">
+                              <div className="absolute left-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                
+                              </div>
+                              <div className="ml-12">
+                                <p className="font-semibold">Picked Up</p>
+                                <p className="text-sm text-gray-600">{order.orderDate}</p>
+                              </div>
+                            </div>
+                            <div className="relative flex items-center">
+                              <div className="absolute left-0 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                                
+                              </div>
+                              <div className="ml-12">
+                                <p className="font-semibold text-gray-500">Delivered</p>
+                                <p className="text-sm text-green-500">Delivered successfully</p>
+                                <p className="text-sm text-gray-600">{order.orderDate}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Map Card */}
+                      <div className="flex-1 bg-white rounded-lg p-4 border border-gray-200">
+                        <h4 className="text-lg font-semibold mb-4">Delivery Location</h4>
+                        <div className="h-[500px] w-full bg-gray-100 rounded-lg relative overflow-hidden">
+                          <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14881.364621935493!2d79.08004442644957!3d21.149761424095135!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bd4c0529518230f%3A0x45cd5a726d54cec2!2sNagpur%20Railway%20Station!5e0!3m2!1sen!2sin!4v1708425086404!5m2!1sen!2sin"
+                            width="100%"
+                            height="100%"
+                            style={{ border: 0 }}
+                            allowFullScreen
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                          ></iframe>
+                          <div className="absolute bottom-4 right-4 bg-white p-2 rounded-lg shadow-md">
+                            <button className="flex items-center gap-2 text-sm text-blue-600">
+                              <i className="fas fa-directions"></i>
+                              Get Directions
+                </button>
               </div>
             </div>
           </div>
-          <nav className="flex flex-col gap-1 mt-4 px-2">
-            <SidebarLink icon={HomeIcon} label="My Account" />
-            <SidebarLink icon={DocumentTextIcon} label="My Orders" active />
-            <SidebarLink icon={ClockIcon} label="History" />
-            <SidebarLink icon={WalletIcon} label="My Wallet" />
-            <SidebarLink icon={CloudIcon} label="My Drive" />
-            <SidebarLink icon={Cog6ToothIcon} label="Settings" />
-          </nav>
-        </aside>
-
-        {/* Main Content */}
-        <main
-          className="flex-1 bg-white rounded-2xl shadow-md p-8 pt-8 overflow-y-auto"
-          style={{ height: "calc(100vh - 5rem)" }}
-        >
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-2xl font-bold mb-3">My Orders</h1>
-            <div className="border-b border-[#e9eaf0] mb-6"></div>
-
-            <div className="flex gap-2 mb-6">
-              <OrderTab label="All" active={filterStatus === "All"} onClick={() => setFilterStatus("All")} />
-              <OrderTab label="Shipped" active={filterStatus === "Shipped"} onClick={() => setFilterStatus("Shipped")} />
-              <OrderTab label="Delivered" active={filterStatus === "Delivered"} onClick={() => setFilterStatus("Delivered")} />
-            </div>
-
-            <div className="flex flex-col gap-4">
-              {filteredOrders.map((order, idx) => (
-                <OrderCard key={idx} {...order} />
-              ))}
-            </div>
+                    </div>
+                  </div>
+                )}
+              </article>
+            ))}
           </div>
-        </main>
-      </div>
-    </div>
-  );
-}
-
-function SidebarLink({
-  icon: Icon,
-  label,
-  active = false,
-}: {
-  icon: React.ElementType;
-  label: string;
-  active?: boolean;
-}) {
-  return (
-    <div
-      className={`flex items-center gap-3 px-6 py-3 rounded-lg transition text-base cursor-pointer ${
-        active
-          ? "bg-[#e9eaf0] text-[#23235b] font-semibold"
-          : "text-gray-600 hover:bg-[#f4f5f7]"
-      }`}
-    >
-      <Icon className="w-5 h-5" />
-      <span>{label}</span>
-    </div>
-  );
-}
-
-function OrderTab({ label, active = false, onClick }: { label: string; active?: boolean; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`px-5 py-1.5 rounded-lg text-sm font-medium border transition cursor-pointer ${
-        active
-          ? "bg-white border-[#dadce0] text-[#23235b]"
-          : "bg-transparent border-transparent text-gray-600 hover:bg-white"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
-function OrderCard({
-  orderDate,
-  orderNo,
-  productName,
-  shop,
-  address,
-  estDelivery,
-  priority,
-  status,
-  price,
-  copies,
-  progress,
-  image,
-}: Order) {
-  return (
-    <div className="bg-[#f6f7fb] rounded-xl flex px-5 py-4 gap-4 items-center shadow-sm border border-[#e9eaf0]">
-      <img
-        src={image}
-        alt={productName}
-        className="w-20 h-24 rounded-lg border object-cover"
-      />
-      <div className="flex-1">
-        <div className="text-xs text-gray-500 mb-1">
-          Order Date & Time: {orderDate} &nbsp; | &nbsp; Order No:{" "}
-          <span className="font-semibold text-gray-700">{orderNo}</span>
-        </div>
-        <div className="font-semibold text-lg text-gray-800 mb-1">{productName}</div>
-        <div className="flex items-center gap-1 text-sm text-gray-500 mb-1">
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M4 4h16v16H4z" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <span className="font-medium">{shop}</span>
-          <span className="mx-1">•</span>
-          <span>{address}</span>
-        </div>
-
-        <div className="flex gap-2 mb-2">
-          {status === "Shipped" && estDelivery && (
-            <span className="bg-[#ededf1] text-gray-700 px-2 py-0.5 rounded text-xs">
-              Est. Delivery Time: {estDelivery}
-            </span>
-          )}
-          {status === "Shipped" && (
-            <span className="bg-[#ffe69c] text-[#856404] px-2 py-0.5 rounded text-xs font-medium">
-              Priority: {priority}
-            </span>
-          )}
-          {status === "Delivered" && (
-            <>
-              <span className="bg-[#d1f7e5] text-[#1aab6e] px-2 py-0.5 rounded text-xs font-medium">
-                Delivered
-              </span>
-              <span className="bg-[#ededf1] text-[#23235b] px-2 py-0.5 rounded text-xs font-medium">
-                Priority: {priority}
-              </span>
-            </>
-          )}
-        </div>
-
-        {status === "Shipped" && (
-          <div className="mb-1">
-            <div className="text-xs text-gray-500 mb-0.5">Delivery Progress:</div>
-            <ProgressBar progress={progress} />
           </div>
-        )}
-      </div>
-
-      <div className="flex flex-col items-end gap-2 min-w-[150px]">
-        <div className="text-right">
-          <div className="text-xl font-bold text-gray-800 mb-1">
-            ₹{price}
-          </div>
-          <div className="text-xs text-gray-500">Copies: {copies}</div>
-          <div className="flex items-center gap-1 text-xs text-gray-500">
-            <svg className="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M3 7V6a2 2 0 012-2h2m0 0h6m-6 0v2m6-2v2m6 2v8a2 2 0 01-2 2H7a2 2 0 01-2-2V7m14 0V6a2 2 0 00-2-2h-2"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Store Pickup
-          </div>
-        </div>
-
-        <div className="flex gap-2">
-          <button className="border border-[#dadce0] text-[#23235b] px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1 bg-white hover:bg-[#f4f5f7] cursor-pointer">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <rect x="4" y="4" width="16" height="16" rx="2" strokeWidth={2} />
-              <path d="M8 2v4M16 2v4M4 10h16" strokeWidth={2} />
-            </svg>
-            Invoice
-          </button>
-          <button className="bg-[#23235b] text-white px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1 hover:bg-[#19194a] cursor-pointer">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Track order
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ProgressBar({ progress }: { progress: number }) {
-  return (
-    <div className="w-full h-2 bg-[#e9eaf0] rounded-full overflow-hidden">
-      <div
-        className="h-full bg-[#1aab6e] transition-all"
-        style={{ width: `${progress}%` }}
-      />
+        </section>
+      </main>
     </div>
   );
 }
