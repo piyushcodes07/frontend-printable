@@ -118,13 +118,13 @@ export default function Home() {
                     <div className="flex gap-2">
                       <button
                         className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-5 py-2 text-sm font-semibold"
-                        onClick={() => toggleInvoice(order.id)}
                       >
                         <i className="far fa-bookmark" /> Invoice
                       </button>
 
                       <button
                         className="flex items-center gap-2 bg-[#0a0c3b] text-white rounded-lg px-5 py-2 text-sm font-semibold"
+                        onClick={() => toggleInvoice(order.id)}
                       >
                         <i className="fas fa-user-lock" /> Track order
                       </button>
@@ -220,8 +220,9 @@ export default function Home() {
 
                                 </div>
                                 <div className="ml-12">
-                                  <p className="font-semibold">Printing</p>
-                                  <p className="text-sm text-blue-500">Printing at high quality</p>
+                                  <span className="font-semibold">Printing</span>
+                                  <span> | </span>
+                                  <span className="text-sm text-blue-500 bg-blue-200 rounded-full px-3 py-1">Printing at high quality</span>
                                   <p className="text-sm text-gray-600">{order.orderDate}</p>
                                 </div>
                               </div>
@@ -230,8 +231,9 @@ export default function Home() {
 
                                 </div>
                                 <div className="ml-12">
-                                  <p className="font-semibold">Ready for Pickup</p>
-                                  <p className="text-sm text-orange-500">Available at PrintMaster Shop</p>
+                                  <span className="font-semibold">Ready for Pickup</span>
+                                  <span> | </span>
+                                  <span className="text-sm text-orange-500  bg-orange-200 rounded-full px-3 py-1">Available at PrintMaster Shop</span>
                                   <p className="text-sm text-gray-600">{order.orderDate}</p>
                                 </div>
                               </div>
@@ -249,8 +251,9 @@ export default function Home() {
 
                                 </div>
                                 <div className="ml-12">
-                                  <p className="font-semibold text-gray-500">Delivered</p>
-                                  <p className="text-sm text-green-500">Delivered successfully</p>
+                                  <span className="font-semibold text-gray-500">Delivered</span>
+                                  <span> | </span>
+                                  <span className="text-sm text-green-500  bg-green-200 rounded-full px-3 py-1">Delivered successfully</span>
                                   <p className="text-sm text-gray-600">{order.orderDate}</p>
                                 </div>
                               </div>
