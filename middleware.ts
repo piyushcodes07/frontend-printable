@@ -7,6 +7,7 @@ import {
 const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
   "/esign/document(.*)",
+  "/print-and-deliver(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

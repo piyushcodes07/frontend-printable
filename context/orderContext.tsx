@@ -9,6 +9,11 @@ export interface DocumentItem {
   paperType: "A4" | "Letter" | string;
   printType: "front" | "front_and_back";
   pageDirection: "vertical" | "horizontal";
+
+  id: string;
+  size: number;
+  uploading?: boolean;
+  error?: string;
 }
 
 export interface Order {

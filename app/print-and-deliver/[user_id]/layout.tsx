@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import { OrderProvider } from "@/context/orderContext";
+import { Protect } from "@clerk/nextjs";
 
 export default function PrintAndDeliverLayout({
   children,
@@ -8,7 +9,9 @@ export default function PrintAndDeliverLayout({
 }) {
   return (
     <section>
-      <OrderProvider>{children}</OrderProvider>
+      <Protect>
+        <OrderProvider>{children}</OrderProvider>
+      </Protect>
     </section>
   );
 }

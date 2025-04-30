@@ -15,22 +15,13 @@ import { Button } from "@/components/ui/button";
 import { useDropzone } from "react-dropzone";
 import { NavBar } from "@/components/nav-bar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useOrder } from "@/context/orderContext";
+import { useOrder, DocumentItem } from "@/context/orderContext";
 
-interface UploadedFile {
-  id: string;
-  name: string;
-  size: number;
-  url?: string;
-  uploading?: boolean;
-  error?: string;
-}
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
 export default function PrintablePage() {
   const { order, dispatch } = useOrder();
-  const [files, setFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<{
@@ -39,10 +30,9 @@ export default function PrintablePage() {
   } | null>(null);
 
   /**
-   * Upload a single file via your API
+   * Upload a single file and sync with context
    */
-  const uploadFile = async (file: File): Promise<UploadedFile> => {
-    const fileId = Math.random().toString(36).substring(2);
+  const uploadFile = async (file: File): Promise<DocumentItem | null> => {
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -59,37 +49,49 @@ export default function PrintablePage() {
       }
 
       const data = await response.json();
-
-      return {
-        id: fileId,
-        name: file.name,
+      const newDoc: DocumentItem = {
+        id: data.fileId,
+        fileName: file.name,
+        fileUrl: data.fileUrl,
+        copies: 1,
+        colorType: "black_and_white",
+        paperType: "A4",
+        printType: "front",
+        pageDirection: "vertical",
         size: file.size,
-        url: data.fileUrl,
-        uploading: false,
       };
-    } catch (err) {
+      dispatch({ type: "ADD_DOCUMENT", payload: newDoc });
+      return newDoc;
+    } catch (err: any) {
       console.error("Upload error:", err);
-      return {
-        id: fileId,
-        name: file.name,
+      const errorDoc: DocumentItem = {
+        id: `error-${Date.now()}`,
+        fileName: file.name,
+        fileUrl: "",
+        copies: 1,
+        colorType: "black_and_white",
+        paperType: "A4",
+        printType: "front",
+        pageDirection: "vertical",
         size: file.size,
-        uploading: false,
-        error: err instanceof Error ? err.message : String(err),
+        error: err.message || String(err),
       };
+      dispatch({ type: "ADD_DOCUMENT", payload: errorDoc });
+      return null;
     }
   };
 
   /**
-   * Delete a single file via your API
+   * Delete a single file via API and sync context
    */
-  const deleteFile = async (fileId: string, fileName: string) => {
+  const deleteFile = async (
+    fileId: string,
+    fileName: string,
+    index: number,
+  ) => {
     try {
-      setFiles((prev) =>
-        prev.map((f) => (f.id === fileId ? { ...f, uploading: true } : f)),
-      );
-
       const response = await fetch(
-        `${API_BASE_URL}/api/file/${encodeURIComponent(fileName)}`,
+        `${API_BASE_URL}/api/file/${encodeURIComponent(fileId)}`,
         { method: "DELETE" },
       );
 
@@ -100,23 +102,11 @@ export default function PrintablePage() {
       }
 
       await response.json();
-
-      setFiles((prev) => prev.filter((f) => f.id !== fileId));
+      dispatch({ type: "REMOVE_DOCUMENT", index });
       setStatusMessage({ text: `${fileName} was successfully deleted.` });
       setTimeout(() => setStatusMessage(null), 3000);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Delete error:", err);
-      setFiles((prev) =>
-        prev.map((f) =>
-          f.id === fileId
-            ? {
-                ...f,
-                uploading: false,
-                error: err instanceof Error ? err.message : String(err),
-              }
-            : f,
-        ),
-      );
       setStatusMessage({
         text: `Failed to delete ${fileName}.`,
         isError: true,
@@ -125,45 +115,31 @@ export default function PrintablePage() {
     }
   };
 
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    if (!acceptedFiles.length) return;
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      if (!acceptedFiles.length) return;
 
-    setIsUploading(true);
-    setUploadError(null);
-    setStatusMessage(null);
+      setIsUploading(true);
+      setUploadError(null);
+      setStatusMessage(null);
 
-    // Placeholder entries
-    const placeholders: UploadedFile[] = acceptedFiles.map((file) => ({
-      id: Math.random().toString(36).substring(2),
-      name: file.name,
-      size: file.size,
-      uploading: true,
-    }));
-    setFiles((prev) => [...prev, ...placeholders]);
+      const results = await Promise.all(acceptedFiles.map(uploadFile));
+      const successCount = results.filter(Boolean).length;
+      const failCount = acceptedFiles.length - successCount;
 
-    // Upload sequentially or parallel? Here we parallelize
-    const results = await Promise.all(acceptedFiles.map(uploadFile));
+      if (failCount) {
+        setUploadError(`Failed to upload ${failCount} file(s).`);
+      } else {
+        setStatusMessage({
+          text: `Successfully uploaded ${successCount} file(s).`,
+        });
+        setTimeout(() => setStatusMessage(null), 3000);
+      }
 
-    // Merge results with state
-    setFiles((prev) => {
-      const withoutPlaceholders = prev.filter(
-        (p) => !placeholders.some((ph) => ph.id === p.id),
-      );
-      return [...withoutPlaceholders, ...results];
-    });
-
-    const errs = results.filter((r) => r.error);
-    if (errs.length) {
-      setUploadError(`Failed to upload ${errs.length} file(s).`);
-    } else {
-      setStatusMessage({
-        text: `Successfully uploaded ${results.length} file(s).`,
-      });
-      setTimeout(() => setStatusMessage(null), 3000);
-    }
-
-    setIsUploading(false);
-  }, []);
+      setIsUploading(false);
+    },
+    [dispatch],
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -219,7 +195,7 @@ export default function PrintablePage() {
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="24" height="24" rx="4" fill={fill} />
         <path
-          d="M7 18V6C7 5.44772 7.44772 5 8 5H16C16.5523 5 17 5.44772 17 6V18C17 18.5523 16.5523 19 16 19H8C7.44772 19 7 18.5523 7 18Z"
+          d="M7 18V6C7 5.44772 7.44772 5 8 5H16C16.5523 5 17 5.44772 17 6V18C17 18.5523 16.5523 19 16 19H8C7.44772 19 7 18 7 18Z"
           fill={path}
         />
         <path
@@ -231,7 +207,6 @@ export default function PrintablePage() {
       </svg>
     );
   };
-
   return (
     <div className="min-h-screen bg-[#dffbe7] flex flex-col">
       <div className="flex-1 flex flex-col items-center py-12 px-4">
@@ -360,7 +335,7 @@ export default function PrintablePage() {
 
           {/* Uploaded Files */}
           <div className="space-y-3">
-            {files.map((fileItem) => (
+            {order.documents.map((fileItem, index) => (
               <div
                 key={fileItem.id}
                 className={`flex items-center justify-between rounded-lg p-3 border ${
@@ -371,11 +346,11 @@ export default function PrintablePage() {
               >
                 <div className="flex items-center">
                   <div className="w-8 h-8 mr-3">
-                    {getFileIcon(fileItem.name)}
+                    {getFileIcon(fileItem.fileName)}
                   </div>
                   <div>
                     <p className="text-sm font-medium text-[#06044b]">
-                      {fileItem.name}
+                      {fileItem.fileName}
                     </p>
                     <p className="text-xs text-[#999999]">
                       {formatFileSize(fileItem.size)}
@@ -394,7 +369,7 @@ export default function PrintablePage() {
                     className="text-[#999999] hover:text-[#06044b]"
                     onClick={(e) => {
                       e.stopPropagation();
-                      deleteFile(fileItem.id, fileItem.name);
+                      deleteFile(fileItem.id, fileItem.fileName, index);
                     }}
                     disabled={fileItem.uploading}
                   >
@@ -413,8 +388,8 @@ export default function PrintablePage() {
               className="bg-[#06044b] hover:bg-[#06044b]/90 text-white px-6 uppercase text-xs font-semibold tracking-wider"
               disabled={
                 isUploading ||
-                files.length === 0 ||
-                files.some((f) => f.uploading || f.error)
+                order.documents.length === 0 ||
+                order.documents.some((f) => f.uploading || f.error)
               }
             >
               {isUploading ? (
