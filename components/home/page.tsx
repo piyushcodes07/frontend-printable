@@ -125,8 +125,11 @@ export default function HomePage() {
   {tools.map((tool, idx) => (
     <div key={idx} className="flex flex-col items-center gap-1">
       <div
-        className={`w-14 h-14 rounded-full ${tool.color} flex items-center justify-center shadow-md hover:scale-105 transition-transform duration-200 cursor-pointer`}
-      >
+  className={`w-14 h-14 rounded-full ${tool.color} flex items-center justify-center shadow-md cursor-pointer
+  transition-all duration-300 ease-in-out
+  hover:scale-110 hover:animate-bounce`}
+>
+
         {tool.img && (
           <img
             src={tool.img}
