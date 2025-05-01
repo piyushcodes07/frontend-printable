@@ -34,8 +34,8 @@ const Convertion = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-gray-100">
       <h1 className="text-[42px] font-bold mb-4">PDF to Word Converter</h1>
-      <div className="bg-white rounded-xl px-[15px] py-[30px]">
-        <div className="border-[3px] border-dashed border-[#06044B] rounded-lg w-[872px]  h-[303px] flex flex-col items-center justify-center text-center  bg-[#F3F3F3] cursor-pointer">
+      <div className="bg-white rounded-[40px] border-[1.5px] border-[#D0D0D0] font-dm px-[15px] py-[30px]">
+        <div className="border-[2px] border-dashed border-[#06044B] rounded-[13px] w-[872px]  h-[303px] flex flex-col items-center justify-center text-center  bg-[#F3F3F3] cursor-pointer">
           <div
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
