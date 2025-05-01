@@ -9,7 +9,7 @@ import {
 } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { NavBar } from "@/components/nav-bar"; // Make sure the path is correct
+import { NavBar } from "@/components/nav-bar"; // Make sure the path is correct\
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

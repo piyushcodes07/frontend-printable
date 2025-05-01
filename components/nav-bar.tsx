@@ -15,11 +15,15 @@ import {
   useUser,
 } from "@clerk/nextjs";
 import MainLogo from "@/public/main-log";
+import ConvertDropDown from "@/components/Convert/ConvertDropDown";
+import ToolsDropDown from "./Tools/ToolsDropDown";
 
 export function NavBar() {
   const User = useUser();
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<
+    "tools" | "convert" | null
+  >(null);
 
   return (
     <header className="bg-[#06044b] text-white w-full overflow-x-hidden">
@@ -33,18 +37,16 @@ export function NavBar() {
               </Link>
             </div>
             <nav className="hidden md:ml-8 md:flex md:space-x-8">
-              <Link
-                href="#"
-                className="px-3 py-2 text-sm font-medium hover:text-[#61e987]"
-              >
-                Tools
-              </Link>
-              <Link
-                href="#"
-                className="px-3 py-2 text-sm font-medium hover:text-[#61e987]"
-              >
-                Convert
-              </Link>
+              {/* Tools Drop Down */}
+              <ToolsDropDown
+                isOpen={activeDropdown === "tools"}
+                onToggle={(open) => setActiveDropdown(open ? "tools" : null)}
+              />
+              {/* Convert Drop Down */}
+              <ConvertDropDown
+                isOpen={activeDropdown === "convert"}
+                onToggle={(open) => setActiveDropdown(open ? "convert" : null)}
+              />
               <Link
                 href="#"
                 className="px-3 py-2 text-sm font-medium hover:text-[#61e987]"
