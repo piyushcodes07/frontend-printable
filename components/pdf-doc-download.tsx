@@ -18,7 +18,6 @@ const Pdf_Doc_Download = () => {
   const toggleDropdown2 = () => setIsOpen2(!isOpen2);
   const [isOpen1, setIsOpen1] = useState(false);
   const toggleDropdown1 = () => setIsOpen1(!isOpen1);
-
  const [extension,setExtension]=useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   useEffect(() => {
