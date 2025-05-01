@@ -37,10 +37,12 @@ export function NavBar() {
               </Link>
             </div>
             <nav className="hidden md:ml-8 md:flex md:space-x-8">
+              {/* Tools Drop Down */}
               <ToolsDropDown
                 isOpen={activeDropdown === "tools"}
                 onToggle={(open) => setActiveDropdown(open ? "tools" : null)}
               />
+              {/* Convert Drop Down */}
               <ConvertDropDown
                 isOpen={activeDropdown === "convert"}
                 onToggle={(open) => setActiveDropdown(open ? "convert" : null)}
