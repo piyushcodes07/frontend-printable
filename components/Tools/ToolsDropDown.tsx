@@ -38,7 +38,7 @@ export default function ToolsDropDown({
   };
 
   const [rightWidth, setRightWidth] = useState<number>(
-    rightWidthMapping[activeSection]
+    rightWidthMapping[activeSection],
   );
 
   const containerWidth = LEFT_FIXED_WIDTH + DIVIDER_WIDTH + rightWidth;
@@ -67,10 +67,7 @@ export default function ToolsDropDown({
       case "AIPDF":
         return (
           <div className="flex flex-col space-y-2">
-            <RightSectionElement
-              text="Chat With PDF"
-              src="/AI-PDF/chat.png"
-            />
+            <RightSectionElement text="Chat With PDF" src="/AI-PDF/chat.png" />
             <RightSectionElement
               text="AI PDF Summarizer"
               src="/AI-PDF/summarize.png"
@@ -87,14 +84,29 @@ export default function ToolsDropDown({
         );
       case "View&Edit":
         return (
-          <div className="grid grid-cols gap-2"> 
+          <div className="grid grid-cols gap-2">
             <RightSectionElement text="Edit PDF" src="/VIEWANDEDIT/text.png" />
-            <RightSectionElement text="Annote PDF" src="/VIEWANDEDIT/annote.png" />
-            <RightSectionElement text="PDF Reader" src="/VIEWANDEDIT/reader.png" />
-            <RightSectionElement text="Number Pages" src="/VIEWANDEDIT/number.png" />
+            <RightSectionElement
+              text="Annote PDF"
+              src="/VIEWANDEDIT/annote.png"
+            />
+            <RightSectionElement
+              text="PDF Reader"
+              src="/VIEWANDEDIT/reader.png"
+            />
+            <RightSectionElement
+              text="Number Pages"
+              src="/VIEWANDEDIT/number.png"
+            />
             <RightSectionElement text="Crop PDF" src="/VIEWANDEDIT/crop.png" />
-            <RightSectionElement text="Redact PDF" src="/VIEWANDEDIT/redact.png" />
-            <RightSectionElement text="Watermark PDF" src="/VIEWANDEDIT/watermark.png" />
+            <RightSectionElement
+              text="Redact PDF"
+              src="/VIEWANDEDIT/redact.png"
+            />
+            <RightSectionElement
+              text="Watermark PDF"
+              src="/VIEWANDEDIT/watermark.png"
+            />
           </div>
         );
       case "Organize":
@@ -102,10 +114,7 @@ export default function ToolsDropDown({
           <div className="flex flex-col space-y-2">
             <RightSectionElement text="Merge PDF" src="/ORGANIZE/merge.png" />
             <RightSectionElement text="Split PDF" src="/ORGANIZE/split.png" />
-            <RightSectionElement
-              text="Rotate PDF"
-              src="/ORGANIZE/rotate.png"
-            />
+            <RightSectionElement text="Rotate PDF" src="/ORGANIZE/rotate.png" />
             <RightSectionElement
               text="Delete Pages"
               src="/ORGANIZE/delete.png"
@@ -172,10 +181,7 @@ export default function ToolsDropDown({
                     text="Protect PDF"
                     src="/tools/lock.png"
                   />
-                  <RightSectionElement
-                    text="Flat PDF"
-                    src="/tools/flat.png"
-                  />
+                  <RightSectionElement text="Flat PDF" src="/tools/flat.png" />
                 </div>
               </div>
             </div>
@@ -196,7 +202,7 @@ export default function ToolsDropDown({
         onClick={() => onToggle(!isOpen)}
         className="px-3 py-2 text-sm font-medium flex items-center hover:cursor-pointer"
       >
-        Tool
+        Tool ▼
       </button>
 
       <AnimatePresence>

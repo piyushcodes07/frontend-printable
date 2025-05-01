@@ -16,7 +16,7 @@ export default function ConvertDropdown({
   onToggle,
 }: ConvertDropDownProps) {
   const [activeSection, setActiveSection] = useState<"from-pdf" | "to-pdf">(
-    "from-pdf"
+    "from-pdf",
   );
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -43,9 +43,9 @@ export default function ConvertDropdown({
     <div className="relative hover:text-[#61e987]">
       <button
         onClick={() => onToggle(!isOpen)}
-        className="px-3 py-2 text-sm font-medium flex items-center hover:cursor-pointer"
+        className="px-3 py-2 text-sm font-medium flex items-center hover:cursor-pointer hover:underline"
       >
-        Convert
+        Convert ▼
       </button>
       <AnimatePresence>
         {isOpen && (
