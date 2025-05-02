@@ -9,9 +9,11 @@ import ChooseDropdown from "@/components/DropdownChooseFiles";
 const Convertion = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [fileName,setFileName]=useState<string>('');
   const toggleDropdown = () => setIsOpen(!isOpen);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
+  
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     if (e.dataTransfer.files.length) {
@@ -19,10 +21,14 @@ const Convertion = () => {
     }
   };
   useEffect(() => {
+    const file = sessionStorage.getItem('fileName');
+  setFileName(`${file}`);
+  }, []);
+  useEffect(() => {
     if (selectedFile) {
       sessionStorage.setItem("selectedFileName", selectedFile.name);
-      sessionStorage.setItem("extenName", "word");
-      router.push("/doc-conversion/loading"); 
+      sessionStorage.setItem("extenName", fileName);
+      router.push("/to-pdf-conversion/loading"); 
     }
   }, [selectedFile, router]);
 
@@ -33,7 +39,7 @@ const Convertion = () => {
   };
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-gray-100">
-      <h1 className="text-[42px] font-bold mb-4">PDF to Word Converter</h1>
+      <h1 className="text-[42px] font-bold mb-4"><span className="uppercase">{fileName}</span> to PDF  Converter</h1>
       <div className="bg-white rounded-[40px] border-[1.5px] border-[#D0D0D0] font-dm px-[15px] py-[30px]">
         <div className="border-[2px] border-dashed border-[#06044B] rounded-[13px] w-[872px]  h-[303px] flex flex-col items-center justify-center text-center  bg-[#F3F3F3] cursor-pointer">
           <div
@@ -52,7 +58,7 @@ const Convertion = () => {
               ref={inputRef}
               type="file"
               className="hidden"
-              accept=".pdf"
+              accept=".ppt"
               onChange={handleFileChange}
             />
           </div>

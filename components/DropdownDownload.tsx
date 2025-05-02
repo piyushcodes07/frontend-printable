@@ -10,19 +10,11 @@ const DownloadDropdown=()=>{
             name:'Word(.docx)'
         },
         {
-<<<<<<< HEAD
-            image:'/Excel.png',
-            name:'Excel(.xlsx)'
-        },
-        {
-            image:'/Ppt.png',
-=======
             image:'/excel.png',
             name:'Excel(.xlsx)'
         },
         {
             image:'/ppt.png',
->>>>>>> 4fbf06dc67d7af4ea80f17031d77f2cc6656c25f
             name:'Power Point(.ppt)'
         },
         {

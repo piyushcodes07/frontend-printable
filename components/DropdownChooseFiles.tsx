@@ -10,11 +10,7 @@ const ChooseDropdown=()=>{
             name:'From Device'
         },
         {
-<<<<<<< HEAD
-            image:'/Excel.png',
-=======
             image:'/excel.png',
->>>>>>> 4fbf06dc67d7af4ea80f17031d77f2cc6656c25f
             name:'From Printable'
         },
         {
