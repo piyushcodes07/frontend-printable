@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NavBar } from "@/components/nav-bar";
 import { cn } from "@/lib/utils";
-
+import { useOrder } from "@/context/orderContext";
 type PrintFile = {
   id: string;
   name: string;
@@ -23,22 +23,27 @@ type PrintFile = {
 };
 
 export default function PrintOptionsPage() {
-  const [files, setFiles] = useState<PrintFile[]>([
-    { id: "1", name: "theprojetks-design-tokens.pdf", size: "0.10 MB" },
-    { id: "2", name: "Company Policy.pdf", size: "5.1 MB" },
-    { id: "3", name: "Marketing Presentation.pptx", size: "3.2 MB" },
-  ]);
+  const { order, dispatch } = useOrder();
+
+  // const [files, setFiles] = useState<PrintFile[]>([
+  //   { id: "1", name: "theprojetks-design-tokens.pdf", size: "0.10 MB" },
+  //   { id: "2", name: "Company Policy.pdf", size: "5.1 MB" },
+  //   { id: "3", name: "Marketing Presentation.pptx", size: "3.2 MB" },
+  // ]);
 
   // Track which document's options are expanded (first one by default)
   const [expandedDocId, setExpandedDocId] = useState<string>(
-    files[0]?.id || "",
+    order.documents[0]?.id || "",
   );
 
   const removeFile = (id: string) => {
-    setFiles(files.filter((file) => file.id !== id));
     // If we're removing the expanded document, expand the first remaining one
-    if (id === expandedDocId && files.length > 1) {
-      const remainingFiles = files.filter((f) => f.id !== id);
+    const indexToRemove = order.documents.findIndex((doc) => doc.id === id);
+    if (indexToRemove !== -1) {
+      dispatch({ type: "REMOVE_DOCUMENT", index: indexToRemove });
+    }
+    if (id === expandedDocId && order.documents.length > 1) {
+      const remainingFiles = order.documents.filter((f) => f.id !== id);
       if (remainingFiles.length > 0) {
         setExpandedDocId(remainingFiles[0].id);
       } else {
@@ -109,9 +114,7 @@ export default function PrintOptionsPage() {
             <div className="w-16 h-16 rounded-full bg-[#61e987] flex items-center justify-center">
               <Check className="h-6 w-6 text-white" />
             </div>
-            <span className="text-xs mt-2 whitespace-nowrap">
-              Upload Document
-            </span>
+            <span className="text-xs mt-2 whitespace-nowrap">Upload Files</span>
           </div>
           <div className="h-[2px] w-16 bg-[#61e987] flex-shrink-0"></div>
           <div className="flex flex-col items-center flex-shrink-0">
@@ -156,7 +159,7 @@ export default function PrintOptionsPage() {
 
           {/* Document List with Expandable Options */}
           <div className="space-y-4">
-            {files.map((file) => (
+            {order.documents.map((file) => (
               <div
                 key={file.id}
                 className="border border-[#e0e0e0] rounded-lg overflow-hidden"
@@ -172,10 +175,12 @@ export default function PrintOptionsPage() {
                   onClick={() => toggleDocumentOptions(file.id)}
                 >
                   <div className="flex items-center">
-                    <div className="w-8 h-8 mr-3">{getFileIcon(file.name)}</div>
+                    <div className="w-8 h-8 mr-3">
+                      {getFileIcon(file.fileName)}
+                    </div>
                     <div>
                       <p className="text-sm font-medium text-[#06044b]">
-                        {file.name}
+                        {file.fileName}
                       </p>
                       <p className="text-xs text-[#999999]">{file.size}</p>
                     </div>
