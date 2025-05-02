@@ -1,5 +1,5 @@
 import React from "react";
-import PageCardComponent from "./PageCardComponent";
+import PageCardComponent from "./ShopCardComponent";
 export default function PageCard() {
   const shops = [
     {
