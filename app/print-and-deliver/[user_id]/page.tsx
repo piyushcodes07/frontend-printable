@@ -16,11 +16,14 @@ import { useDropzone } from "react-dropzone";
 import { NavBar } from "@/components/nav-bar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useOrder, DocumentItem } from "@/context/orderContext";
-
+import { BreadcrumbLink } from "@/components/ui/breadcrumb";
+import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
 export default function PrintablePage() {
+  const User = useUser();
   const { order, dispatch } = useOrder();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -28,6 +31,7 @@ export default function PrintablePage() {
     text: string;
     isError?: boolean;
   } | null>(null);
+  const router = useRouter();
 
   /**
    * Upload a single file and sync with context
@@ -386,6 +390,9 @@ export default function PrintablePage() {
           <div className="flex justify-end mt-6">
             <Button
               className="bg-[#06044b] hover:bg-[#06044b]/90 text-white px-6 uppercase text-xs font-semibold tracking-wider"
+              onClick={() =>
+                router.push(`/print-and-deliver/${User.user?.id}/print-options`)
+              }
               disabled={
                 isUploading ||
                 order.documents.length === 0 ||
