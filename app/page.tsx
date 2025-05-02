@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { FaChevronDown, FaFileAlt } from "react-icons/fa";
-import PageCard from "./Pagecard";
-import UplodeBox from "./UplodeBox";
+import PageCard from "@/components/HomePage/Shopcard";
+import UplodeBox from "../components/HomePage/UplodeBox";
 
 const tools = [
   { label: "AI PDF", img: "/ai-pdf.png", color: "bg-[#61E987]" },
