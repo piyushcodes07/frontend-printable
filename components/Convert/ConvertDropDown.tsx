@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
 import LeftSectionElement from "./LeftSectionElement";
 import RightSectionElement from "./RightSectionElement";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 interface ConvertDropDownProps {
   isOpen: boolean;
@@ -16,9 +16,10 @@ export default function ConvertDropdown({
   onToggle,
 }: ConvertDropDownProps) {
   const [activeSection, setActiveSection] = useState<"from-pdf" | "to-pdf">(
-    "from-pdf",
+    "from-pdf"
   );
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -38,6 +39,11 @@ export default function ConvertDropdown({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen, onToggle]);
+
+  const handleNavigate = (path: string) => {
+    router.push(path);
+    onToggle(false); // close dropdown
+  };
 
   return (
     <div className="relative hover:text-[#61e987]">
@@ -80,7 +86,11 @@ export default function ConvertDropdown({
                 <motion.div>
                   <h5 className="text-xs mb-4">Convert from PDF</h5>
                   <div className="flex flex-col space-y-2">
-                    <RightSectionElement text="PDF to Word" src="/docx.png" />
+                    <RightSectionElement
+                      text="PDF to Word"
+                      src="/docx.png"
+                      onClick={() => handleNavigate("/pdftoword")}
+                    />
                     <RightSectionElement text="PDF to Excel" src="/excel.png" />
                     <RightSectionElement text="PDF to PPT" src="/ppt.png" />
                     <RightSectionElement text="PDF to JPG" src="/img.png" />
