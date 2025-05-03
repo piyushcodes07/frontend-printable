@@ -54,13 +54,38 @@ const Convertion = () => {
                 Drag & drop your files here
               </p>
             )}
-            <input
+            {fileName=='word' && <input
               ref={inputRef}
               type="file"
               className="hidden"
-              accept=".ppt"
+              accept=".doc,docx"
               onChange={handleFileChange}
             />
+}
+{fileName=='ppt' && <input
+              ref={inputRef}
+              type="file"
+              className="hidden"
+              accept=".ppt,.pptx"
+              onChange={handleFileChange}
+            />
+}
+{fileName=='excel' && <input
+              ref={inputRef}
+              type="file"
+              className="hidden"
+              accept=".xls,xlsx"
+              onChange={handleFileChange}
+            />
+}
+{fileName=='jpg' && <input
+              ref={inputRef}
+              type="file"
+              className="hidden"
+              accept=".jpg,.jpeg,.png"
+              onChange={handleFileChange}
+            />
+}
           </div>
 
           <div className="">
