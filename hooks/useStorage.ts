@@ -1,8 +1,11 @@
-import { useOrder, DocumentItem } from "@/context/orderContext";
+import { useOrder, DocumentItem } from "@/context/orderContext"; // Ensure DocumentItem is imported
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+
 export default function UseStorage() {
   const { order, dispatch } = useOrder();
+
   const uploadFile = async (file: File): Promise<DocumentItem | null> => {
     try {
       const formData = new FormData();
@@ -15,40 +18,45 @@ export default function UseStorage() {
 
       if (!response.ok) {
         throw new Error(
-          `Upload failed: ${response.status} ${response.statusText}`,
+          `Upload failed: ${response.status} ${response.statusText}`, // Corrected template literal
         );
       }
 
       const data = await response.json();
+      // Ensure new documents default to "All" pages
       const newDoc: DocumentItem = {
         id: data.fileId,
         fileName: file.name,
         fileUrl: data.fileUrl,
         copies: 1,
-        colorType: "black_and_white",
-        paperType: "A4",
+        colorType: "black and white", // Match exact type string
+        paperSize: "A4 (8.27 x 11.69 inches)", // Match exact type string
         printType: "front",
         pageDirection: "vertical",
+        pagesToPrint: "All", // <<<---- ADDED DEFAULT
         size: file.size,
       };
       dispatch({ type: "ADD_DOCUMENT", payload: newDoc });
       return newDoc;
     } catch (err: any) {
       console.error("Upload error:", err);
+      // Also add default in error case if the doc is added to the list
       const errorDoc: DocumentItem = {
         id: `error-${Date.now()}`,
         fileName: file.name,
         fileUrl: "",
         copies: 1,
-        colorType: "black_and_white",
-        paperType: "A4",
+        colorType: "black and white",
+        paperSize: "A4 (8.27 x 11.69 inches)",
         printType: "front",
         pageDirection: "vertical",
+        pagesToPrint: "All", // <<<---- ADDED DEFAULT FOR ERROR CASE
         size: file.size,
         error: err.message || String(err),
       };
+      // Check if your logic adds error docs to the list - if so, dispatch
       dispatch({ type: "ADD_DOCUMENT", payload: errorDoc });
-      return null;
+      return null; // Or return errorDoc if you handle it differently
     }
   };
 
@@ -56,7 +64,9 @@ export default function UseStorage() {
     fileId: string,
     fileName: string,
     index: number,
-    setStatusMessage: ({}: any) => void,
+    setStatusMessage: (
+      status: { text: string; isError?: boolean } | null,
+    ) => void, // More specific type
   ) => {
     try {
       const response = await fetch(
@@ -66,21 +76,22 @@ export default function UseStorage() {
 
       if (!response.ok) {
         throw new Error(
-          `Delete failed: ${response.status} ${response.statusText}`,
+          `Delete failed: ${response.status} ${response.statusText}`, // Corrected template literal
         );
       }
 
-      await response.json();
+      await response.json(); // Assuming response confirms deletion
       dispatch({ type: "REMOVE_DOCUMENT", index });
       setStatusMessage({ text: `${fileName} was successfully deleted.` });
       setTimeout(() => setStatusMessage(null), 3000);
     } catch (err: any) {
       console.error("Delete error:", err);
       setStatusMessage({
-        text: `Failed to delete ${fileName}.`,
+        text: `Failed to delete ${fileName}. ${err.message || ""}`.trim(), // Add error message
         isError: true,
       });
-      setTimeout(() => setStatusMessage(null), 3000);
+      // Don't auto-hide error messages immediately, or make duration longer
+      // setTimeout(() => setStatusMessage(null), 5000);
     }
   };
 

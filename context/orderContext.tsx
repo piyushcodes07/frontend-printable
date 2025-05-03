@@ -5,11 +5,14 @@ export interface DocumentItem {
   fileName: string;
   fileUrl: string;
   copies: number;
-  colorType: "black_and_white" | "color";
-  paperType: "A4" | "Letter" | string;
-  printType: "front" | "front_and_back";
+  colorType: "black and white" | "color";
+  paperSize:
+    | "Letter (8.5 x 11 inches)"
+    | "A4 (8.27 x 11.69 inches)"
+    | "Legal (8.5 x 14 inches)";
+  printType: "front" | "front and back";
   pageDirection: "vertical" | "horizontal";
-
+  pagesToPrint: "All" | string;
   id: string;
   size: number;
   uploading?: boolean;
