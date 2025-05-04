@@ -91,20 +91,57 @@ export default function ConvertDropdown({
                       src="/docx.png"
                       onClick={() => handleNavigate("/pdftoword")}
                     />
-                    <RightSectionElement text="PDF to Excel" src="/excel.png" />
-                    <RightSectionElement text="PDF to PPT" src="/ppt.png" />
-                    <RightSectionElement text="PDF to JPG" src="/img.png" />
+                    <RightSectionElement
+                      text="PDF to Excel"
+                      src="/excel.png"
+                      onClick={() => handleNavigate("/pdftoexcel")}
+                    />
+                    <RightSectionElement
+                      text="PDF to PPT"
+                      src="/ppt.png"
+                      onClick={() => handleNavigate("/pdftoppt")}
+                    />
+                    <RightSectionElement
+                      text="PDF to JPG"
+                      src="/img.png"
+                      onClick={() => handleNavigate("/pdftojpg")}
+                    />
+                    <RightSectionElement
+                      text="PDF compress"
+                      src="/pdfformat.png"
+                      onClick={() => handleNavigate("/pdfcompress")}
+                    />
                   </div>
                 </motion.div>
               ) : (
                 <motion.div>
                   <h5 className="text-xs mb-4">Convert to PDF</h5>
                   <div className="flex flex-col space-y-2">
-                    <RightSectionElement text="Word to PDF" src="/docx.png" />
-                    <RightSectionElement text="Excel to PDF" src="/excel.png" />
-                    <RightSectionElement text="PPT to PDF" src="/ppt.png" />
-                    <RightSectionElement text="JPG to PDF" src="/img.png" />
-                    <RightSectionElement text="PDF OCR" src="/ocr.png" />
+                    <RightSectionElement
+                      text="Word to PDF"
+                      src="/docx.png"
+                      onClick={() => handleNavigate("/wordtopdf")}
+                    />
+                    <RightSectionElement
+                      text="Excel to PDF"
+                      src="/excel.png"
+                      onClick={() => handleNavigate("/exceltopdf")}
+                    />
+                    <RightSectionElement
+                      text="PPT to PDF"
+                      src="/ppt.png"
+                      onClick={() => handleNavigate("/ppttopdf")}
+                    />
+                    <RightSectionElement
+                      text="JPG to PDF"
+                      src="/img.png"
+                      onClick={() => handleNavigate("/jpgtopdf")}
+                    />
+                    <RightSectionElement
+                      text="PDF OCR"
+                      src="/ocr.png"
+                      onClick={() => handleNavigate("/pdfocr")}
+                    />
                   </div>
                 </motion.div>
               )}

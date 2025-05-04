@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaChevronDown, FaFileAlt } from 'react-icons/fa';
 
-export default function PdfToWord() {
+export default function PdfCompress() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -25,7 +25,7 @@ export default function PdfToWord() {
     if (file) {
       const fileName = encodeURIComponent(file.name);
       const fileSize = encodeURIComponent((file.size / (1024 * 1024)).toFixed(1));
-      router.push(`/upload?name=${fileName}&size=${fileSize} MB`);
+      router.push(`/uploadcompress?page=upload&name=${fileName}&size=${fileSize}MB`);
     }
   };
 
@@ -42,12 +42,10 @@ export default function PdfToWord() {
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center py-6 px-4 font-[Poppins]">
-      {/* Title below the navbar */}
       <h1 className="text-2xl md:text-3xl font-bold text-[#06044B] mb-6 mt-4">
-        PDF to Word Converter
+        Compress PDF Files
       </h1>
 
-      {/* Upload box */}
       <div className="relative z-20 w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-6 border border-gray-200">
         <div className="bg-[#F3F3F3] border-[3px] border-dashed border-[#06044B] rounded-2xl p-10 text-center">
           <p className="text-gray-700 font-medium mb-6 text-base">Drag & Drop your file here</p>
@@ -98,18 +96,18 @@ export default function PdfToWord() {
           />
 
           <p className="mt-4 text-xs text-gray-500">
-          Supported formats: .pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.txt<br />
+            Supported formats: .pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.txt<br />
             Max file size: 50MB
           </p>
         </div>
       </div>
 
-      {/* Info paragraph with left alignment */}
-      <p className="mt-6 text-left max-w-2xl text-gray-600 text-sm md:text-base">
-      Effortlessly convert your PDFs into fully editable Excel spreadsheets online—completely free of charge.
+      {/* Updated info paragraph */}
+      <p className="mt-6 text-center max-w-2xl text-gray-600 text-sm md:text-base">
+        Effortlessly compress your PDFs online—completely free of charge.
         <br />
         <span className="block mt-1">
-        Extract data seamlessly for easy editing, with no sign-ups or downloads required.
+          Reduce file size while preserving quality, with no sign-ups or downloads required.
         </span>
       </p>
     </div>
