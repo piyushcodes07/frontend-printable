@@ -15,7 +15,8 @@ import { Input } from "@/components/ui/input"; // Use Input component
 import { cn } from "@/lib/utils";
 import { useOrder, DocumentItem } from "@/context/orderContext";
 import UseStorage from "@/hooks/useStorage";
-
+import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 // Base class for form elements for consistent styling
 const formElementBaseClass =
   "w-full pl-3 pr-3 py-2 border border-[#d0d0d0] rounded-md bg-[#f0fdf4] focus:outline-none focus:ring-1 focus:ring-[#61e987] focus:border-[#61e987] text-sm"; // Base for Input
@@ -25,6 +26,8 @@ export default function PrintOptionsPage() {
   const { order, dispatch } = useOrder();
   const { uploadFile, deleteFile } = UseStorage();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const User = useUser();
+  const router = useRouter();
 
   const [statusMessage, setStatusMessage] = useState<{
     text: string;
@@ -579,7 +582,11 @@ export default function PrintOptionsPage() {
                 ? "bg-gray-400 cursor-not-allowed" // Disabled style
                 : "bg-[#06044b] hover:bg-[#06044b]/90", // Enabled style
             )}
-            // TODO: Add onClick handler for navigation
+            onClick={() =>
+              router.push(
+                `/print-and-deliver/${User.user?.id}/location-selection`,
+              )
+            } // TODO: Add onClick handler for navigation
             disabled={
               order.documents.length === 0 ||
               order.documents.some((doc) => !!doc.error)
