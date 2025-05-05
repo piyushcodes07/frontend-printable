@@ -1,0 +1,95 @@
+import { PDFDocument, rgb } from "pdf-lib";
+import * as htmlToImage from "html-to-image";
+function hexToRgb(hex: string) {
+  const sanitized = hex.replace("#", "");
+  const bigint = Number.parseInt(sanitized, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return rgb(r / 255, g / 255, b / 255);
+}
+
+interface SignData {
+  type: "sign" | "text" | "date" | "checkbox" | "initials";
+  signUrl?: string;
+  value?: string;
+  checked?: boolean;
+  fontSize?: number;
+  color?: string;
+  signSize: { width: number; height: number };
+  position: { x: number; y: number; pageIndex: number | null };
+}
+
+export const drawSignatureOnPdf = async (
+  pdfData: ArrayBuffer,
+  signs: SignData[]
+) => {
+  const pdfDoc = await PDFDocument.load(pdfData);
+  let i = -1;
+
+  for (const sign of signs) {
+    i++;
+    const page = pdfDoc.getPage(sign.position.pageIndex || 0);
+    const { height } = page.getSize();
+
+    if (sign.type === "sign" && sign.signUrl) {
+      const isPng = sign.signUrl.startsWith("data:image/png");
+      const img = isPng
+        ? await pdfDoc.embedPng(sign.signUrl)
+        : await pdfDoc.embedJpg(sign.signUrl);
+
+      page.drawImage(img, {
+        x: sign.position.x,
+        y: height - sign.position.y - sign.signSize.height,
+        width: sign.signSize.width,
+        height: sign.signSize.height,
+      });
+    } else if (
+      sign.type === "text" ||
+      sign.type === "date" ||
+      sign.type === "initials"
+    ) {
+      const fontSize = sign.fontSize || 12;
+      const baselineOffset = fontSize * 1.2;
+
+      const yPosition = height - sign.position.y - baselineOffset;
+      page.drawText(sign.value || "", {
+        x: sign.position.x,
+        y: yPosition,
+        size: fontSize,
+        color: hexToRgb(sign.color || "#000"),
+      });
+    } else if (sign.type === "checkbox") {
+      const element = document.getElementById(`check-${i}`) as HTMLInputElement;
+
+      if (element && sign.type === "checkbox") {
+        if (!!sign.value) {
+          element.setAttribute("checked", "true");
+        } // Ensures it's boolean
+
+        try {
+          const dataUrl = await htmlToImage.toPng(element);
+          const embeddedCheckbox = await pdfDoc.embedPng(dataUrl);
+          page.drawImage(embeddedCheckbox, {
+            x: sign.position.x,
+            y: height - sign.position.y - sign.signSize.height,
+            width: sign.signSize.width,
+            height: sign.signSize.height, // probably signSize.height, not width
+          });
+        } catch (error) {
+          console.error("Failed to render checkbox image:", error);
+        }
+      }
+    }
+  }
+
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "signed.pdf";
+  a.click();
+  URL.revokeObjectURL(url);
+};
