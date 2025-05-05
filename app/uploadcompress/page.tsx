@@ -68,12 +68,14 @@ export default function UploadPage() {
       <div className="flex flex-col lg:flex-row w-full max-w-6xl">
         {/* Main Center Content */}
         <div className="flex-1 flex flex-col items-center w-full">
+          {/* Stage 1 */}
           {!showResultImages && (
             <>
               <img
                 src="/pdfformat.png"
                 alt="PDF"
-                className="w-48 h-60 object-contain mb-4"
+                style={{ width: '248.25px', height: '322px' }}
+                className="object-contain mb-4"
               />
               <p className="text-sm text-gray-600 mb-2">
                 {fileName} ({fileSize})
@@ -93,13 +95,15 @@ export default function UploadPage() {
             </div>
           )}
 
+          {/* Stage 2 */}
           {showResultImages && !showWordImage && (
             <>
               <div className="flex items-center justify-center mb-4 w-full">
                 <img
                   src="/priview.png"
                   alt="Preview"
-                  className="w-40 h-52 object-contain"
+                  style={{ width: '229px', height: '275px' }}
+                  className="object-contain"
                 />
                 <div className="w-9 h-9 rounded-full bg-[#2B3F6C] flex items-center justify-center mx-4 shadow-md">
                   <svg
@@ -118,7 +122,8 @@ export default function UploadPage() {
                 <img
                   src="/pdfformat.png"
                   alt="PDF"
-                  className="w-40 h-52 object-contain"
+                  style={{ width: '218px', height: '275px' }}
+                  className="object-contain"
                 />
               </div>
 
@@ -142,12 +147,14 @@ export default function UploadPage() {
             </>
           )}
 
+          {/* Stage 3 */}
           {showWordImage && (
             <>
               <img
                 src="/pdfformat.png"
                 alt="PDF"
-                className="w-80 h-96 object-contain mt-6"
+                style={{ width: '248.25px', height: '322px' }}
+                className="object-contain mt-6"
               />
               <p className="text-sm text-gray-600 mb-2 mt-4">
                 {docxFileName} ({fileSize})
@@ -236,9 +243,8 @@ export default function UploadPage() {
               🔗 Share
             </button>
             <button className="w-[48%] border border-[#1e1c4e] py-2 rounded-md hover:bg-[#1e1c4e] hover:text-white transition">
-  🗑️ Delete
-</button>
-
+              🗑️ Delete
+            </button>
           </div>
         </div>
       )}
