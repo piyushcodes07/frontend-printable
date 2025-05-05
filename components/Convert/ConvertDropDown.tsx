@@ -5,7 +5,7 @@ import Image from "next/image";
 import LeftSectionElement from "./LeftSectionElement";
 import RightSectionElement from "./RightSectionElement";
 import { motion, AnimatePresence } from "framer-motion";
-
+import { useRouter } from "next/navigation";
 interface ConvertDropDownProps {
   isOpen: boolean;
   onToggle: (open: boolean) => void;
@@ -19,7 +19,16 @@ export default function ConvertDropdown({
     "from-pdf",
   );
   const dropdownRef = useRef<HTMLDivElement>(null);
-
+  const router=useRouter();
+  const handleConvert=(filename: string)=>{
+    sessionStorage.setItem("fileName",filename);
+    router.push("/from-pdf-conversion"); 
+  }
+  const handleConverttoPdf=(filename: string)=>{
+    sessionStorage.setItem("fileName",filename);
+    router.push("/to-pdf-conversion"); 
+  }
+  
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -80,21 +89,21 @@ export default function ConvertDropdown({
                 <motion.div>
                   <h5 className="text-xs mb-4">Convert from PDF</h5>
                   <div className="flex flex-col space-y-2">
-                    <RightSectionElement text="PDF to Word" src="/docx.png" />
-                    <RightSectionElement text="PDF to Excel" src="/excel.png" />
-                    <RightSectionElement text="PDF to PPT" src="/ppt.png" />
-                    <RightSectionElement text="PDF to JPG" src="/img.png" />
+                    <RightSectionElement text="PDF to Word" src="/docx.png"  onClick={()=>handleConvert('word')}/>
+                    <RightSectionElement text="PDF to Excel" src="/excel.png" onClick={()=>handleConvert('excel')} />
+                    <RightSectionElement text="PDF to PPT" src="/ppt.png" onClick={()=>handleConvert('ppt')}/>
+                    <RightSectionElement text="PDF to JPG" src="/img.png" onClick={()=>handleConvert('jpg')}/>
                   </div>
                 </motion.div>
               ) : (
                 <motion.div>
                   <h5 className="text-xs mb-4">Convert to PDF</h5>
                   <div className="flex flex-col space-y-2">
-                    <RightSectionElement text="Word to PDF" src="/docx.png" />
-                    <RightSectionElement text="Excel to PDF" src="/excel.png" />
-                    <RightSectionElement text="PPT to PDF" src="/ppt.png" />
-                    <RightSectionElement text="JPG to PDF" src="/img.png" />
-                    <RightSectionElement text="PDF OCR" src="/ocr.png" />
+                    <RightSectionElement text="Word to PDF" src="/docx.png" onClick={()=>handleConverttoPdf('word')}/>
+                    <RightSectionElement text="Excel to PDF" src="/excel.png" onClick={()=>handleConverttoPdf('excel')}/>
+                    <RightSectionElement text="PPT to PDF" src="/ppt.png" onClick={()=>handleConverttoPdf('ppt')}/>
+                    <RightSectionElement text="JPG to PDF" src="/img.png" onClick={()=>handleConverttoPdf('jpg')}/>
+                    <RightSectionElement text="PDF OCR" src="/ocr.png" onClick={()=>handleConverttoPdf('ocr')}/>
                   </div>
                 </motion.div>
               )}
