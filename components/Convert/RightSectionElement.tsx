@@ -4,15 +4,17 @@ import Link from "next/link";
 type RightSectionElementProps = {
   text: string;
   src: string;
+  link?: string;
 };
 
 export default function RightSectionElement({
   text,
   src,
+  link,
 }: RightSectionElementProps) {
   return (
     <Link
-      href="#"
+      href={link ? link : "#"}
       className="flex items-center justify-between p-2 rounded-md"
     >
       <div className="flex items-center space-x-3">

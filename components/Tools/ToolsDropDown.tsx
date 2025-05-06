@@ -38,7 +38,7 @@ export default function ToolsDropDown({
   };
 
   const [rightWidth, setRightWidth] = useState<number>(
-    rightWidthMapping[activeSection],
+    rightWidthMapping[activeSection]
   );
 
   const containerWidth = LEFT_FIXED_WIDTH + DIVIDER_WIDTH + rightWidth;
@@ -181,7 +181,11 @@ export default function ToolsDropDown({
                     text="Protect PDF"
                     src="/tools/lock.png"
                   />
-                  <RightSectionElement text="Flat PDF" src="/tools/flat.png" />
+                  <RightSectionElement
+                    text="Flat PDF"
+                    src="/tools/flat.png"
+                    link="/drop-file"
+                  />
                 </div>
               </div>
             </div>
