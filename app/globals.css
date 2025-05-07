@@ -1,1 +1,75 @@
 @import "tailwindcss";
+
+/* Home.css */
+.processing-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .image-transition {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem; /* Space between images and arrow */
+    margin-bottom: 1rem;
+    max-width: 400px; /* Matches max-w-[400px] */
+  }
+  
+  .image-transition img {
+    width: 120px;
+    height: 140px;
+    object-fit: contain;
+  }
+  
+  .arrow-icon {
+    color: #2f3e59;
+    font-size: 1.25rem; /* Matches text-xl */
+    font-weight: bold;
+  }
+  
+  .file-details {
+    color: #4b5563; /* Matches text-gray-600 */
+    font-size: 0.75rem; /* Matches text-xs */
+    margin-bottom: 1.5rem;
+    max-width: 300px;
+  }
+  
+  .securing-text {
+    font-weight: 600; /* Matches font-semibold */
+    margin-bottom: 0.5rem;
+  }
+  
+  .progress-bar {
+    width: 100%;
+    max-width: 300px;
+    height: 1rem; /* Matches h-4 */
+    background-color: #ffffff;
+    border-radius: 9999px; /* Matches rounded-full */
+    overflow: hidden;
+  }
+  
+  .progress-bar-fill {
+    height: 100%;
+    background-image: linear-gradient(to right, #1f4e5f, #3a8a99); /* Matches bg-gradient-to-r from-[#1f4e5f] to-[#3a8a99] */
+    border-radius: 9999px;
+    width: 0; /* Start at 0% */
+    animation: progress 5s linear forwards; /* Animate over 5 seconds */
+  }
+  
+  @keyframes progress {
+    0% {
+      width: 0%;
+    }
+    100% {
+      width: 100%;
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .image-transition {
+      max-width: none; /* Matches sm:max-w-none */
+    }
+  }
+  
