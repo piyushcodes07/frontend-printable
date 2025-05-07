@@ -202,8 +202,8 @@ export default function UploadPage() {
           {/* Compress Button */}
           <div className="mt-auto pt-4">
             <button
-              className={`w-full border border-[#1e1c4e] text-[#1e1c4e] py-2 rounded-md transition duration-200
-              hover:bg-[#1e1c4e] hover:text-white ${
+              className={`w-full border border-[#06044B] text-[#06044B] py-2 rounded-md transition duration-200
+              hover:bg-[#06044B] hover:text-white ${
                 !selectedCompression ? 'opacity-50 cursor-not-allowed' : ''
               }`}
               disabled={!selectedCompression}
@@ -223,25 +223,25 @@ export default function UploadPage() {
         >
           <p className="text-lg font-medium mb-4">{docxFileName}</p>
 
-          <button className="w-full bg-[#1e1c4e] text-white py-2 rounded-md mb-2 hover:opacity-90">
+          <button className="w-full bg-[#06044B] text-white py-2 rounded-md mb-2 hover:opacity-90">
             ⬇️ DOWNLOAD
           </button>
 
           <p className="text-center text-sm mb-2">or</p>
 
-          <button className="w-full bg-[#1e1c4e] text-white py-2 rounded-md mb-3 hover:opacity-90">
+          <button className="w-full bg-[#06044B] text-white py-2 rounded-md mb-3 hover:opacity-90">
             🖨️ Print
           </button>
 
-          <button className="w-full border border-[#1e1c4e] py-2 rounded-md mb-3 hover:bg-[#1e1c4e] hover:text-white transition">
+          <button className="w-full border border-[#06044B] py-2 rounded-md mb-3 hover:bg-[#06044B] hover:text-white transition">
             ⬆️ Export As
           </button>
 
           <div className="flex justify-between">
-            <button className="w-[48%] border border-[#1e1c4e] py-2 rounded-md hover:bg-[#1e1c4e] hover:text-white transition">
+            <button className="w-[48%] border border-[#06044B] py-2 rounded-md hover:bg-[#06044B] hover:text-white transition">
               🔗 Share
             </button>
-            <button className="w-[48%] border border-[#1e1c4e] py-2 rounded-md hover:bg-[#1e1c4e] hover:text-white transition">
+            <button className="w-[48%] border border-[#06044B] py-2 rounded-md hover:bg-[#06044B] hover:text-white transition">
               🗑️ Delete
             </button>
           </div>

@@ -171,15 +171,15 @@ export default function UploadPage() {
             🖨️ Print
           </button>
 
-          <button className="w-full border border-[#1e1c4e] py-2 rounded-md mb-3 hover:bg-[#1e1c4e] hover:text-white transition">
+          <button className="w-full border border-[#06044B] py-2 rounded-md mb-3 hover:bg-[#06044B] hover:text-white transition">
             ⬆️ Export As
           </button>
 
           <div className="flex justify-between">
-            <button className="w-[48%] border border-[#1e1c4e] py-2 rounded-md hover:bg-[#1e1c4e] hover:text-white transition">
+            <button className="w-[48%] border border-[#06044B] py-2 rounded-md hover:bg-[#06044B] hover:text-white transition">
               🔗 Share
             </button>
-            <button className="w-[48%] border border-[#1e1c4e] py-2 rounded-md hover:bg-red-600 hover:text-white transition">
+            <button className="w-[48%] border border-[#06044B] py-2 rounded-md hover:bg-[#06044B] hover:text-white transition">
               🗑️ Delete
             </button>
           </div>
