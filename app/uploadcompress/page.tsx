@@ -68,14 +68,12 @@ export default function UploadPage() {
       <div className="flex flex-col lg:flex-row w-full max-w-6xl">
         {/* Main Center Content */}
         <div className="flex-1 flex flex-col items-center w-full">
-          {/* Stage 1 */}
           {!showResultImages && (
             <>
               <img
                 src="/pdfformat.png"
                 alt="PDF"
-                style={{ width: '248.25px', height: '322px' }}
-                className="object-contain mb-4"
+                className="w-48 h-60 object-contain mb-4"
               />
               <p className="text-sm text-gray-600 mb-2">
                 {fileName} ({fileSize})
@@ -89,21 +87,22 @@ export default function UploadPage() {
           {showProgressBar && (
             <div className="w-64 h-3 bg-white rounded-full shadow-inner overflow-hidden mb-4">
               <div
-                className="h-full bg-gradient-to-r from-green-400 to-blue-500 rounded-full transition-all duration-200"
-                style={{ width: `${progress}%` }}
+                className="h-full rounded-full transition-all duration-200"
+                style={{
+                  width: `${progress}%`,
+                  background: 'linear-gradient(to right, #06044B, #61E987)',
+                }}
               />
             </div>
           )}
 
-          {/* Stage 2 */}
           {showResultImages && !showWordImage && (
             <>
               <div className="flex items-center justify-center mb-4 w-full">
                 <img
                   src="/priview.png"
                   alt="Preview"
-                  style={{ width: '229px', height: '275px' }}
-                  className="object-contain"
+                  className="w-40 h-52 object-contain"
                 />
                 <div className="w-9 h-9 rounded-full bg-[#2B3F6C] flex items-center justify-center mx-4 shadow-md">
                   <svg
@@ -122,8 +121,7 @@ export default function UploadPage() {
                 <img
                   src="/pdfformat.png"
                   alt="PDF"
-                  style={{ width: '218px', height: '275px' }}
-                  className="object-contain"
+                  className="w-40 h-52 object-contain"
                 />
               </div>
 
@@ -138,8 +136,11 @@ export default function UploadPage() {
                   </p>
                   <div className="w-64 h-3 bg-white rounded-full shadow-inner overflow-hidden mb-4">
                     <div
-                      className="h-full bg-gradient-to-r from-green-400 to-blue-500 rounded-full transition-all duration-200"
-                      style={{ width: `${convertingProgress}%` }}
+                      className="h-full rounded-full transition-all duration-200"
+                      style={{
+                        width: `${convertingProgress}%`,
+                        background: 'linear-gradient(to right, #06044B, #61E987)',
+                      }}
                     />
                   </div>
                 </>
@@ -147,14 +148,12 @@ export default function UploadPage() {
             </>
           )}
 
-          {/* Stage 3 */}
           {showWordImage && (
             <>
               <img
                 src="/pdfformat.png"
                 alt="PDF"
-                style={{ width: '248.25px', height: '322px' }}
-                className="object-contain mt-6"
+                className="w-80 h-96 object-contain mt-6"
               />
               <p className="text-sm text-gray-600 mb-2 mt-4">
                 {docxFileName} ({fileSize})

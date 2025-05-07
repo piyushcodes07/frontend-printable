@@ -76,8 +76,11 @@ export default function UploadPage() {
           {showProgressBar && (
             <div className="w-64 h-3 bg-white rounded-full shadow-inner overflow-hidden mb-4">
               <div
-                className="h-full bg-gradient-to-r from-green-400 to-blue-500 rounded-full transition-all duration-200"
-                style={{ width: `${progress}%` }}
+                className="h-full rounded-full transition-all duration-200"
+                style={{
+                  width: `${progress}%`,
+                  background: 'linear-gradient(to right, #06044B, #61E987)',
+                }}
               />
             </div>
           )}
@@ -123,8 +126,11 @@ export default function UploadPage() {
                   </p>
                   <div className="w-64 h-3 bg-white rounded-full shadow-inner overflow-hidden mb-4">
                     <div
-                      className="h-full bg-gradient-to-r from-green-400 to-blue-500 rounded-full transition-all duration-200"
-                      style={{ width: `${convertingProgress}%` }}
+                      className="h-full rounded-full transition-all duration-200"
+                      style={{
+                        width: `${convertingProgress}%`,
+                        background: 'linear-gradient(to right, #06044B, #61E987)',
+                      }}
                     />
                   </div>
                 </>
@@ -150,10 +156,9 @@ export default function UploadPage() {
       {/* Right-Side Panel - Fully Flush */}
       {showWordImage && (
         <div
-        className="lg:absolute top-10 right-0 bottom-0 w-full lg:w-[320px] px-4 py-6 shadow-lg rounded-none"
-        style={{ background: 'linear-gradient(to bottom, #DFFBE7, #CDCDDB)' }}
-      >
-      
+          className="lg:absolute top-10 right-0 bottom-0 w-full lg:w-[320px] px-4 py-6 shadow-lg rounded-none"
+          style={{ background: 'linear-gradient(to bottom, #DFFBE7, #CDCDDB)' }}
+        >
           <p className="text-lg font-medium mb-4">{docxFileName}</p>
 
           <button className="w-full bg-[#1e1c4e] text-white py-2 rounded-md mb-2 hover:opacity-90">
