@@ -6,10 +6,15 @@ const API_BASE_URL =
 export default function UseStorage() {
   const { order, dispatch } = useOrder();
 
-  const uploadFile = async (file: File): Promise<DocumentItem | null> => {
+  const uploadFile = async (
+    file: File,
+    ownerId: string
+  ): Promise<DocumentItem | null> => {
     try {
       const formData = new FormData();
+
       formData.append("file", file);
+      formData.append("ownerId", ownerId || "");
 
       const response = await fetch(`${API_BASE_URL}/api/file/upload`, {
         method: "POST",
@@ -18,11 +23,12 @@ export default function UseStorage() {
 
       if (!response.ok) {
         throw new Error(
-          `Upload failed: ${response.status} ${response.statusText}`, // Corrected template literal
+          `Upload failed: ${response.status} ${response.statusText}` // Corrected template literal
         );
       }
 
       const data = await response.json();
+
       // Ensure new documents default to "All" pages
       const newDoc: DocumentItem = {
         id: data.fileId,
@@ -65,18 +71,18 @@ export default function UseStorage() {
     fileName: string,
     index: number,
     setStatusMessage: (
-      status: { text: string; isError?: boolean } | null,
-    ) => void, // More specific type
+      status: { text: string; isError?: boolean } | null
+    ) => void // More specific type
   ) => {
     try {
       const response = await fetch(
         `${API_BASE_URL}/api/file/${encodeURIComponent(fileId)}`,
-        { method: "DELETE" },
+        { method: "DELETE" }
       );
 
       if (!response.ok) {
         throw new Error(
-          `Delete failed: ${response.status} ${response.statusText}`, // Corrected template literal
+          `Delete failed: ${response.status} ${response.statusText}` // Corrected template literal
         );
       }
 

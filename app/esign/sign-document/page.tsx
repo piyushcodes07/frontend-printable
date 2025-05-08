@@ -13,6 +13,7 @@ const DOMAIN_BASE_URL =
 function SignDocument() {
   const [onlyOther, setOther] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [fileUrl, setFileUrl] = useState("");
   const { user } = useUser();
   const { fileIds, signers_email } = useSignUrl();
   const fileId = [1];
