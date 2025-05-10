@@ -145,7 +145,7 @@ const PdfCanvasPage = ({
 
   return (
     <div
-      className="relative"
+      className="relative my-10"
       style={{ width: "100%", maxWidth: "100%" }}
       onDrop={handleDrop}
       onDragOver={(e) => e.preventDefault()}

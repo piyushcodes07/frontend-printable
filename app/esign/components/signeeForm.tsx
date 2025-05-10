@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import SigneeCard from "./singeeCard";
 import { useSignUrl } from "../useSign";
@@ -21,7 +21,7 @@ interface FormErrors {
 
 function SingerDetailsForm({ onlyOther }: { onlyOther: boolean }) {
   const [addSignee, setAddSignee] = useState(false);
-  const { setSignerEmail } = useSignUrl();
+  const { setSignerEmail, updateSignerEmail, signers_email } = useSignUrl();
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -47,7 +47,7 @@ function SingerDetailsForm({ onlyOther }: { onlyOther: boolean }) {
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
-    const emailRepeat = signees.find((signee) => signee.email === email);
+    const emailRepeat = signers_email.find((email) => email === email);
 
     if (!email) {
       newErrors.email = "Email is required";
@@ -76,21 +76,35 @@ function SingerDetailsForm({ onlyOther }: { onlyOther: boolean }) {
     };
 
     setSignerEmail(email);
+
     setSignees((prev) => [...prev, newSignee]);
+
     setEmail("");
     setFirstName("");
     setLastName("");
     setAddSignee(false);
     setErrors({});
   };
+  useEffect(() => {
+    const email = user?.primaryEmailAddress?.emailAddress;
+    if (!email) return;
+
+    if (onlyOther) {
+      setSignerEmail(email);
+    } else {
+      updateSignerEmail(email);
+    }
+  }, [onlyOther, user]);
 
   const removeSignee = (index: number) => {
+    updateSignerEmail(signees[index].email);
+
     setSignees((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
     <div className="signeeForm">
-      {onlyOther && (
+      {!!onlyOther && (
         <div className="rounded-[5px] fade-in mb-4">
           <h2 className="mb-2 font-bold">Your Details</h2>
           <div className="flex slide-down items-center p-2 mb-2 border-2 border-b-blue-700 bg-white rounded-md">

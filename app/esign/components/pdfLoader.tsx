@@ -9,33 +9,33 @@ import { useSignUrl } from "../useSign";
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js`;
 
 const PdfLoader = ({ pdfUrl }: { pdfUrl: string }) => {
-  const { signs } = useSignUrl();
-  const [pdfData, setPdfData] = useState<ArrayBuffer | null>(null);
+  const { signs, setPdfData } = useSignUrl();
+  const [pdfData, setPdfBuffer] = useState<ArrayBuffer | null>(null);
   const [pdfPages, setPdfPages] = useState<any[]>([]);
+  const [scale, setScale] = useState(1);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const loadPdf = async (url: string, newScale: number) => {
+    const loadingTask = pdfjsLib.getDocument(url);
+    const pdf = await loadingTask.promise;
+    const pages = [];
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const rotation = page.rotate;
+      const viewport = page.getViewport({ scale: newScale, rotation });
+      pages.push({ page, viewport });
+    }
+
+    const bytes = await fetch(url).then((res) => res.arrayBuffer());
+    setPdfBuffer(bytes);
+    setPdfData(bytes);
+    setPdfPages(pages);
+  };
 
   useEffect(() => {
     if (!pdfUrl) return;
-
-    const loadPdf = async () => {
-      const loadingTask = pdfjsLib.getDocument(pdfUrl);
-      const pdf = await loadingTask.promise;
-      const pages = [];
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        console.log(page.rotate);
-        const rotation = page.rotate;
-        const viewport = page.getViewport({ scale: 1, rotation });
-        pages.push({ page, viewport });
-      }
-
-      const bytes = await fetch(pdfUrl).then((res) => res.arrayBuffer());
-      setPdfData(bytes);
-      setPdfPages(pages);
-    };
-
-    loadPdf();
-  }, [pdfUrl]);
+    loadPdf(pdfUrl, scale);
+  }, [pdfUrl, scale]);
 
   const handleDownload = async () => {
     if (pdfData && signs) {
@@ -43,14 +43,22 @@ const PdfLoader = ({ pdfUrl }: { pdfUrl: string }) => {
     }
   };
 
+  const handleZoomIn = () => {
+    setScale((prev) => Math.min(prev + 0.25, 3));
+  };
+
+  const handleZoomOut = () => {
+    setScale((prev) => Math.max(prev - 0.25, 0.5));
+  };
+
   return (
-    <div className="space-y-4 ">
+    <div className="relative space-y-4">
       <div
         ref={containerRef}
-        className="overflow-x-hidden center "
+        className="overflow-x-hidden center"
         style={{ maxWidth: "100%" }}
       >
-        <div className="flex flex-col gap-y-8  ">
+        <div className="flex flex-col gap-y-8">
           {pdfPages.map((p, i) => (
             <PdfCanvasPage
               key={i}
@@ -62,12 +70,25 @@ const PdfLoader = ({ pdfUrl }: { pdfUrl: string }) => {
         </div>
       </div>
 
-      <button
-        className="px-4 py-2 bg-green-600 text-white rounded"
-        onClick={handleDownload}
-      >
-        Download Edited PDF
-      </button>
+      {/* Zoom Control Buttons */}
+      <div className="fixed bottom-4 left-1/2 transform -translate-x-[250px] z-50">
+        <div className="flex gap-4 bg-black/90 backdrop-blur-md shadow-lg px-6 py-3 rounded-full border border-gray-300">
+          <button
+            onClick={handleZoomOut}
+            className="text-xl center w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 active:scale-95 transition"
+            title="Zoom Out"
+          >
+            −
+          </button>
+          <button
+            onClick={handleZoomIn}
+            className="text-xl w-10 h-10 rounded-full center  bg-gray-200 hover:bg-gray-300 active:scale-95 transition"
+            title="Zoom In"
+          >
+            +
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

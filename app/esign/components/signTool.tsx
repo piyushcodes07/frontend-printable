@@ -9,7 +9,7 @@ import {
 // import UploadSign from "./uploadSign";
 import dynamic from "next/dynamic";
 
-const UploadSign = dynamic(() => import("../components/uploadSign"), {
+const UploadSign = dynamic(() => import("./uploadSign"), {
   ssr: false,
 });
 

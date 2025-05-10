@@ -1,46 +1,132 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import SingerDetailsForm from "../components/signeeForm";
+import dynamic from "next/dynamic";
 import SigningTool from "../components/signTool";
-import DocumentView from "../components/documentView";
-import GetFiles from "../components/utils/fetchFile";
-import { File } from "lucide-react";
+import { GetFiles, SubmitSign } from "../components/utils/apiCalls";
+import { useUser } from "@clerk/nextjs";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useSearchParams } from "next/navigation";
+import { useSignUrl } from "../useSign";
+import { drawSignatureOnPdf } from "../components/utils/pdfUtils";
 
-interface Props {
-  searchParams: { id?: string };
-}
-interface File {
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+const PdfViewer = dynamic(
+  () => import("../components/pdfLoader").then((mod) => mod.default),
+  {
+    ssr: false,
+  }
+);
+
+interface FileData {
   fileUrl: string;
   view: boolean;
   sign: boolean;
+  status: string;
 }
 
-export default function SignDocument({ searchParams }: Props) {
-  const [onlyOther, setOther] = useState(true);
-  const [file, setFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(true); // just added loading state
+export default function SignDocument() {
+  const searchParams = useSearchParams();
+  const { pdfData, signs } = useSignUrl();
+  const fileId = searchParams.get("id");
+  const [file, setFile] = useState<any>(null); // using any to allow timeline
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false); // For button loading state
+  const { user } = useUser();
 
-  const userId = 1;
+  const handleSignSubmit = async () => {
+    if (!pdfData || !signs || !fileId) {
+      toast.error("Missing required data for saving document.");
+      return;
+    }
+
+    setSubmitting(true);
+    // const API = `${API_BASE_URL}/api/esign/submitSignature`;
+
+    try {
+      const fileBlob = await drawSignatureOnPdf(pdfData, signs);
+      const pdfFile = new File([fileBlob], "signed.pdf", {
+        type: "application/pdf",
+      });
+
+      const formData = new FormData();
+      formData.append("file", pdfFile);
+      formData.append(
+        "signeeEmail",
+        user?.primaryEmailAddress?.emailAddress || ""
+      );
+      formData.append("ownerId", user?.id || "");
+      formData.append("fileId", fileId);
+      const res = await SubmitSign(formData);
+      const response = await res.json();
+      if (response.success) {
+        toast.success(
+          response.msg || "signed and saved document successfully!!"
+        );
+        // Refresh file data to update status
+        const FileData = await GetFiles(fileId, user?.id);
+        setFile({
+          ...FileData,
+          timeline: {
+            createdAt: "2025-05-01T10:00:00Z",
+            requestSentAt: "2025-05-01T10:10:00Z",
+            signedAt: new Date().toISOString(),
+            signedBy: user?.fullName || "Current User",
+            pendingSignees: FileData.pendingSignees || [],
+          },
+        });
+      } else {
+        toast.error(response.msg || "Failed to save document.");
+      }
+    } catch (err) {
+      toast.error("Failed to save document.");
+      console.error("Error:", err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   useEffect(() => {
     const fetch = async () => {
       setLoading(true);
-      const { id } = await searchParams;
-      if (id) {
-        const FileData = await GetFiles(id, JSON.stringify(userId));
-        setFile(FileData);
+      if (!user || !fileId) return;
+
+      try {
+        const FileData = await GetFiles(fileId, user?.id);
+        const enrichedFileData = {
+          ...FileData,
+          timeline: {
+            createdAt: "2025-05-01T10:00:00Z",
+            requestSentAt: "2025-05-01T10:10:00Z",
+            signedAt: FileData.signedAt || "2025-05-02T09:30:00Z",
+            signedBy: FileData.signedBy || "Jane Doe",
+            pendingSignees: FileData.pendingSignees || ["Alice", "Bob"],
+          },
+        };
+        setFile(enrichedFileData);
+      } catch (err) {
+        toast.error("Failed to fetch file data.");
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetch();
-  }, [searchParams]);
+  }, [searchParams, user, fileId]);
 
-  console.log(file);
+  const formatTime = (iso: string) =>
+    new Date(iso).toLocaleString(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
 
   return (
-    <section className="sign-document text-black flex-1 ">
-      <div className="doc-title flex itemm-center shadow-md  absolute   justify-center bg-white">
-        <h1>file-name: Test.pdf</h1>
-        <div className="icon">
+    <section className="sign-document text-black flex-1">
+      <ToastContainer position="top-right" autoClose={3000} />
+      <div className="doc-title flex items-center shadow-md absolute justify-center bg-white w-full">
+        <h1>file-name: {file?.fileName || "Test.pdf"}</h1>
+        <div className="icon ml-2">
           <svg
             width="21"
             height="21"
@@ -71,24 +157,74 @@ export default function SignDocument({ searchParams }: Props) {
         </div>
       </div>
 
-      <div className="document-body flex flex-row  pt-10 h-[90vh] justify-between">
-        <div className="DocumentArea flex   flex-3 overflow-y-scroll  overflow-x-hidden">
+      <div className="document-body flex flex-row pt-10 h-[90vh] justify-between">
+        <div className="DocumentArea flex flex-3 overflow-y-scroll overflow-x-hidden">
           {loading ? (
-            <p className=" w-full h-full center">Loading File....</p>
+            <p className="w-full h-full flex items-center justify-center">
+              Loading File...
+            </p>
           ) : file ? (
-            <DocumentView pdfUrl={"/pdf.pdf"} />
+            <div className="pdf-container w-full h-full">
+              <PdfViewer pdfUrl={file.fileUrl} />
+            </div>
           ) : (
-            <p className="w-full h-full center">
-              No Such File Exist with requested ID
+            <p className="w-full h-full flex items-center justify-center">
+              No Such File Exists with Requested ID
             </p>
           )}
         </div>
 
-        <div className="signingTool  flex flex-col flex-1  justify-between p-4 py-6">
-          <SigningTool />
-          <button className="border-1 text-[18px] rounded-xl border-[#06044B] p-3 hover:bg-[#06044B] hover:text-green-500">
-            <p>Sign Document</p>
-          </button>
+        <div className="signingTool flex flex-col flex-1 justify-between p-4 py-6">
+          {!file || file.status === "pending" ? (
+            <>
+              <SigningTool />
+              <button
+                className="border-1 text-[18px] rounded-xl border-[#06044B] p-3 hover:bg-[#06044B] hover:text-green-500 transition-all duration-300 ease-in-out"
+                onClick={handleSignSubmit}
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <div
+                    role="status"
+                    className="flex items-center justify-center"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      className="w-6 h-6 text-gray-200 animate-spin fill-blue-600"
+                      viewBox="0 0 100 101"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                        fill="currentColor"
+                      />
+                      <path
+                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                        fill="currentFill"
+                      />
+                    </svg>
+                    <span className="ml-2">Submitting...</span>
+                  </div>
+                ) : (
+                  <p>Sign Document</p>
+                )}
+              </button>
+            </>
+          ) : (
+            <div className="timeline text-sm text-gray-800">
+              <h2 className="text-lg font-semibold mb-2">Signing Timeline</h2>
+              <ul className="list-disc ml-4 space-y-1">
+                <li>Created: {formatTime(file.timeline.createdAt)}</li>
+                <li>Request Sent: {formatTime(file.timeline.requestSentAt)}</li>
+                <li>Signed At: {formatTime(file.timeline.signedAt)}</li>
+                <li>Signed By: {file.timeline.signedBy}</li>
+                <li>
+                  Pending Signees: {file.timeline.pendingSignees.join(", ")}
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </section>

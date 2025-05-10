@@ -8,7 +8,6 @@ function hexToRgb(hex: string) {
   const b = bigint & 255;
   return rgb(r / 255, g / 255, b / 255);
 }
-
 interface SignData {
   type: "sign" | "text" | "date" | "checkbox" | "initials";
   signUrl?: string;
@@ -65,16 +64,16 @@ export const drawSignatureOnPdf = async (
       if (element && sign.type === "checkbox") {
         if (!!sign.value) {
           element.setAttribute("checked", "true");
-        } // Ensures it's boolean
+        }
 
         try {
           const dataUrl = await htmlToImage.toPng(element);
           const embeddedCheckbox = await pdfDoc.embedPng(dataUrl);
           page.drawImage(embeddedCheckbox, {
             x: sign.position.x,
-            y: height - sign.position.y - sign.signSize.height,
+            y: (height - sign.position.y - sign.signSize.height) * 1.25, // adjusted y for exact positioning
             width: sign.signSize.width,
-            height: sign.signSize.height, // probably signSize.height, not width
+            height: sign.signSize.height,
           });
         } catch (error) {
           console.error("Failed to render checkbox image:", error);
@@ -85,11 +84,5 @@ export const drawSignatureOnPdf = async (
 
   const pdfBytes = await pdfDoc.save();
   const blob = new Blob([pdfBytes], { type: "application/pdf" });
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "signed.pdf";
-  a.click();
-  URL.revokeObjectURL(url);
+  return blob;
 };

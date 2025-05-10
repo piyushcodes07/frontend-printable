@@ -14,8 +14,6 @@ export default function UseStorage() {
       const formData = new FormData();
 
       formData.append("file", file);
-      formData.append("ownerId", ownerId || "");
-
       const response = await fetch(`${API_BASE_URL}/api/file/upload`, {
         method: "POST",
         body: formData,
