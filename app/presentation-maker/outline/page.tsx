@@ -10,6 +10,7 @@ type Slide = {
   id: number;
   title: string;
   bulletPoints: string[];
+  isEditing: boolean;
 };
 export default function PromptEditor() {
   const [slides, setSlides] = useState<Slide[]>([]);
@@ -19,6 +20,16 @@ export default function PromptEditor() {
   const topic = searchParams.get("topic");
   const cards = searchParams.get("cards");
 
+  const toggleEditMode = (id: number) => {
+    setSlides(
+      slides.map((card) => {
+        if (card.id === id) {
+          return { ...card, isEditing: !card.isEditing };
+        }
+        return card;
+      }),
+    );
+  };
   const fetchSlides = async () => {
     setLoading(true);
     setSlides([]);
@@ -66,6 +77,7 @@ export default function PromptEditor() {
       id: newId,
       title: `New Card ${newId}`,
       bulletPoints: ["Add your content here..."],
+      isEditing: true,
     };
     setSlides([...slides, newCard]);
   };
@@ -110,6 +122,7 @@ export default function PromptEditor() {
             cards={slides}
             addCard={addCard}
             deleteCard={deleteCard}
+            toggleEditMode={toggleEditMode}
             updateCard={updateCard}
           />
         </div>

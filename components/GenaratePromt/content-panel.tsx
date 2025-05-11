@@ -16,6 +16,7 @@ export default function ContentPanel({
   cards,
   addCard,
   deleteCard,
+  toggleEditMode,
   updateCard,
 }) {
   return (
