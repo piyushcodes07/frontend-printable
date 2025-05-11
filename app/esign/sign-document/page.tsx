@@ -123,7 +123,7 @@ function SignDocument() {
         const payload = {
           requestedBy: user?.id,
           fileIds: [fileId],
-          signers_email: [signers_email[signers_email.length - 1]],
+          signers_email: signers_email,
           link,
           signs,
         };
@@ -136,7 +136,7 @@ function SignDocument() {
         const payload = {
           requestedBy: user?.id,
           fileIds: [result.fileId],
-          signers_email: [signers_email[signers_email.length - 1]],
+          signers_email: signers_email,
           link,
           signs,
         };

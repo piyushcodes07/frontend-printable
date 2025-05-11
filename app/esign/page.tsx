@@ -1,14 +1,11 @@
 "use client";
-
 import type React from "react";
-
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import {
   PenLine,
-  Users,
   MoreVertical,
   FileText,
   Download,
@@ -25,11 +22,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-
-import {
-  GetDocumentSignRecord,
-  UploadDocument,
-} from "./components/utils/apiCalls";
+import { deleteFile, GetDocumentSignRecord } from "./components/utils/apiCalls";
+import { toast } from "react-toastify";
 
 export default function DocumentManagement() {
   const router = useRouter();
@@ -37,9 +31,12 @@ export default function DocumentManagement() {
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
+  const [downloadLoading, setDownloadLoading] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    console.log("DocumentManagement mounted in browser:", typeof window);
     if (user?.id) {
       fetchDocuments();
     }
@@ -54,9 +51,7 @@ export default function DocumentManagement() {
           `Failed to fetch documents: ${response.status} ${response.statusText}`
         );
       }
-
       const result = await response.json();
-      console.log(result);
       setDocuments(result);
     } catch (error) {
       console.error("Error fetching documents:", error);
@@ -89,18 +84,74 @@ export default function DocumentManagement() {
     router.push(`/esign/sign-document`);
   };
 
-  const handleDocumentAction = (action: string, document: any) => {
+  const handleDocumentAction = async (action: string, document: any) => {
+    console.log(
+      "handleDocumentAction called, isBrowser:",
+      typeof window !== "undefined"
+    );
     switch (action) {
       case "open":
-        window.open(`/esign/document?id=${document.fileId}`, "_blank");
+        if (typeof window !== "undefined") {
+          window.open(`/esign/document?id=${document.fileId}`, "_blank");
+        }
         break;
       case "download":
-        // Implement download functionality
-        console.log("Downloading:", document.fileName);
+        try {
+          setDownloadLoading(document.fileId);
+          const downloadUrl =
+            document.fileUrl ||
+            `https://blog-storage-printable.s3.amazonaws.com/documents/${document.fileId}_${document.fileName}`;
+
+          if (typeof window !== "undefined") {
+            const response = await fetch(downloadUrl, {
+              method: "GET",
+              headers: {
+                Accept: "application/octet-stream",
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`Failed to fetch file: ${response.statusText}`);
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = window.document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", document.fileName);
+            window.document.body.appendChild(link);
+            link.click();
+            window.document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            toast.success(`${document.fileName} download started`);
+          } else {
+            console.warn("Download attempted on server; skipping.");
+            toast.error("Download is only available in the browser");
+          }
+        } catch (error) {
+          toast.error("Download failed");
+          console.error("Download error:", error);
+        } finally {
+          setDownloadLoading(null);
+        }
         break;
       case "delete":
-        // Implement delete functionality
-        console.log("Deleting:", document.fileName);
+        try {
+          setDeleteLoading(document.fileId);
+          const response = await deleteFile({
+            fileId: document.fileId,
+            ownerId: user?.id,
+            fileName: document.fileName,
+          });
+          const data = await response.json();
+          toast.success(data.msg);
+          await fetchDocuments();
+        } catch (error) {
+          toast.error("File delete failed");
+          console.error("Delete error:", error);
+        } finally {
+          setDeleteLoading(null);
+        }
         break;
       default:
         break;
@@ -114,19 +165,19 @@ export default function DocumentManagement() {
     switch (status.toLowerCase()) {
       case "completed":
         color = "green";
-        icon = <div className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></div>;
+        icon = <div className="mr-1.5 h-2 w-2 rounded-full bg-green-500" />;
         break;
       case "canceled":
         color = "red";
-        icon = <div className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></div>;
+        icon = <div className="mr-1.5 h-2 w-2 rounded-full bg-red-500" />;
         break;
       case "out for signature":
         color = "amber";
-        icon = <div className="mr-1.5 h-2 w-2 rounded-full bg-amber-500"></div>;
+        icon = <div className="mr-1.5 h-2 w-2 rounded-full bg-amber-500" />;
         break;
       default:
         color = "gray";
-        icon = <div className="mr-1.5 h-2 w-2 rounded-full bg-gray-500"></div>;
+        icon = <div className="mr-1.5 h-2 w-2 rounded-full bg-gray-500" />;
     }
 
     return (
@@ -165,10 +216,10 @@ export default function DocumentManagement() {
   };
 
   return (
-    <div className="container mx-auto p-14 max-w-6xl text-black ">
+    <div className="container  mx-auto p-14 max-w-6xl text-black">
       <h1 className="text-xl font-semibold mb-6">Start a new document</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10 center ">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10 center">
         <Card
           className="p-6 hover:bg-green-300 transition-colors cursor-pointer"
           onClick={handleUploadClick}
@@ -194,14 +245,6 @@ export default function DocumentManagement() {
         className="hidden"
         onChange={handleFileChange}
       />
-
-      {/* <h2 className="text-xl font-semibold mb-4">Actions required</h2> */}
-      {/* <div className="bg-white border border-slate-200 rounded-lg p-6 mb-10 text-center">
-        <p className="text-slate-700">
-          No documents to sign, take a breather. Documents you need to sign will
-          appear here.
-        </p>
-      </div> */}
 
       <h2 className="text-xl font-semibold mb-4">Documents</h2>
 
@@ -231,8 +274,8 @@ export default function DocumentManagement() {
                 </tr>
               ) : (
                 documents.map((doc, idx) => (
-                  <tr key={idx} className="border-b hover:bg-slate-50 ">
-                    <td className="py-4 ">
+                  <tr key={idx} className="border-b hover:bg-slate-50">
+                    <td className="py-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-slate-100 rounded-md">
                           <FileText className="h-4 w-4 text-slate-700" />
@@ -246,7 +289,7 @@ export default function DocumentManagement() {
                       </div>
                     </td>
                     <td className="py-4">{getStatusBadge(doc.status)}</td>
-                    <td className="py-4 px-4 text-sm ">you</td>
+                    <td className="py-4 px-4 text-sm">you</td>
                     <td className="py-4 px-2">
                       {renderSigneeAvatars(doc.signees)}
                     </td>
@@ -257,37 +300,54 @@ export default function DocumentManagement() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 rounded-full cursor-pointer"
+                            className="h-8 w-8 rounded-full cursor-pointer "
                           >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="z-50 bg-white border  border-gray-200 shadow-md rounded-md p-1 text-sm"
-                        >
+                        <DropdownMenuContent align="end" className="bg-white">
                           <DropdownMenuItem
-                            onClick={() => handleDocumentAction("open", doc)}
-                            className="cursor-pointer hover:bg-gray-200"
+                            onSelect={() => handleDocumentAction("open", doc)}
+                            className="cursor-pointer hover:bg-gray-500"
                           >
-                            <FileText className="mr-2 h-4 w-4 text-black text-bold " />
-                            <p className="text-black"> Open</p>
+                            <FileText className="mr-2 h-4 w-4 text-black " />
+                            <p className="text-black">View</p>
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() =>
-                              handleDocumentAction("download", doc)
-                            }
-                            className="cursor-pointer hover:bg-gray-200"
+                            onSelect={(e) => {
+                              e.preventDefault(); // Prevent menu from closing
+                              handleDocumentAction("download", doc);
+                            }}
+                            className="cursor-pointer hover:bg-gray-500"
+                            disabled={downloadLoading === doc.fileId}
                           >
-                            <Download className="mr-2 h-4 w-4 text-black text-bold " />
-                            <p className="text-black">Download</p>
+                            <Download className="mr-2 h-4 w-4 text-black" />
+                            <p className="text-black">
+                              {downloadLoading === doc.fileId
+                                ? "Downloading..."
+                                : "Download"}
+                            </p>
+                            {downloadLoading === doc.fileId && (
+                              <div className="ml-2 h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                            )}
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => handleDocumentAction("delete", doc)}
-                            className="cursor-pointer hover:bg-gray-200"
+                            onSelect={(e) => {
+                              e.preventDefault(); // Prevent menu from closing
+                              handleDocumentAction("delete", doc);
+                            }}
+                            className="cursor-pointer hover:bg-gray-500"
+                            disabled={deleteLoading === doc.fileId}
                           >
-                            <Trash2 className="mr-2 h-4 w-4 text-black text-bold " />
-                            <p className="text-black">Delete</p>
+                            <Trash2 className="mr-2 h-4 w-4 text-black" />
+                            <p className="text-black">
+                              {deleteLoading === doc.fileId
+                                ? "Deleting..."
+                                : "Delete"}
+                            </p>
+                            {deleteLoading === doc.fileId && (
+                              <div className="ml-2 h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                            )}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -299,21 +359,6 @@ export default function DocumentManagement() {
           </table>
         </div>
       )}
-
-      {/* File Upload Loading Dialog */}
-      <Dialog open={uploadLoading} onOpenChange={setUploadLoading}>
-        <DialogContent className="sm:max-w-md flex flex-col items-center justify-center p-6">
-          <div className="text-center space-y-4">
-            <div className="mx-auto h-16 w-16 mb-4">
-              <div className="h-16 w-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-            <h3 className="text-lg font-medium">Uploading Document</h3>
-            <p className="text-sm text-slate-500">
-              Please wait while we process your file...
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

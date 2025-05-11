@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useSearchParams } from "next/navigation";
 import { useSignUrl } from "../useSign";
 import { drawSignatureOnPdf } from "../components/utils/pdfUtils";
+import TimeLine from "../components/timeLine";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -31,6 +32,7 @@ export default function SignDocument() {
   const { pdfData, signs } = useSignUrl();
   const fileId = searchParams.get("id");
   const [file, setFile] = useState<any>(null); // using any to allow timeline
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false); // For button loading state
   const { user } = useUser();
@@ -66,16 +68,9 @@ export default function SignDocument() {
         );
         // Refresh file data to update status
         const FileData = await GetFiles(fileId, user?.id);
-        setFile({
-          ...FileData,
-          timeline: {
-            createdAt: "2025-05-01T10:00:00Z",
-            requestSentAt: "2025-05-01T10:10:00Z",
-            signedAt: new Date().toISOString(),
-            signedBy: user?.fullName || "Current User",
-            pendingSignees: FileData.pendingSignees || [],
-          },
-        });
+        setFileUrl(FileData.fileUrl);
+
+        setFile(FileData.info);
       } else {
         toast.error(response.msg || "Failed to save document.");
       }
@@ -94,17 +89,10 @@ export default function SignDocument() {
 
       try {
         const FileData = await GetFiles(fileId, user?.id);
-        const enrichedFileData = {
-          ...FileData,
-          timeline: {
-            createdAt: "2025-05-01T10:00:00Z",
-            requestSentAt: "2025-05-01T10:10:00Z",
-            signedAt: FileData.signedAt || "2025-05-02T09:30:00Z",
-            signedBy: FileData.signedBy || "Jane Doe",
-            pendingSignees: FileData.pendingSignees || ["Alice", "Bob"],
-          },
-        };
-        setFile(enrichedFileData);
+        console.log(FileData);
+        setFileUrl(FileData.fileUrl);
+
+        setFile(FileData.info);
       } catch (err) {
         toast.error("Failed to fetch file data.");
         console.error("Error:", err);
@@ -163,9 +151,9 @@ export default function SignDocument() {
             <p className="w-full h-full flex items-center justify-center">
               Loading File...
             </p>
-          ) : file ? (
+          ) : fileUrl ? (
             <div className="pdf-container w-full h-full">
-              <PdfViewer pdfUrl={file.fileUrl} />
+              <PdfViewer pdfUrl={fileUrl} />
             </div>
           ) : (
             <p className="w-full h-full flex items-center justify-center">
@@ -175,7 +163,7 @@ export default function SignDocument() {
         </div>
 
         <div className="signingTool flex flex-col flex-1 justify-between p-4 py-6">
-          {!file || file.status === "pending" ? (
+          {!loading && (!file || file.status === "pending") && (
             <>
               <SigningTool />
               <button
@@ -211,20 +199,9 @@ export default function SignDocument() {
                 )}
               </button>
             </>
-          ) : (
-            <div className="timeline text-sm text-gray-800">
-              <h2 className="text-lg font-semibold mb-2">Signing Timeline</h2>
-              <ul className="list-disc ml-4 space-y-1">
-                <li>Created: {formatTime(file.timeline.createdAt)}</li>
-                <li>Request Sent: {formatTime(file.timeline.requestSentAt)}</li>
-                <li>Signed At: {formatTime(file.timeline.signedAt)}</li>
-                <li>Signed By: {file.timeline.signedBy}</li>
-                <li>
-                  Pending Signees: {file.timeline.pendingSignees.join(", ")}
-                </li>
-              </ul>
-            </div>
           )}
+
+          {file && <TimeLine timelineItems={file} />}
         </div>
       </div>
     </section>

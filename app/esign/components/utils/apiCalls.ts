@@ -43,3 +43,10 @@ export const sendSignRequestEmail = async (payload: any) => {
     body: JSON.stringify(payload),
   });
 };
+export const deleteFile = async (payload: any) => {
+  return await fetch(`${API_BASE_URL}/api/esign/deleteFile`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+};

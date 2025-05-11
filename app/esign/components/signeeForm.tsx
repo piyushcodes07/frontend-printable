@@ -47,7 +47,7 @@ function SingerDetailsForm({ onlyOther }: { onlyOther: boolean }) {
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
-    const emailRepeat = signers_email.find((email) => email === email);
+    const emailRepeat = signees.find((signe) => signe.email === email);
 
     if (!email) {
       newErrors.email = "Email is required";
@@ -76,6 +76,7 @@ function SingerDetailsForm({ onlyOther }: { onlyOther: boolean }) {
     };
 
     setSignerEmail(email);
+    console.log(signers_email);
 
     setSignees((prev) => [...prev, newSignee]);
 
