@@ -1,12 +1,25 @@
-"use client"
+"use client";
 
-import { ChevronDown, ArrowLeft, LayoutGrid, FileText, Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import PromptCard from "./prompt-card"
+import {
+  ChevronDown,
+  ArrowLeft,
+  LayoutGrid,
+  FileText,
+  Plus,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import PromptCard from "./prompt-card";
+import LoadingCardSkeleton from "../Generate/loadingCard";
 
-export default function ContentPanel({ cards, addCard, deleteCard, toggleEditMode, updateCard }) {
+export default function ContentPanel({
+  loading,
+  cards,
+  addCard,
+  deleteCard,
+  updateCard,
+}) {
   return (
-    <div className="space-y-6 border-1  rounded-[20px] p-6 mt-16" >
+    <div className="space-y-6 border-1  rounded-[20px] p-6 mt-16">
       <h2 className="text-lg text-gray-600 mb-2">Content</h2>
 
       {/* View Mode Buttons */}
@@ -15,7 +28,10 @@ export default function ContentPanel({ cards, addCard, deleteCard, toggleEditMod
           <Button variant="outline" className="rounded-full bg-white">
             <FileText className="h-4 w-4 mr-2" /> Freeform
           </Button>
-          <Button variant="outline" className="rounded-full bg-blue-600 text-white">
+          <Button
+            variant="outline"
+            className="rounded-full bg-blue-600 text-white"
+          >
             <LayoutGrid className="h-4 w-4 mr-2" /> Card-by-Card
           </Button>
         </div>
@@ -28,7 +44,7 @@ export default function ContentPanel({ cards, addCard, deleteCard, toggleEditMod
       <div className="space-y-4">
         {cards.map((card, index) => (
           <PromptCard
-            key={card.id}
+            key={index}
             card={card}
             isNew={index === cards.length - 1 && card.isEditing}
             onDelete={() => deleteCard(card.id)}
@@ -48,10 +64,14 @@ export default function ContentPanel({ cards, addCard, deleteCard, toggleEditMod
         {/* Footer */}
         <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl mt-6">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">{cards.length} Total Cards</span>
+            <span className="text-sm font-medium">
+              {cards.length} Total Cards
+            </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Type --- for card breaks</span>
+            <span className="text-sm text-gray-500">
+              Type --- for card breaks
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center">
@@ -61,11 +81,11 @@ export default function ContentPanel({ cards, addCard, deleteCard, toggleEditMod
           </div>
         </div>
       </div>
-
+      <div>{loading ? <LoadingCardSkeleton /> : null}</div>
       {/* Continue Button */}
       <Button className="w-full py-6 rounded-md bg-indigo-900 hover:bg-indigo-800 text-white">
         Continue <ArrowLeft className="ml-2 h-4 w-4 rotate-180" />
       </Button>
     </div>
-  )
+  );
 }

@@ -1,9 +1,10 @@
-"use client"
+"use client";
+import { useRouter } from "next/navigation";
 
-import { useState } from "react"
-import { ChevronDown, Sparkles, X, Check } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { useState } from "react";
+import { ChevronDown, Sparkles, X, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,30 +12,32 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 type Slide = {
-  title: string
-  content: string[]
-  background: string
-}
+  title: string;
+  content: string[];
+  background: string;
+};
 
 type Presentation = {
-  title: string
-  slides: Slide[]
-  style: string
-}
+  title: string;
+  slides: Slide[];
+  style: string;
+};
 
 export default function AIPresentationGenerator() {
-  const [prompt, setPrompt] = useState("")
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null)
-  const [generatedPresentation, setGeneratedPresentation] = useState<Presentation | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [selectedCard, setSelectedCard] = useState("Card 1")
-
-  const cardOptions = Array.from({ length: 10 }, (_, i) => `Card ${i + 1}`)
-
+  const [prompt, setPrompt] = useState("");
+  const router = useRouter();
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
+  const [generatedPresentation, setGeneratedPresentation] =
+    useState<Presentation | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedCard, setSelectedCard] = useState("Card 1");
+  const [selectedLanguage, setSelectedLanguage] = useState("English");
+  const cardOptions = Array.from({ length: 10 }, (_, i) => `Card ${i + 1}`);
+  const languageOptions = ["English", "Hindi", "Marathi", "Telgu", "Bengali"];
   const templates = [
     {
       id: 1,
@@ -72,65 +75,79 @@ export default function AIPresentationGenerator() {
       bgClass: "bg-gray-800",
       image: "/Generate/images2.png",
     },
-  ]
+  ];
+
+  const handelClick = () => {
+    router.push(
+      `presentation-maker/outline?topic=${prompt}&lang=${selectedLanguage}&cards=${selectedCard}`,
+    );
+  };
 
   const generatePresentation = async () => {
     if (!prompt.trim()) {
-      setError("Please enter a description for your presentation")
-      return
+      setError("Please enter a description for your presentation");
+      return;
     }
 
-    setError(null)
-    setIsGenerating(true)
+    setError(null);
+    setIsGenerating(true);
 
     try {
       // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Get the selected template or default to the first one
-      const template = selectedTemplate ? templates.find((t) => t.id === selectedTemplate) : templates[0]
+      const template = selectedTemplate
+        ? templates.find((t) => t.id === selectedTemplate)
+        : templates[0];
 
       // Generate a mock presentation based on the prompt
-      const words = prompt.split(" ")
-      const title = words.length > 3 ? words.slice(0, 3).join(" ") + "..." : prompt
+      const words = prompt.split(" ");
+      const title =
+        words.length > 3 ? words.slice(0, 3).join(" ") + "..." : prompt;
 
       // Create slides based on the prompt
-      const slideCount = 3 + Math.floor(Math.random() * 3) // 3-5 slides
-      const slides: Slide[] = []
+      const slideCount = 3 + Math.floor(Math.random() * 3); // 3-5 slides
+      const slides: Slide[] = [];
 
       for (let i = 0; i < slideCount; i++) {
-        const slideTitle = i === 0 ? title : `${title} - Part ${i}`
+        const slideTitle = i === 0 ? title : `${title} - Part ${i}`;
 
-        const contentCount = 2 + Math.floor(Math.random() * 3) // 2-4 bullet points
+        const contentCount = 2 + Math.floor(Math.random() * 3); // 2-4 bullet points
         const content = Array(contentCount)
           .fill(0)
-          .map((_, idx) => `Point ${idx + 1}: ${prompt.slice(0, 20)}${idx > 0 ? ` (variation ${idx})` : ""}`)
+          .map(
+            (_, idx) =>
+              `Point ${idx + 1}: ${prompt.slice(0, 20)}${idx > 0 ? ` (variation ${idx})` : ""}`,
+          );
 
         slides.push({
           title: slideTitle,
           content,
-          background: template?.bgClass || "bg-gradient-to-br from-purple-300 via-blue-300 to-teal-200",
-        })
+          background:
+            template?.bgClass ||
+            "bg-gradient-to-br from-purple-300 via-blue-300 to-teal-200",
+        });
       }
 
       const presentation: Presentation = {
         title,
         slides,
         style: template?.title || "Gradient background Design",
-      }
+      };
 
-      setGeneratedPresentation(presentation)
+      setGeneratedPresentation(presentation);
     } catch (err) {
-      setError("Failed to generate presentation. Please try again.")
-      console.error(err)
+      setError("Failed to generate presentation. Please try again.");
+      console.error(err);
     } finally {
-      setIsGenerating(false)
+      setIsGenerating(false);
     }
-  }
+  };
 
   const closePresentation = () => {
-    setGeneratedPresentation(null)
-  }
+    setGeneratedPresentation(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-300 via-blue-300 to-teal-200 p-4 md:p-8">
@@ -138,19 +155,28 @@ export default function AIPresentationGenerator() {
         {!generatedPresentation ? (
           <>
             <div className="text-center mb-8">
-              <h1 className="text-[48px] text-[#575174] tracking-tight font-bold ">Generate</h1>
-              <p className="text-[18px] font-normal text-[#716C8C] mb-4">Start creating something amazing.</p>
-              <h2 className="text-[32px]  tracking-tight  font-semibold text-black mb-6">AI Presentation</h2>
+              <h1 className="text-[48px] text-[#575174] tracking-tight font-bold ">
+                Generate
+              </h1>
+              <p className="text-[18px] font-normal text-[#716C8C] mb-4">
+                Start creating something amazing.
+              </p>
+              <h2 className="text-[32px]  tracking-tight  font-semibold text-black mb-6">
+                AI Presentation
+              </h2>
 
               <div className="flex flex-wrap justify-center gap-2 mb-6">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="bg-white rounded-full px-4 flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      className="bg-white rounded-full px-4 flex items-center gap-1"
+                    >
                       {selectedCard} <ChevronDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56 bg-white">
-                    <DropdownMenuLabel >Select Card </DropdownMenuLabel>
+                    <DropdownMenuLabel>Select Card </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {cardOptions.map((card) => (
                       <DropdownMenuItem
@@ -159,18 +185,47 @@ export default function AIPresentationGenerator() {
                         className="flex items-center justify-between"
                       >
                         {card}
-                        {selectedCard === card && <Check className="h-4 w-4 ml-2" />}
+                        {selectedCard === card && (
+                          <Check className="h-4 w-4 ml-2" />
+                        )}
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                <Button variant="outline" className="bg-white rounded-full px-4 flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  className="bg-white rounded-full px-4 flex items-center gap-1"
+                >
                   Default <ChevronDown className="h-4 w-4" />
                 </Button>
-                <Button variant="outline" className="bg-white rounded-full px-4 flex items-center gap-1">
-                  English (US) <ChevronDown className="h-4 w-4" />
-                </Button>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="bg-white rounded-full px-4 flex items-center gap-1"
+                    >
+                      {selectedLanguage} <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 bg-white">
+                    <DropdownMenuLabel>Select Language </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {languageOptions.map((lang) => (
+                      <DropdownMenuItem
+                        key={lang}
+                        onClick={() => setSelectedLanguage(lang)}
+                        className="flex items-center justify-between"
+                      >
+                        {lang}
+                        {selectedLanguage === lang && (
+                          <Check className="h-4 w-4 ml-2" />
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
 
               <div className="mb-4">
@@ -187,7 +242,7 @@ export default function AIPresentationGenerator() {
 
               <Button
                 className="rounded-full w-[358px] h-[80px] text-[24px]  bg-white text-gray-800 hover:bg-gray-100 flex items-center gap-2 mx-auto"
-                onClick={generatePresentation}
+                onClick={handelClick}
                 disabled={isGenerating}
               >
                 {isGenerating ? (
@@ -204,37 +259,54 @@ export default function AIPresentationGenerator() {
             </div>
 
             <div className="mt-12">
-              <h3 className="text-center text-black text-[16px] font-normal mb-6">Example Templates</h3>
+              <h3 className="text-center text-black text-[16px] font-normal mb-6">
+                Example Templates
+              </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {templates.map((template) => (
                   <div
                     key={template.id}
                     className={`rounded-lg overflow-hidden p-4 cursor-pointer transition-all duration-200 ${
-                      selectedTemplate === template.id ? "ring-2 ring-purple-500 ring-offset-2" : ""
+                      selectedTemplate === template.id
+                        ? "ring-2 ring-purple-500 ring-offset-2"
+                        : ""
                     }`}
                     onClick={() => setSelectedTemplate(template.id)}
                   >
                     <div
                       className={`${template.bgClass} rounded-lg p-4 h-40 flex items-center justify-center relative`}
                       style={
-                        template.image ? { backgroundImage: `url(${template.image})`, backgroundSize: "cover" } : {}
+                        template.image
+                          ? {
+                              backgroundImage: `url(${template.image})`,
+                              backgroundSize: "cover",
+                            }
+                          : {}
                       }
                     >
                       <Card className="bg-white p-3 w-[200px] h-[90px] rounded-lg shadow-md">
                         <div className="font-medium text-[18px]">Title</div>
                         <div className="text-xs text-gray-500">
-                          Main body and <span className="text-blue-500 text-[14px]">Link</span>
+                          Main body and{" "}
+                          <span className="text-blue-500 text-[14px]">
+                            Link
+                          </span>
                         </div>
                       </Card>
                     </div>
-                    <p className="text-center text-sm mt-2 text-gray-700">{template.title}</p>
+                    <p className="text-center text-sm mt-2 text-gray-700">
+                      {template.title}
+                    </p>
                   </div>
                 ))}
               </div>
 
               <div className="flex justify-center mt-8">
-                <Button variant="outline" className="rounded-full w-[250px] h-[50px] bg-white flex items-center gap-2 text-[18px]">
+                <Button
+                  variant="outline"
+                  className="rounded-full w-[250px] h-[50px] bg-white flex items-center gap-2 text-[18px]"
+                >
                   See More <span className="font-bold">&raquo;</span>
                 </Button>
               </div>
@@ -264,7 +336,9 @@ export default function AIPresentationGenerator() {
                 <div key={index} className="border rounded-lg overflow-hidden">
                   <div className={`${slide.background} p-6`}>
                     <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-lg">
-                      <h3 className="text-xl font-semibold mb-3">{slide.title}</h3>
+                      <h3 className="text-xl font-semibold mb-3">
+                        {slide.title}
+                      </h3>
                       <ul className="space-y-2">
                         {slide.content.map((point, idx) => (
                           <li key={idx} className="flex items-start">
@@ -292,5 +366,5 @@ export default function AIPresentationGenerator() {
         )}
       </div>
     </div>
-  )
+  );
 }
