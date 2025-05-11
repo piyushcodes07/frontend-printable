@@ -4,7 +4,7 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const file = formData.get('file') as Blob;
 
-  const apiKey = process.env.Pdftoword_API_KEY;
+  const apiKey = process.env.Pdfcompress_API_KEY;
 
   const cloudconvertResponse = await fetch('https://api.cloudconvert.com/v2/convert', {
     method: 'POST',
