@@ -36,6 +36,7 @@ interface SignProps {
   setCurrentDocument: (doc: string) => void;
   pdfData: ArrayBuffer | null;
   setPdfData: (data: ArrayBuffer) => void;
+  resetSign: () => void;
 }
 
 const SignContext = createContext<SignProps | undefined>(undefined);
@@ -56,6 +57,9 @@ export default function SignProvider({
   const [pdfData, setPdfData] = useState<ArrayBuffer | null>(null);
 
   const addSign = (sign: SignData) => setSigns((prev) => [...prev, sign]);
+  const resetSign = () => {
+    setSigns([]);
+  };
 
   const setSignDragging = (val: boolean) => setSignDragStatus(val);
   const setCurrentSlide = (pageIndex: number) => setCurrentPage(pageIndex);
@@ -116,6 +120,7 @@ export default function SignProvider({
         updateSignerEmail,
         pdfData,
         setPdfData,
+        resetSign,
       }}
     >
       {children}

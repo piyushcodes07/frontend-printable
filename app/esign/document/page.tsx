@@ -29,10 +29,11 @@ interface FileData {
 
 export default function SignDocument() {
   const searchParams = useSearchParams();
-  const { pdfData, signs } = useSignUrl();
+  const { pdfData, signs, resetSign } = useSignUrl();
   const fileId = searchParams.get("id");
   const [file, setFile] = useState<any>(null); // using any to allow timeline
   const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [toEdit, setToEdit] = useState(true);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false); // For button loading state
   const { user } = useUser();
@@ -63,12 +64,19 @@ export default function SignDocument() {
       const res = await SubmitSign(formData);
       const response = await res.json();
       if (response.success) {
+        resetSign();
+
         toast.success(
           response.msg || "signed and saved document successfully!!"
         );
         // Refresh file data to update status
         const FileData = await GetFiles(fileId, user?.id);
         setFileUrl(FileData.fileUrl);
+        const found = FileData.info.find(
+          (info: any) =>
+            info.ownerId === user?.id && info.signeeSignStatus === "pending"
+        );
+        found ? setToEdit(true) : setToEdit(false);
 
         setFile(FileData.info);
       } else {
@@ -90,7 +98,13 @@ export default function SignDocument() {
       try {
         const FileData = await GetFiles(fileId, user?.id);
         console.log(FileData);
+
         setFileUrl(FileData.fileUrl);
+        const found = FileData.info.find(
+          (info: any) =>
+            info.ownerId === user?.id && info.signeeSignStatus === "pending"
+        );
+        found ? setToEdit(true) : setToEdit(false);
 
         setFile(FileData.info);
       } catch (err) {
@@ -163,7 +177,7 @@ export default function SignDocument() {
         </div>
 
         <div className="signingTool flex flex-col flex-1 justify-between p-4 py-6">
-          {!loading && (!file || file.status === "pending") && (
+          {!loading && toEdit && (
             <>
               <SigningTool />
               <button
@@ -201,7 +215,7 @@ export default function SignDocument() {
             </>
           )}
 
-          {file && <TimeLine timelineItems={file} />}
+          {file && !toEdit && <TimeLine timelineItems={file} />}
         </div>
       </div>
     </section>
