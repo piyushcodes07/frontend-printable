@@ -55,11 +55,8 @@ export default function SignDocument() {
 
       const formData = new FormData();
       formData.append("file", pdfFile);
-      formData.append(
-        "signeeEmail",
-        user?.primaryEmailAddress?.emailAddress || ""
-      );
-      formData.append("ownerId", user?.id || "");
+      formData.append("signeeId", user?.id as string);
+
       formData.append("fileId", fileId);
       const res = await SubmitSign(formData);
       const response = await res.json();
@@ -70,12 +67,13 @@ export default function SignDocument() {
           response.msg || "signed and saved document successfully!!"
         );
         // Refresh file data to update status
-        const FileData = await GetFiles(fileId, user?.id);
+        const FileData = await GetFiles(fileId, user?.id as string);
         setFileUrl(FileData.fileUrl);
         const found = FileData.info.find(
           (info: any) =>
             info.ownerId === user?.id && info.signeeSignStatus === "pending"
         );
+
         found ? setToEdit(true) : setToEdit(false);
 
         setFile(FileData.info);
@@ -97,13 +95,16 @@ export default function SignDocument() {
 
       try {
         const FileData = await GetFiles(fileId, user?.id);
-        console.log(FileData);
+        console.log(FileData, toEdit);
 
         setFileUrl(FileData.fileUrl);
-        const found = FileData.info.find(
+        const found = FileData.info.some(
           (info: any) =>
-            info.ownerId === user?.id && info.signeeSignStatus === "pending"
+            info.ownerId === user?.id &&
+            info.signeeEmail === user?.primaryEmailAddress?.emailAddress &&
+            info.signeeSignStatus === "pending"
         );
+        console.log("value of :", found);
         found ? setToEdit(true) : setToEdit(false);
 
         setFile(FileData.info);
