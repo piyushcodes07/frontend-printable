@@ -38,41 +38,61 @@ export default function AIPresentationGenerator() {
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const cardOptions = Array.from({ length: 10 }, (_, i) => `Card ${i + 1}`);
   const languageOptions = ["English", "Hindi", "Marathi", "Telgu", "Bengali"];
+
   const templates = [
     {
       id: 1,
       title: "Gradient background Design",
-      bgClass: "bg-gradient-to-br from-purple-300 via-blue-300 to-teal-200",
+      backgroundColor:
+        "bg-gradient-to-br from-purple-300 via-blue-300 to-teal-200",
+      headingColor: "#2C3E50", // Deep midnight blue for strong contrast
+      subHeadingColor: "#4A5568", // Soothing slate gray for secondary text
+      bulletColor: "#3182CE", // Bright blue accent from gradient
       image: "/Generate/images4.png",
     },
     {
       id: 2,
       title: "Creative art background Design",
-      bgClass: "bg-gradient-to-r from-pink-300 to-orange-200",
+      backgroundColor: "bg-gradient-to-r from-pink-300 to-orange-200",
+      headingColor: "#2C3E50", // Consistent dark navy for readability
+      subHeadingColor: "#D53F8C", // Vibrant magenta for playful subheadings
+      bulletColor: "#ED8936", // Warm orange for bullet points
       image: "/Generate/images5.png",
     },
     {
       id: 3,
       title: "3D background Design",
-      bgClass: "bg-gradient-to-r from-rose-300 to-rose-200",
+      backgroundColor: "bg-gradient-to-r from-rose-300 to-rose-200",
+      headingColor: "#2D3748", // Charcoal gray for a modern look
+      subHeadingColor: "#805AD5", // Soft purple for depth
+      bulletColor: "#F687B3", // Rose pink to echo the gradient
       image: "/Generate/image6.png",
     },
     {
       id: 4,
       title: "Nature background Design",
-      bgClass: "bg-green-100",
+      backgroundColor: "bg-green-100",
+      headingColor: "#22543D", // Dark forest green for clarity
+      subHeadingColor: "#38A169", // Fresh medium green for accents
+      bulletColor: "#2F855A", // Rich emerald for bullets
       image: "/Generate/images-1.png",
     },
     {
       id: 5,
       title: "Flower background Design",
-      bgClass: "bg-yellow-100",
+      backgroundColor: "bg-yellow-100",
+      headingColor: "#2D3748", // Versatile charcoal for headings
+      subHeadingColor: "#D69E2E", // Goldenrod for floral vibes
+      bulletColor: "#ECC94B", // Sunny yellow for bullet points
       image: "/Generate/images3.png",
     },
     {
       id: 6,
       title: "Professional background Design",
-      bgClass: "bg-gray-800",
+      backgroundColor: "bg-gray-800",
+      headingColor: "#E2E8F0", // Almost-white for strong contrast
+      subHeadingColor: "#A0AEC0", // Light steel gray for subheads
+      bulletColor: "#CBD5E0", // Soft pale gray for bullets
       image: "/Generate/images2.png",
     },
   ];
@@ -272,10 +292,13 @@ export default function AIPresentationGenerator() {
                         ? "ring-2 ring-purple-500 ring-offset-2"
                         : ""
                     }`}
-                    onClick={() => setSelectedTemplate(template.id)}
+                    onClick={() => {
+                      localStorage.setItem("themeID", template.id.toString());
+                      setSelectedTemplate(template.id);
+                    }}
                   >
                     <div
-                      className={`${template.bgClass} rounded-lg p-4 h-40 flex items-center justify-center relative`}
+                      className={`${template.backgroundColor} rounded-lg p-4 h-40 flex items-center justify-center relative`}
                       style={
                         template.image
                           ? {

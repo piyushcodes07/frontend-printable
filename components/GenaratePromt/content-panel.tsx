@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import PromptCard from "./prompt-card";
 import LoadingCardSkeleton from "../Generate/loadingCard";
-
+import { useRouter } from "next/navigation";
 export default function ContentPanel({
   loading,
   cards,
@@ -19,6 +19,7 @@ export default function ContentPanel({
   toggleEditMode,
   updateCard,
 }) {
+  const router = useRouter();
   return (
     <div className="space-y-6 border-1  rounded-[20px] p-6 mt-16">
       <h2 className="text-lg text-gray-600 mb-2">Content</h2>
@@ -84,7 +85,12 @@ export default function ContentPanel({
       </div>
       <div>{loading ? <LoadingCardSkeleton /> : null}</div>
       {/* Continue Button */}
-      <Button className="w-full py-6 rounded-md bg-indigo-900 hover:bg-indigo-800 text-white">
+      <Button
+        onClick={() =>
+          router.push("/presentation-maker/outline/generate-preview")
+        }
+        className="w-full py-6 rounded-md bg-indigo-900 hover:bg-indigo-800 text-white"
+      >
         Continue <ArrowLeft className="ml-2 h-4 w-4 rotate-180" />
       </Button>
     </div>

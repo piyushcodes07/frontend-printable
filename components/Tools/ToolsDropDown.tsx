@@ -5,6 +5,7 @@ import Image from "next/image";
 import LeftSectionElement from "../Convert/LeftSectionElement";
 import RightSectionElement from "../Convert/RightSectionElement";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 interface ToolsDropDownProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export default function ToolsDropDown({
   isOpen,
   onToggle,
 }: ToolsDropDownProps) {
+  const router = useRouter();
   const [activeSection, setActiveSection] = useState<ActiveSection>("AIPDF");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -38,7 +40,7 @@ export default function ToolsDropDown({
   };
 
   const [rightWidth, setRightWidth] = useState<number>(
-    rightWidthMapping[activeSection]
+    rightWidthMapping[activeSection],
   );
 
   const containerWidth = LEFT_FIXED_WIDTH + DIVIDER_WIDTH + rightWidth;
@@ -251,7 +253,7 @@ export default function ToolsDropDown({
                   />
                   <LeftSectionElement
                     text="AI Presentation Maker"
-                    onClick={() => setActiveSection("AIPresenet")}
+                    onClick={() => router.push("/presentation-maker")}
                     src="/ai.png"
                   />
                   <div className="mt-auto pt-4">

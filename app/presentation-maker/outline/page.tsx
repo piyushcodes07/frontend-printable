@@ -12,8 +12,11 @@ type Slide = {
   bulletPoints: string[];
   isEditing: boolean;
 };
+import { useSlidesContext } from "@/context/globalSlideContext";
+import { setGlobal } from "next/dist/trace";
 export default function PromptEditor() {
-  const [slides, setSlides] = useState<Slide[]>([]);
+  const { setGlobalSlides, globalSlides } = useSlidesContext();
+  // const [globalSlides, setGlobalSlides] = useState<Slide[]>([]);
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const language = searchParams.get("lang");
@@ -21,8 +24,8 @@ export default function PromptEditor() {
   const cards = searchParams.get("cards");
 
   const toggleEditMode = (id: number) => {
-    setSlides(
-      slides.map((card) => {
+    setGlobalSlides(
+      globalSlides.map((card) => {
         if (card.id === id) {
           return { ...card, isEditing: !card.isEditing };
         }
@@ -32,7 +35,7 @@ export default function PromptEditor() {
   };
   const fetchSlides = async () => {
     setLoading(true);
-    setSlides([]);
+    setGlobalSlides([]);
 
     const response = await fetch(
       `/api/ppt-get/outline?topic=${topic}&cards=${cards},&language=${language}`,
@@ -54,7 +57,7 @@ export default function PromptEditor() {
           if (line.trim()) {
             try {
               const slide: Slide = JSON.parse(line);
-              setSlides((prev) => [...prev, slide]);
+              setGlobalSlides((prev) => [...prev, slide]);
             } catch (e) {
               console.error("Error parsing slide:", e);
             }
@@ -72,25 +75,27 @@ export default function PromptEditor() {
   // Add function to add a new card
   const addCard = () => {
     const newId =
-      slides.length > 0 ? Math.max(...slides.map((card) => card.id)) + 1 : 1;
+      globalSlides.length > 0
+        ? Math.max(...globalSlides.map((card) => card.id)) + 1
+        : 1;
     const newCard = {
       id: newId,
       title: `New Card ${newId}`,
       bulletPoints: ["Add your content here..."],
       isEditing: true,
     };
-    setSlides([...slides, newCard]);
+    setGlobalSlides([...globalSlides, newCard]);
   };
 
   // Add function to delete a card
   const deleteCard = (id: number) => {
-    slides.filter((card) => card.id !== id);
+    globalSlides.filter((card) => card.id !== id);
   };
 
   // Add function to update card content
   const updateCard = (id: number, title: any, content: any) => {
-    setSlides(
-      slides.map((card) => {
+    setGlobalSlides(
+      globalSlides.map((card) => {
         if (card.id === id) {
           return { ...card, title, content, isEditing: false };
         }
@@ -119,7 +124,7 @@ export default function PromptEditor() {
           <SettingsPanel />
           <ContentPanel
             loading={loading}
-            cards={slides}
+            cards={globalSlides}
             addCard={addCard}
             deleteCard={deleteCard}
             toggleEditMode={toggleEditMode}
