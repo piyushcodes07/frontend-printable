@@ -173,7 +173,7 @@ export default function Home() {
         ) : (
           <div className="bg-[#e1e3eb] m-0 p-0 font-sans w-full">
             <header className="border-b border-gray-300 p-2 font-bold text-black text-sm bg-white">
-              Protect PDF
+              Unlock PDF
             </header>
             <main className="flex flex-col md:flex-row min-h-[calc(100vh-32px)]">
             <section className="flex-1 flex flex-col items-center justify-center bg-[#e0e2eb] p-4">
