@@ -27,7 +27,7 @@ export default function MergeProgressPage() {
 
       <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center text-center px-4">
         <div className="mb-6">
-          <img src="/pdf file.png" alt="PDF Icon" className="w-28 h-36 mx-auto" />
+          <img src="/pdfformat.png" alt="PDF Icon" className="w-28 h-36 mx-auto" />
           <p className="text-sm text-gray-500 mt-2">
             personal-scanned-letter-template.pdf (5.1 MB)
           </p>
