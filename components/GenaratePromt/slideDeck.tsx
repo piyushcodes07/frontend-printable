@@ -2,9 +2,11 @@
 import SlideforIntroduction from "@/components/Generate/slides/slideForIntroduction";
 import { SlideConflictOverview } from "../Generate/slides/slideConflictOverview";
 import { useUser } from "@clerk/nextjs";
+import { SlideCircularProcesss } from "../Generate/slides/SlideCircularProcess";
 const slideComponents: Record<string, any> = {
   SlideForIntroduction: SlideforIntroduction,
   SlideConflictOverview: SlideConflictOverview,
+  SlideCircularProcesss: SlideCircularProcesss,
 };
 
 export function SlideDeck({

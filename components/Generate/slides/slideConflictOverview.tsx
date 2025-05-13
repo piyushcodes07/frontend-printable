@@ -1,6 +1,8 @@
 import React from "react";
 import { z } from "zod";
 import { tool } from "ai";
+import { useFirstPexelsImage } from "@/components/ui/pixelsPhoto";
+import { Rows } from "lucide-react";
 
 export const SlideConflictOvervieww = tool({
   description:
@@ -45,62 +47,110 @@ export const SlideConflictOverview: React.FC<Props> = ({
   subHeadingColor = "#1f433e",
   bulletColor = "#1f433e",
 }) => {
+  const { photo, error, refresh } = useFirstPexelsImage(title, {
+    refreshInterval: 0,
+  });
+
   return (
     <div
       style={{
-        fontFamily: "sans-serif",
-        color: headingColor,
+        height: "450px", // total fixed height
+        width: "1000px",
+        maxWidth: "1050px", // to match your screenshot
+        margin: "0 auto",
+        fontFamily: "Georgia, serif",
         backgroundColor,
-        padding: "1rem",
+        color: headingColor,
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        borderRadius: "8px",
       }}
     >
-      {/* Header Image */}
-      <div style={{ width: "100%", height: "250px", overflow: "hidden" }}>
+      {/* Top Image Area */}
+      <div
+        style={{
+          height: "250px",
+          width: "100%",
+          overflow: "hidden",
+          flexShrink: 0,
+        }}
+      >
         <img
-          src={imageSrc}
+          src={photo?.src?.landscape || imageSrc}
           alt={title}
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
         />
       </div>
 
-      {/* Title */}
-      <h1 style={{ fontSize: "2rem", margin: "1rem 0", color: headingColor }}>
-        {title}
-      </h1>
-
-      {/* Sections Grid */}
+      {/* Bottom Content Area */}
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${sections.length}, 1fr)`,
-          gap: "2rem",
+          flex: 1,
+          padding: "1.5rem",
+          backgroundColor,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
         }}
       >
-        {sections.map((sec, idx) => (
-          <div key={idx}>
-            <img
-              src={sec.iconSrc}
-              alt={`${sec.heading} icon`}
-              style={{ width: "24px", height: "24px", marginBottom: "0.5rem" }}
-            />
-            <h2
-              style={{
-                fontSize: "1.25rem",
-                margin: "0.5rem 0",
-                color: subHeadingColor,
-              }}
-            >
-              {sec.heading}
-            </h2>
-            <div style={{ fontSize: "1rem", lineHeight: "1.5" }}>
-              {sec.contents.map((line, i) => (
-                <p key={i} style={{ margin: "0.5rem 0", color: bulletColor }}>
-                  {line}
-                </p>
-              ))}
+        {/* Title */}
+        <h1
+          style={{
+            fontSize: "2rem",
+            marginBottom: "1rem",
+            color: headingColor,
+          }}
+        >
+          {title}
+        </h1>
+
+        {/* Section Grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${sections.length}, 1fr)`,
+            gap: "1.5rem",
+          }}
+        >
+          {sections.map((sec, idx) => (
+            <div key={idx}>
+              <img
+                src="/AI-PDF/check.png"
+                alt={`${sec.heading} icon`}
+                style={{
+                  width: "24px",
+                  height: "24px",
+                  marginBottom: "0.5rem",
+                  background: "#e8e2d8",
+                  padding: "4px",
+                  borderRadius: "4px",
+                }}
+              />
+              <h2
+                style={{
+                  fontSize: "1.1rem",
+                  fontWeight: "600",
+                  marginBottom: "0.25rem",
+                  color: subHeadingColor,
+                }}
+              >
+                {sec.heading}
+              </h2>
+              <div style={{ fontSize: "0.95rem", color: bulletColor }}>
+                {sec.contents.map((line, i) => (
+                  <p key={i} style={{ margin: "0.25rem 0" }}>
+                    {line}
+                  </p>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

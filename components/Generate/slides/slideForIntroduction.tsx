@@ -43,11 +43,11 @@ const SlideForIntroduction: React.FC<SlideProps> = ({
       style={backgroundStyle}
     >
       {/* Left Image */}
-      <div className="w-full md:w-1/2 mb-6 md:mb-0">
+      <div className="w-[600px] h-[450px]  md:w-1/2 mb-6 md:mb-0">
         <img
-          src={photo?.src.medium}
+          src={photo?.src.landscape}
           alt={title}
-          className="w-full h-auto rounded-lg shadow-md"
+          className="w-full h-full object-contain rounded-lg shadow-md"
         />
       </div>
 
