@@ -1,6 +1,5 @@
 "use client";
 
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import React, { useEffect, useState } from "react";
 
 
@@ -173,7 +172,7 @@ export default function Home() {
         ) : (
           <div className="bg-[#e1e3eb] m-0 p-0 font-sans w-full">
             <header className="border-b border-gray-300 p-2 font-bold text-black text-sm bg-white">
-              Unlock PDF
+              Protect PDF
             </header>
             <main className="flex flex-col md:flex-row min-h-[calc(100vh-32px)]">
             <section className="flex-1 flex flex-col items-center justify-center bg-[#e0e2eb] p-4">
@@ -239,6 +238,25 @@ export default function Home() {
                       Hit unlock and you're good to go.
                     </p>
                   </div>
+                  <div className="bg-white flex items-center border border-gray-300 rounded-md overflow-hidden">
+                      <span className="px-3 text-gray-600 text-xs flex items-center justify-center">
+                        <i className="fas fa-lock"></i>
+                      </span>
+                      <input
+                        className="flex-1 py-2 px-3 text-xs outline-none"
+                        placeholder="Enter Password"
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      <button
+                        className="bg-[#1a1f56] px-3 py-2.5 text-white text-xs flex items-center justify-center"
+                        type="button"
+                        onClick={togglePasswordVisibility}
+                      >
+                        <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+                      </button>
+                    </div>
                 </div>
                 <button
                   className="mt-6 w-full border border-[#1a1f56] text-[#1a1f56] text-xs py-2 rounded-md flex items-center justify-center hover:bg-[#1a1f56] hover:text-white transition"
