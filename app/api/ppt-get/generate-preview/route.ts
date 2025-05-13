@@ -32,6 +32,31 @@ export async function POST(request: Request) {
               return { ...props };
             },
           }),
+          SlideConflictOverview: tool({
+            description:
+              "Generate a slide with a full-width header image, a main title, and a flexible grid of informational sections (each with an icon, subheading, and content). Ideal for historical or thematic overviews divided into Causes, Key Events, Outcomes, etc., with customizable color theming.",
+            parameters: z.object({
+              imageSrc: z.string().describe("URL of the main slide image"),
+              title: z.string().describe("Main heading of the slide"),
+              sections: z
+                .array(
+                  z.object({
+                    iconSrc: z.string().describe("URL of the section icon"),
+                    heading: z.string().describe("Section title"),
+                    contents: z
+                      .array(z.string())
+                      .describe(
+                        "Array of paragraph or bullet texts for this section",
+                      ),
+                  }),
+                )
+                .describe("List of sections to display on the slide"),
+            }),
+            execute: async (props) => {
+              // Just echo back to feed into <Slide {...props} />
+              return { ...props };
+            },
+          }),
         },
         toolChoice: "required",
       });

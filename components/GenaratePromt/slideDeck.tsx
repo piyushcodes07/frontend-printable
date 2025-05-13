@@ -1,8 +1,10 @@
 "use client";
 import SlideforIntroduction from "@/components/Generate/slides/slideForIntroduction";
+import { SlideConflictOverview } from "../Generate/slides/slideConflictOverview";
 import { useUser } from "@clerk/nextjs";
 const slideComponents: Record<string, any> = {
   SlideForIntroduction: SlideforIntroduction,
+  SlideConflictOverview: SlideConflictOverview,
 };
 
 export function SlideDeck({
