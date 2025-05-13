@@ -9,7 +9,7 @@ function hexToRgb(hex: string) {
   return rgb(r / 255, g / 255, b / 255);
 }
 interface SignData {
-  type: "sign" | "text" | "date" | "checkbox" | "initials";
+  type: "sign" | "text" | "date" | "checkbox" | "initials" | "documentId";
   signUrl?: string;
   value?: string;
   checked?: boolean;
@@ -21,7 +21,8 @@ interface SignData {
 
 export const drawSignatureOnPdf = async (
   pdfData: ArrayBuffer,
-  signs: SignData[]
+  signs: SignData[],
+  signId?: string
 ) => {
   const pdfDoc = await PDFDocument.load(pdfData);
   let i = -1;
@@ -43,10 +44,19 @@ export const drawSignatureOnPdf = async (
         width: sign.signSize.width,
         height: sign.signSize.height,
       });
+      if (signId) {
+        page.drawText(signId, {
+          x: sign.position.x,
+          y: height - sign.position.y,
+          size: 10,
+          color: hexToRgb("#80919E"),
+        });
+      }
     } else if (
       sign.type === "text" ||
       sign.type === "date" ||
-      sign.type === "initials"
+      sign.type === "initials" ||
+      sign.type === "documentId"
     ) {
       const fontSize = sign.fontSize || 12;
       const baselineOffset = fontSize * 1.2;

@@ -12,10 +12,15 @@ import { sign } from "crypto";
 function EditCard({ index, type }: { index: number; type: string }) {
   const { updateSign, removeSign, signs } = useSignUrl();
   const { user } = useUser();
-  const [fontSize, setFontSize] = useState(22);
+  const [fontSize, setFontSize] = useState(12);
   const [textColor, setTextColor] = useState("#000000");
   return (
-    <div className="w-[300px] bg-[#fff] -z-50 rounded-3xl card-shadow  flex flex-col  space-x-2 border border-[#C9C9C9]">
+    <div
+      className={
+        "w-[300px] bg-[#fff] -z-50 rounded-3xl card-shadow  flex flex-col  space-x-2 border border-[#C9C9C9] " +
+        (type === "documentId" ? "hidden" : "")
+      }
+    >
       {/* Avatar & Name */}
       <div className="flex items-center space-x-2 p-2  w-full justify-between  ">
         <img

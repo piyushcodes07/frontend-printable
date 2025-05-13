@@ -9,7 +9,7 @@ import { useSignUrl } from "../useSign";
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js`;
 
 const PdfLoader = ({ pdfUrl }: { pdfUrl: string }) => {
-  const { signs, setPdfData } = useSignUrl();
+  const { signs, setPdfData, addSign } = useSignUrl();
   const [pdfData, setPdfBuffer] = useState<ArrayBuffer | null>(null);
   const [pdfPages, setPdfPages] = useState<any[]>([]);
   const [scale, setScale] = useState(1);
@@ -20,6 +20,15 @@ const PdfLoader = ({ pdfUrl }: { pdfUrl: string }) => {
     const pdf = await loadingTask.promise;
     const pages = [];
     for (let i = 1; i <= pdf.numPages; i++) {
+      const options = {
+        type: "documentId" as "documentId",
+        value: "",
+        color: "#80919E",
+        fontSize: 10,
+        signSize: { width: 100, height: 30 },
+        position: { x: 380, y: 5, pageIndex: i - 1 },
+      };
+      addSign(options);
       const page = await pdf.getPage(i);
       const rotation = page.rotate;
       const viewport = page.getViewport({ scale: newScale, rotation });
@@ -71,7 +80,7 @@ const PdfLoader = ({ pdfUrl }: { pdfUrl: string }) => {
       </div>
 
       {/* Zoom Control Buttons */}
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-[250px] z-50">
+      {/* <div className="fixed bottom-4 left-1/2 transform -translate-x-[250px] z-50">
         <div className="flex gap-4 bg-black/90 backdrop-blur-md shadow-lg px-6 py-3 rounded-full border border-gray-300">
           <button
             onClick={handleZoomOut}
@@ -88,7 +97,7 @@ const PdfLoader = ({ pdfUrl }: { pdfUrl: string }) => {
             +
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -179,8 +179,11 @@ const PdfCanvasPage = ({
                     },
                   });
                 }}
+                disableDragging={sign.type === "documentId"}
                 enableResizing={
-                  sign.type != "checkbox"
+                  sign.type === "documentId"
+                    ? false
+                    : sign.type !== "checkbox"
                     ? true
                     : {
                         top: false,
@@ -211,47 +214,49 @@ const PdfCanvasPage = ({
                 )}
                 {value != null && (
                   <div
-                    className="cursor-grab space-y-2"
+                    className=" space-y-2"
                     style={{
                       fontSize: `${sign.fontSize}px`,
                     }}
                   >
-                    <input
-                      type={
-                        sign.type === "initials"
-                          ? "text"
-                          : sign.type === "date"
-                          ? "date"
-                          : sign.type === "checkbox"
-                          ? "checkbox"
-                          : "text"
-                      }
-                      id={`check-${index}`}
-                      checked={sign.type === "checkbox" ? value : null}
-                      value={sign.type !== "checkbox" ? value : value}
-                      onClick={() => {
-                        setCard(true);
-                        setCardIndex(index);
-                      }}
-                      onChange={(e) =>
-                        updateSign(index, {
-                          value:
-                            sign.type === "checkbox"
-                              ? e.target.checked
-                              : e.target.value,
-                        })
-                      }
-                      className="border border-black outline-none w-full"
-                      style={{
-                        color: (color as string) || "#000000",
-                        padding: "0",
-                        margin: "0",
-                        lineHeight: "1",
-                        boxSizing: "border-box",
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    />
+                    {sign.type !== "documentId" && (
+                      <input
+                        type={
+                          sign.type === "initials"
+                            ? "text"
+                            : sign.type === "date"
+                            ? "date"
+                            : sign.type === "checkbox"
+                            ? "checkbox"
+                            : "text"
+                        }
+                        id={`check-${index}`}
+                        checked={sign.type === "checkbox" ? value : null}
+                        value={sign.type !== "checkbox" ? value : value}
+                        onClick={() => {
+                          setCard(true);
+                          setCardIndex(index);
+                        }}
+                        onChange={(e) =>
+                          updateSign(index, {
+                            value:
+                              sign.type === "checkbox"
+                                ? e.target.checked
+                                : e.target.value,
+                          })
+                        }
+                        className={"outline-none w-full border border-black"}
+                        style={{
+                          color: (color as string) || "#000000",
+                          padding: "0",
+                          margin: "0",
+                          lineHeight: "1",
+                          boxSizing: "border-box",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      />
+                    )}
 
                     {isCard && cardIndex === index && (
                       <EditCard index={index} type={sign.type} />

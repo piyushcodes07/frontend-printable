@@ -2,13 +2,13 @@
 import React, { createContext, useContext, useState } from "react";
 
 export interface SignData {
-  type: "sign" | "text" | "date" | "checkbox" | "initials";
+  type: "sign" | "text" | "date" | "checkbox" | "initials" | "documentId";
   signUrl?: string;
   value?: string | boolean;
   checked?: boolean;
   fontSize?: number;
   color?: string;
-  signSize: { width: number; height: number; fontSize?: number };
+  signSize: { width: number; height: number };
   position: { x: number; y: number; pageIndex: number | null };
 }
 

@@ -41,21 +41,36 @@ function SignDocument() {
     router.replace(`?${params.toString()}`); // no page reload
   };
   const { user } = useUser();
-  const { fileId, signers_email, signs, pdfData } = useSignUrl();
+  const { fileId, signers_email, signs, pdfData, updateSign } = useSignUrl();
 
   const uploadDocument = async () => {
     console.log(fileName);
     if (!pdfData || !signs || !fileName) {
       throw new Error("Missing required data for saving document.");
     }
+    const fileId = String(Date.now());
+    // Create a new signs array with updated documentId values
+    const updatedSigns = signs.map((sign, index) =>
+      sign.type === "documentId"
+        ? { ...sign, value: `Printable.com Document ID: ${fileId}` }
+        : sign
+    );
 
-    const fileBlob = await drawSignatureOnPdf(pdfData, signs);
+    // Update the signs state
+    const indexArr = signs
+      .map((sign, index) => (sign.type === "documentId" ? index : -1))
+      .filter((i) => i !== -1);
+    for (const index of indexArr) {
+      updateSign(index, { value: `Printable.com Document ID: ${fileId}` });
+    }
+
+    const fileBlob = await drawSignatureOnPdf(pdfData, updatedSigns);
     const pdfFile = new File([fileBlob], fileName, { type: "application/pdf" });
 
     const formData = new FormData();
     formData.append("file", pdfFile);
     formData.append("ownerId", user?.id || "");
-    formData.append("fileName", fileName);
+    formData.append("fileId", fileId);
 
     try {
       const response = await UploadDocument(formData);
@@ -95,19 +110,6 @@ function SignDocument() {
     }
   };
 
-  // const sendSignRequest = async (payload: any) => {
-  //   try {
-  //     const res = await sendSignRequestEmail(payload);
-  //     const response = await res.json();
-  //     if (!response.success) {
-  //       throw new Error(response.msg);
-  //     }
-  //     return response;
-  //   } catch (err) {
-  //     throw err;
-  //   }
-  // };
-
   const handleSignRequest = async (e) => {
     e.preventDefault();
     if (!signers_email || signers_email.length === 0) {
@@ -123,7 +125,7 @@ function SignDocument() {
         const payload = {
           requestedBy: user?.id,
           fileIds: [fileId],
-          signers_email: signers_email,
+          signers_email: [signers_email[signers_email.length - 1]],
           link,
           signs,
         };
@@ -136,7 +138,7 @@ function SignDocument() {
         const payload = {
           requestedBy: user?.id,
           fileIds: [result.fileId],
-          signers_email: signers_email,
+          signers_email: [signers_email[signers_email.length - 1]],
           link,
           signs,
         };

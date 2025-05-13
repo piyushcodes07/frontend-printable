@@ -35,7 +35,8 @@ const SigningTool = () => {
       type: "initials" as "initials",
       value: "demo",
       signSize: { width: 60, height: 20 },
-      position: { x: 200, y: 200, pageIndex: currentSlide, fontSize: 12 },
+      fontSize: 12,
+      position: { x: 200, y: 200, pageIndex: currentSlide },
     };
     addSign(options);
   };
@@ -45,7 +46,8 @@ const SigningTool = () => {
       type: "text" as "text",
       value: "Sample text",
       signSize: { width: 100, height: 30 },
-      position: { x: 150, y: 200, pageIndex: currentSlide, fontSize: 14 },
+      fontSize: 12,
+      position: { x: 150, y: 200, pageIndex: currentSlide },
     };
     addSign(options);
   };
@@ -55,7 +57,8 @@ const SigningTool = () => {
       type: "date" as "date",
       value: new Date().toISOString().split("T")[0],
       signSize: { width: 100, height: 30 },
-      position: { x: 150, y: 240, pageIndex: currentSlide, fontSize: 14 },
+      fontSize: 12,
+      position: { x: 150, y: 240, pageIndex: currentSlide },
     };
     addSign(options);
   };
@@ -65,7 +68,8 @@ const SigningTool = () => {
       type: "checkbox" as "checkbox",
       value: false,
       signSize: { width: 20, height: 20 },
-      position: { x: 150, y: 280, pageIndex: currentSlide, fontSize: 14 },
+      fontSize: 12,
+      position: { x: 150, y: 280, pageIndex: currentSlide },
     };
     addSign(options);
   };

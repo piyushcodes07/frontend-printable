@@ -45,8 +45,6 @@ export default function SignDocument() {
     }
 
     setSubmitting(true);
-    // const API = `${API_BASE_URL}/api/esign/submitSignature`;
-
     try {
       const fileBlob = await drawSignatureOnPdf(pdfData, signs);
       const pdfFile = new File([fileBlob], "signed.pdf", {
