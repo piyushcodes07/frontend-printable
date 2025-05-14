@@ -22,11 +22,9 @@ export async function GET(request: Request) {
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
-      let id = 1;
       for await (const slide of elementStream) {
-        const chunk = encoder.encode(JSON.stringify({ ...slide, id }) + "\n");
+        const chunk = encoder.encode(JSON.stringify({ ...slide }) + "\n");
         controller.enqueue(chunk);
-        id += 1;
       }
       controller.close();
     },
