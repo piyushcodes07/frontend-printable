@@ -29,13 +29,26 @@ const converterConfig: Record<
         allowedExtensions: ".pdf",
         outputExtension: "",
     },
-
+    "excel-pdf": {
+        heading: "Excel to PDF Converter",
+        supportedFormats: ".csv,.xlsx",
+        description: "Save Excel Spreadsheets data into PDF — no sign-ups required.",
+        allowedExtensions: ".csv,.xlsx",
+        outputExtension: "",
+    },
     "pdf-ppt": {
         heading: "PDF to PowerPoint Converter",
         supportedFormats: ".pdf",
         description: "Turn your PDF documents into fully editable PowerPoint presentations in seconds.",
         allowedExtensions: ".pdf",
         outputExtension: "pptx",
+    },
+    "ppt-pdf": {
+        heading: "PowerPoint to PDF Converter",
+        supportedFormats: ".ppt,.pptx",
+        description: "Turn your PowerPoint Presentations into PDF in seconds.",
+        allowedExtensions: ".ppt,.pptx",
+        outputExtension: "",
     },
     "pdf-image": {
         heading: "PDF to Image Converter",
