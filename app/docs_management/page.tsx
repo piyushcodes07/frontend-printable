@@ -19,7 +19,7 @@ const Dashboard = () => {
             </div>
 
             {/* Right Side: All Files */}
-            <div className="col-span-2  rounded-lg  flex-grow">
+            <div className="col-span-2  rounded-lg  flex-grow ml-12">
                 <AllFile />
             </div>
         </div>
