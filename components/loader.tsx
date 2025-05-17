@@ -31,7 +31,7 @@ const router =useRouter();
   useEffect(()=>{
    
     if(progress===100){
-        router.push('/doc-conversion/convert')
+        router.push('/from-pdf-conversion/convert')
     }
   },[progress,router])
 

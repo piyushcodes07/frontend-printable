@@ -182,7 +182,11 @@ export default function ToolsDropDown({
                     text="Protect PDF"
                     src="/tools/lock.png"
                   />
-                  <RightSectionElement text="Flat PDF" src="/tools/flat.png" />
+                  <RightSectionElement
+                    text="Flat PDF"
+                    src="/tools/flat.png"
+                    link="/drop-file"
+                  />
                 </div>
               </div>
             </div>

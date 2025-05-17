@@ -64,5 +64,3 @@ const router =useRouter();
         </>
   )
 }
-
-export default Convert
