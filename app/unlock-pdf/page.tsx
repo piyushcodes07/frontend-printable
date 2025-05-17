@@ -310,7 +310,7 @@ export default function Home() {
         <div className="bg-[#e0e2eb] w-full">
         <header className="bg-white border-b border-gray-300">
          <div className="max-w-full px-4 py-2 font-bold text-black text-[14px]">
-          Protect PDF
+          Unlock PDF
          </div>
         </header>
         <main className="flex min-h-[calc(100vh-36px)]">
@@ -334,7 +334,7 @@ export default function Home() {
   {/* Download Button */}
   <button
     className="w-full flex items-center justify-center gap-2 bg-[#050a3d] text-[10px] text-white py-2 rounded-md"
-    onClick={handleDownload}
+    onClick={handleProtectPDF}
   >
     <i className="fas fa-download text-[10px]"></i>
     DOWNLOAD
