@@ -1,5 +1,6 @@
 "use client";
-
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 
 
@@ -42,14 +43,48 @@ export default function Home() {
     event.preventDefault();
   };
 
-  const handleProtectPDF = () => {
+  const handleProtectPDF = async() => {
     setUploading(true);
     setProcessing(true);
-    setTimeout(() => {
+
+
+    try {
+      const formData = new FormData();
+      formData.append("fileInput", selectedFiles[0]);
+      formData.append("password", password);
+      const response = await axios.post("/api/remove-password", formData, {
+        responseType: "blob",
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      // Extract filename from Content-Disposition header
+      const contentDisposition = response.headers["content-disposition"];
+      let filename = "downloaded-file";
+
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename\*?=(?:UTF-8'')?["']?([^"';\n]+)["']?/i);
+        if (match && match[1]) {
+          filename = decodeURIComponent(match[1]);
+        }
+      }
+
+      // Create blob URL and trigger download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("PDF download failed:", error);
+      alert("Failed to download PDF");
+    } finally {
       setProcessing(false);
       setUploading(false);
       setSecured(true);
-    }, 5000);
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -172,7 +207,7 @@ export default function Home() {
         ) : (
           <div className="bg-[#e1e3eb] m-0 p-0 font-sans w-full">
             <header className="border-b border-gray-300 p-2 font-bold text-black text-sm bg-white">
-              Protect PDF
+              Unlock PDF
             </header>
             <main className="flex flex-col md:flex-row min-h-[calc(100vh-32px)]">
             <section className="flex-1 flex flex-col items-center justify-center bg-[#e0e2eb] p-4">
@@ -215,8 +250,9 @@ export default function Home() {
         src="https://storage.googleapis.com/a1aa/image/22f85669-7b9f-414e-1c8d-012a90b71317.jpg"
         width="150"
       />
-      <p className="text-[10px] text-gray-500 mt-2">
-        personal-letter-template.pdf (78.68 KB)
+      <p className="text-gray-600 font-semibold mt-6">
+        {selectedFiles[0]?.name || "personal-letter-template.pdf"} (
+        {(selectedFiles[0]?.size / 1024).toFixed(2) || "78.68"} KB)
       </p>
       <p className="text-gray-600 font-semibold mt-6">Uploading....</p>
       <div className="w-64 h-4 rounded-full bg-white mt-2 border border-gray-200 overflow-hidden">
@@ -280,8 +316,9 @@ export default function Home() {
         <main className="flex min-h-[calc(100vh-36px)]">
          <section className="flex-1 flex flex-col items-center justify-center gap-2 bg-[#e0e2eb] px-4">
           <img alt="Red PDF file icon with folded corner on pink background" className="w-[160px] h-[200px] rounded-xl drop-shadow-md" height="200" src="https://storage.googleapis.com/a1aa/image/e2d21a1c-a062-442f-23ae-072e1bf44239.jpg" width="160"/>
-          <p className="text-[10px] text-[#9a9a9a]">
-           personal-letter-template.pdf (62.64 KB)
+          <p className="text-gray-600 font-semibold mt-6">
+            {selectedFiles[0]?.name || "personal-letter-template.pdf"} (
+            {(selectedFiles[0]?.size / 1024).toFixed(2) || "78.68"} KB)
           </p>
           <p className="text-[14px] font-semibold text-black">
            PDFs are secured now!
@@ -290,9 +327,9 @@ export default function Home() {
          <aside className="w-[320px] bg-gradient-to-b from-[#d7f0d9] to-[#e0e2eb] px-6 py-8 flex flex-col gap-4">
   {/* File Name */}
   <p className="text-[12px] text-black underline decoration-dotted decoration-black decoration-1 cursor-pointer max-w-max">
-    personal-letter-template
-    <span className="text-[#9a9a9a]">.docx</span>
-  </p>
+        {selectedFiles[0]?.name || "personal-letter-template.pdf"} (
+        {(selectedFiles[0]?.size / 1024).toFixed(2) || "78.68"} KB)
+      </p>
 
   {/* Download Button */}
   <button
