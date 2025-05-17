@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
 import LeftSectionElement from "./LeftSectionElement";
 import RightSectionElement from "./RightSectionElement";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,7 +15,7 @@ export default function ConvertDropdown({
   onToggle,
 }: ConvertDropDownProps) {
   const [activeSection, setActiveSection] = useState<"from-pdf" | "to-pdf">(
-    "from-pdf",
+    "from-pdf"
   );
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router=useRouter();
