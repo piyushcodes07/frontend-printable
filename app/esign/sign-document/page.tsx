@@ -49,7 +49,7 @@ function SignDocument() {
       throw new Error("Missing required data for saving document.");
     }
     const fileId = String(Date.now());
-    // Create a new signs array with updated documentId values
+    // create a new signs array with updated documentId values
     const updatedSigns = signs.map((sign, index) =>
       sign.type === "documentId"
         ? { ...sign, value: `Printable.com Document ID: ${fileId}` }
@@ -138,7 +138,7 @@ function SignDocument() {
         const payload = {
           requestedBy: user?.id,
           fileIds: [result.fileId],
-          signers_email: [signers_email[signers_email.length - 1]],
+          signers_email: signers_email,
           link,
           signs,
         };
