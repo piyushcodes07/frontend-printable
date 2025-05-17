@@ -1,7 +1,7 @@
 "use client";
-import { POST } from "@/app/api/flatten/route";
 import { useUser } from "@clerk/nextjs";
-import React, { useEffect, useRef, useState } from "react";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface File {
   fileId: string;
@@ -16,7 +16,7 @@ interface Folder {
   folderName: string;
   files: File[];
 }
-
+const API_URL = "http://localhost:5000/api";
 function AllFile() {
   const [createFolder, setCreateFolder] = useState(false);
   const [folderName, setFolderName] = useState("");
@@ -31,6 +31,19 @@ function AllFile() {
   const [searchText, setSearchText] = useState<string>("");
   const [visible, setVisible] = useState({ file: false });
   const { user } = useUser();
+  const [isLoading, setIsLoading] = useState<{
+    addFolder: boolean;
+    uploadFile: boolean;
+    deleteFolder: boolean;
+    moveFile: boolean;
+    deleteFile: boolean;
+  }>({
+    addFolder: false,
+    uploadFile: false,
+    deleteFolder: false,
+    moveFile: false,
+    deleteFile: false,
+  });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -38,15 +51,11 @@ function AllFile() {
   const fetchFolders = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/fileManagement/getFiles",
+        `${API_URL}/fileManagement/getFiles/${
+          user?.id || "user_2wnUNxZtME63CvOzZpEWF6nLm3a"
+        }`,
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ownerId: user?.id || "user_2wnUNxZtME63CvOzZpEWF6nLm3a",
-          }),
+          method: "GET",
         }
       ); // Replace with actual endpoint
       const result: { msg: string; data: Folder[] } = await response.json();
@@ -82,20 +91,18 @@ function AllFile() {
   // Add folder
   const handleAddFolder = async () => {
     if (!folderName.trim()) return;
+    setIsLoading((prev) => ({ ...prev, addFolder: true }));
     const payload = {
       folderName,
       ownerId: user?.id || "user_2wnUNxZtME63CvOzZpEWF6nLm3a",
     };
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/fileManagement/createFolder",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(`${API_URL}/fileManagement/createFolder`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
       if (response.ok) {
         setFolderName("");
@@ -106,6 +113,8 @@ function AllFile() {
       }
     } catch (error) {
       console.error("Error adding folder:", error);
+    } finally {
+      setIsLoading((prev) => ({ ...prev, addFolder: false }));
     }
   };
 
@@ -114,12 +123,15 @@ function AllFile() {
     const file = e.target.files?.[0];
     if (!file || !fileSelection) return;
 
+    setIsLoading((prev) => ({ ...prev, uploadFile: true }));
     const formData = new FormData();
+    const fileId = String(Date.now());
     formData.append("file", file);
-    formData.append("folderName", fileSelection);
+    formData.append("ownerId", user?.id || "user_2wnUNxZtME63CvOzZpEWF6nLm3a");
+    formData.append("fileId", fileId);
 
     try {
-      const response = await fetch("/api/files", {
+      const response = await fetch(`${API_URL}/esign/upload-document`, {
         method: "POST",
         body: formData,
       });
@@ -131,17 +143,20 @@ function AllFile() {
       }
     } catch (error) {
       console.error("Error uploading file:", error);
+    } finally {
+      setIsLoading((prev) => ({ ...prev, uploadFile: false }));
     }
   };
 
   // Rename folder
   const handleRenameFolder = async (folder: Folder, newName: string) => {
     try {
-      const response = await fetch(`/api/folders/${folder.folderId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folderName: newName }),
-      });
+      const response = await fetch(
+        `${API_URL}/fileManagement/renameFolder/${folder.folderId}/${newName}`,
+        {
+          method: "PATCH",
+        }
+      );
 
       if (response.ok) {
         setOpenFolderMenuIndex(null);
@@ -156,10 +171,14 @@ function AllFile() {
 
   // Delete folder
   const handleDeleteFolder = async (folder: Folder) => {
+    setIsLoading((prev) => ({ ...prev, deleteFolder: true }));
     try {
-      const response = await fetch(`/api/folders/${folder.folderId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `${API_URL}/fileManagement/deleteFolder/${folder.folderId}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         setOpenFolderMenuIndex(null);
@@ -169,17 +188,23 @@ function AllFile() {
       }
     } catch (error) {
       console.error("Error deleting folder:", error);
+    } finally {
+      setIsLoading((prev) => ({ ...prev, deleteFolder: false }));
     }
   };
 
   // Move file to folder
-  const handleMoveFile = async (fileId: string, targetFolderName: string) => {
+  const handleMoveFile = async (fileId: string, folderId: string) => {
+    setIsLoading((prev) => ({ ...prev, moveFile: true }));
     try {
-      const response = await fetch(`/api/files/${fileId}/move`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetFolderName }),
-      });
+      const response = await fetch(
+        `${API_URL}/fileManagement/moveFileToFolder`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fileId, folderId }),
+        }
+      );
 
       if (response.ok) {
         setOpenFileMenuIndex(null);
@@ -189,14 +214,23 @@ function AllFile() {
       }
     } catch (error) {
       console.error("Error moving file:", error);
+    } finally {
+      setIsLoading((prev) => ({ ...prev, moveFile: false }));
     }
   };
 
   // Delete file
-  const handleDeleteFile = async (fileId: string) => {
+  const handleDeleteFile = async (fileId: string, fileName: string) => {
+    setIsLoading((prev) => ({ ...prev, deleteFile: true }));
     try {
-      const response = await fetch(`/api/files/${fileId}`, {
-        method: "DELETE",
+      const response = await fetch(`${API_URL}/fileManagement/deleteFile`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileId,
+          ownerId: user?.id || "user_2wnUNxZtME63CvOzZpEWF6nLm3a",
+          fileName,
+        }),
       });
 
       if (response.ok) {
@@ -207,6 +241,8 @@ function AllFile() {
       }
     } catch (error) {
       console.error("Error deleting file:", error);
+    } finally {
+      setIsLoading((prev) => ({ ...prev, deleteFile: false }));
     }
   };
 
@@ -254,6 +290,28 @@ function AllFile() {
               >
                 <img src="./upload.png" className="h-5 w-5" alt="" />
                 <p>Upload File</p>
+                {isLoading.uploadFile && (
+                  <svg
+                    className="animate-spin ml-2 h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                )}
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -296,14 +354,26 @@ function AllFile() {
           {folders.map((folder, idx) => (
             <div
               key={folder.folderId || "root"}
-              className="relative flex items-center justify-between bg-white rounded-lg p-2 min-w-[150px] w-1/5 cursor-pointer"
+              className={`relative flex items-center justify-between ${
+                fileSelection === folder.folderName
+                  ? "bg-[#06044B] text-white"
+                  : "bg-white"
+              } rounded-lg p-2 min-w-[150px] w-1/5 cursor-pointer`}
             >
               <div
                 className="flex items-center gap-x-2"
                 onClick={() => setFileselection(folder.folderName)}
               >
                 <img src="./folder.png" className="h-6 w-6" alt="" />
-                <p className="text-black">{folder.folderName}</p>
+                <p
+                  className={
+                    fileSelection === folder.folderName
+                      ? "text-white"
+                      : "text-black"
+                  }
+                >
+                  {folder.folderName}
+                </p>
               </div>
               <img
                 src="./threedot.webp"
@@ -334,6 +404,28 @@ function AllFile() {
                     onClick={() => handleDeleteFolder(folder)}
                   >
                     Delete
+                    {isLoading.deleteFolder && (
+                      <svg
+                        className="animate-spin ml-2 h-4 w-4 inline"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    )}
                   </div>
                 </div>
               )}
@@ -362,9 +454,31 @@ function AllFile() {
             </button>
             <button
               onClick={handleAddFolder}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center"
             >
               Add
+              {isLoading.addFolder && (
+                <svg
+                  className="animate-spin ml-2 h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              )}
             </button>
           </div>
         </div>
@@ -417,21 +531,81 @@ function AllFile() {
                     </div>
                     <div
                       className="hover:bg-[#06044B] hover:text-white p-2 cursor-pointer"
-                      onClick={() => handleDeleteFile(item.fileId)}
+                      onClick={() =>
+                        handleDeleteFile(item.fileId, item.fileName)
+                      }
                     >
                       Delete
+                      {isLoading.deleteFile && (
+                        <svg
+                          className="animate-spin ml-2 h-4 w-4 inline"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                      )}
                     </div>
-                    <div
-                      className="hover:bg-[#06044B] hover:text-white p-2 cursor-pointer"
-                      onClick={() => {
-                        const targetFolder = prompt(
-                          "Enter target folder name:"
-                        );
-                        if (targetFolder)
-                          handleMoveFile(item.fileId, targetFolder);
-                      }}
-                    >
-                      Move to Folder
+                    <div className="hover:bg-[#06044B] hover:text-white p-2 cursor-pointer">
+                      <div className="flex items-center justify-between">
+                        <span>Move to Folder</span>
+                        {isLoading.moveFile && (
+                          <svg
+                            className="animate-spin ml-2 h-4 w-4"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                        )}
+                      </div>
+                      <select
+                        className="w-full mt-1 p-1 text-black bg-white rounded"
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            handleMoveFile(item.fileId, e.target.value);
+                          }
+                        }}
+                      >
+                        <option value="">Select folder</option>
+                        {folders.map(
+                          (folder) =>
+                            folder.folderName !== fileSelection && (
+                              <option
+                                key={folder.folderId}
+                                value={folder.folderId || ""}
+                              >
+                                {folder.folderName}
+                              </option>
+                            )
+                        )}
+                      </select>
                     </div>
                   </div>
                 )}
