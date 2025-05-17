@@ -1,14 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { FaChevronDown, FaFileAlt } from 'react-icons/fa';
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { FaChevronDown, FaFileAlt } from "react-icons/fa";
+import { useFileContext } from "./FileContext"; 
 
 export default function PdfCompress() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
+  const { setFile } = useFileContext(); // Add this line to get setFile
 
   const handleFromDeviceClick = () => {
     fileInputRef.current?.click();
@@ -16,28 +18,36 @@ export default function PdfCompress() {
   };
 
   const handleFromDriveClick = () => {
-    alert('Google Drive integration goes here');
+    alert("Google Drive integration goes here");
     setDropdownOpen(false);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const fileName = encodeURIComponent(file.name);
-      const fileSize = encodeURIComponent((file.size / (1024 * 1024)).toFixed(1));
-      router.push(`/uploadcompress?page=upload&name=${fileName}&size=${fileSize}MB`);
-    }
+    if (!file) return;
+
+    // Save the file to context for later use
+    setFile(file);
+
+    const fileName = encodeURIComponent(file.name);
+    const fileSize = encodeURIComponent((file.size / (1024 * 1024)).toFixed(1));
+    router.push(
+      `/uploadcompress?page=upload&name=${fileName}&size=${fileSize}MB`
+    );
   };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -48,7 +58,9 @@ export default function PdfCompress() {
 
       <div className="relative z-20 w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-6 border border-gray-200">
         <div className="bg-[#F3F3F3] border-[3px] border-dashed border-[#06044B] rounded-2xl p-10 text-center">
-          <p className="text-gray-700 font-medium mb-6 text-base">Drag & Drop your file here</p>
+          <p className="text-gray-700 font-medium mb-6 text-base">
+            Drag & Drop your file here
+          </p>
 
           <div className="flex items-center justify-center w-full mb-5">
             <div className="border-t border-gray-300 flex-grow mr-2" />
@@ -65,7 +77,9 @@ export default function PdfCompress() {
               Choose Files
               <div className="h-6 border-l border-white mx-2 self-stretch" />
               <FaChevronDown
-                className={`text-lg transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : 'rotate-0'}`}
+                className={`text-lg transition-transform duration-300 ${
+                  dropdownOpen ? "rotate-180" : "rotate-0"
+                }`}
               />
             </button>
 
@@ -96,7 +110,9 @@ export default function PdfCompress() {
           />
 
           <p className="mt-4 text-xs text-gray-500">
-            Supported formats: .pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.txt<br />
+            Supported formats:
+            .pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.txt
+            <br />
             Max file size: 50MB
           </p>
         </div>
@@ -107,7 +123,8 @@ export default function PdfCompress() {
         Effortlessly compress your PDFs online—completely free of charge.
         <br />
         <span className="block mt-1">
-          Reduce file size while preserving quality, with no sign-ups or downloads required.
+          Reduce file size while preserving quality, with no sign-ups or
+          downloads required.
         </span>
       </p>
     </div>

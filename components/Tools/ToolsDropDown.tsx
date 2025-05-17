@@ -38,7 +38,7 @@ export default function ToolsDropDown({
   };
 
   const [rightWidth, setRightWidth] = useState<number>(
-    rightWidthMapping[activeSection],
+    rightWidthMapping[activeSection]
   );
 
   const containerWidth = LEFT_FIXED_WIDTH + DIVIDER_WIDTH + rightWidth;
@@ -159,6 +159,7 @@ export default function ToolsDropDown({
                 <RightSectionElement
                   text="Compress PDF"
                   src="/tools/compress.png"
+                  link="/pdfcompress"
                 />
               </div>
               <div>
