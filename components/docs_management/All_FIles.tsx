@@ -4,7 +4,7 @@ import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import { Search, X, FolderIcon, FileIcon, Loader2 } from "lucide-react";
+import { Search, X, FolderIcon, FileIcon, Loader2, Upload } from "lucide-react";
 
 interface FileType {
   fileId: string;
@@ -33,6 +33,90 @@ function formatFileSize(bytes: number): string {
     Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
   );
 }
+
+// PDFThumbnail Component - Convert first page of PDF to PNG
+const PDFThumbnail = ({ url, alt }: { url: string; alt: string }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Only load if we have a URL
+    if (!url) {
+      setIsLoading(false);
+      return;
+    }
+
+    const loadPdfThumbnail = async () => {
+      try {
+        // Import our utility function
+        const { convertPdfToImage } = await import("./pdf-to-thumbnail");
+
+        // Convert the PDF to an image
+        const result = await convertPdfToImage(url);
+
+        if (result.success && result.imageUrl) {
+          setThumbnailUrl(result.imageUrl);
+        } else {
+          setError(result.error || "Failed to generate thumbnail");
+        }
+      } catch (err) {
+        console.error("Error generating PDF thumbnail:", err);
+        setError("Failed to generate thumbnail");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPdfThumbnail();
+
+    // Set up a timeout to handle cases where the PDF might not load
+    const timeoutId = setTimeout(() => {
+      if (isLoading) {
+        setIsLoading(false);
+        setError("Thumbnail generation timed out");
+      }
+    }, 10000);
+
+    // Clean up function
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [url, isLoading]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center w-[200px] h-[150px] bg-gray-100 rounded-lg">
+        <Loader2 className="h-8 w-8 text-gray-400 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !thumbnailUrl) {
+    return (
+      <div className="flex flex-col items-center justify-center w-[200px] h-[150px] bg-gray-100 rounded-lg">
+        <FileIcon className="h-10 w-10 text-gray-400 mb-2" />
+        <p className="text-xs text-gray-500 text-center px-2">
+          {error || "PDF preview unavailable"}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-[200px] h-[150px] bg-gray-100 rounded-lg overflow-hidden">
+      <img
+        src={thumbnailUrl || "/placeholder.svg"}
+        alt={alt}
+        className="w-full h-full object-contain"
+        onError={() => {
+          setThumbnailUrl(null);
+          setError("Failed to load thumbnail");
+        }}
+      />
+    </div>
+  );
+};
 
 function AllFile() {
   const { toast } = useToast();
@@ -66,6 +150,7 @@ function AllFile() {
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const emptyStateFileInputRef = useRef<HTMLInputElement>(null);
   const dropAreaRef = useRef<HTMLDivElement>(null);
   const addMenuRef = useRef<HTMLDivElement>(null);
   const folderMenuRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -259,7 +344,17 @@ function AllFile() {
 
   // Upload file
   const uploadFile = async (file: File) => {
-    if (!file || !fileSelection) return;
+    if (!file) {
+      console.error("No file provided");
+      return;
+    }
+
+    if (!fileSelection) {
+      console.error("No folder selected");
+      return;
+    }
+
+    console.log("Uploading file:", file.name, "to folder:", fileSelection);
 
     setIsLoading((prev) => ({ ...prev, uploadFile: true }));
     const formData = new FormData();
@@ -268,20 +363,31 @@ function AllFile() {
     formData.append("ownerId", user?.id || "user_2wnUNxZtME63CvOzZpEWF6nLm3a");
     formData.append("fileId", fileId);
 
+    // Find the current folder ID
+    const currentFolder = folders.find(
+      (folder) => folder.folderName === fileSelection
+    );
+    if (currentFolder?.folderId) {
+      formData.append("folderId", currentFolder.folderId);
+    }
+
     try {
+      console.log("Sending request to upload file");
       const response = await fetch(`${API_URL}/esign/upload-document`, {
         method: "POST",
         body: formData,
       });
 
       if (response.ok) {
+        console.log("File uploaded successfully");
         await fetchFolders(); // Refetch data
         toast({
           title: "Success",
           description: `File "${file.name}" uploaded successfully`,
         });
       } else {
-        console.error("Failed to upload file");
+        const errorText = await response.text();
+        console.error("Failed to upload file:", errorText);
         toast({
           title: "Error",
           description: "Failed to upload file",
@@ -301,9 +407,13 @@ function AllFile() {
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("File input change detected");
     const file = e.target.files?.[0];
     if (file) {
+      console.log("File selected:", file.name);
       await uploadFile(file);
+      // Reset the input so the same file can be selected again
+      e.target.value = "";
     }
   };
 
@@ -477,6 +587,22 @@ function AllFile() {
       className="flex flex-col items-center justify-start p-2 bg-[#E6E6ED] rounded-lg min-h-screen w-full transition-colors duration-300"
       onClick={handleBackgroundClick}
     >
+      {/* Hidden file inputs */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="hidden"
+        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+        onChange={handleFileUpload}
+      />
+      <input
+        ref={emptyStateFileInputRef}
+        type="file"
+        className="hidden"
+        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+        onChange={handleFileUpload}
+      />
+
       {/* Add/upload dropdown */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -573,21 +699,7 @@ function AllFile() {
                     setVisible((prev) => ({ ...prev, file: false }));
                   }}
                 >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-5 w-5"
-                  >
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="17 8 12 3 7 8" />
-                    <line x1="12" y1="3" x2="12" y2="15" />
-                  </svg>
+                  <Upload className="h-5 w-5" />
                   <p>Upload File</p>
                   {isLoading.uploadFile && (
                     <svg
@@ -611,13 +723,6 @@ function AllFile() {
                       ></path>
                     </svg>
                   )}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    className="hidden"
-                    accept=".pdf"
-                    onChange={handleFileUpload}
-                  />
                 </div>
               </motion.div>
             )}
@@ -943,30 +1048,38 @@ function AllFile() {
               return files.length > 0 ? (
                 <div className="flex flex-wrap gap-4 w-full">
                   <AnimatePresence>
-                    {files.map((item: FileType) => (
+                    {files.map((item: FileType, index) => (
                       <motion.div
                         key={item.fileId}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
                         whileHover={{
                           y: -5,
                           boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                         }}
-                        transition={{ duration: 0.2 }}
+                        transition={{
+                          duration: 0.3,
+                          ease: "easeOut",
+                          staggerChildren: 0.05,
+                          delayChildren: 0.05 * index,
+                        }}
                         className="relative flex flex-col bg-white rounded-lg p-2 min-w-[200px] min-h-[150px] group"
                         onClick={(e) => e.stopPropagation()} // Prevent background click
                       >
                         <div className="overflow-hidden rounded-lg">
-                          <img
-                            src={
-                              item.fileType.includes("pdf")
-                                ? "/pdf_file.png"
-                                : item.fileUrl
-                            }
-                            alt={item.fileName}
-                            className="w-[200px] h-[150px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
-                          />
+                          {item.fileType.includes("pdf") ? (
+                            <PDFThumbnail
+                              url={item.fileUrl}
+                              alt={item.fileName}
+                            />
+                          ) : (
+                            <img
+                              src={item.fileUrl || "/placeholder.svg"}
+                              alt={item.fileName}
+                              className="w-[200px] h-[150px] object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                            />
+                          )}
                         </div>
                         <div className="flex items-center justify-between mt-2">
                           <p className="text-black/70 text-sm truncate max-w-[160px]">
@@ -1128,11 +1241,34 @@ function AllFile() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation(); // Prevent background click
-                      fileInputRef.current?.click();
+                      emptyStateFileInputRef.current?.click();
                     }}
-                    className="mt-2 px-4 py-2 bg-[#06044B] text-white rounded-md hover:bg-[#06044B]/90 transition-colors duration-200"
+                    className="mt-2 px-4 py-2 bg-[#06044B] text-white rounded-md hover:bg-[#06044B]/90 transition-colors duration-200 flex items-center gap-2"
                   >
+                    <Upload className="h-4 w-4" />
                     Upload Files
+                    {isLoading.uploadFile && (
+                      <svg
+                        className="animate-spin ml-2 h-4 w-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    )}
                   </button>
                   <p className="text-xs text-gray-400 mt-4">
                     Or drag and drop files here
