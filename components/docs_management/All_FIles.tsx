@@ -69,6 +69,14 @@ function AllFile() {
     moveFile: false,
     deleteFile: false,
   });
+  const [renameFolder, setRenameFolder] = useState<{
+    isOpen: boolean;
+    folder: FolderType | null;
+  }>({
+    isOpen: false,
+    folder: null,
+  });
+  const [newFolderName, setNewFolderName] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const emptyStateFileInputRef = useRef<HTMLInputElement>(null);
@@ -160,6 +168,13 @@ function AllFile() {
   useEffect(() => {
     fetchFolders();
   }, []);
+
+  // Add this useEffect after the other useEffects
+  useEffect(() => {
+    if (renameFolder.isOpen && renameFolder.folder) {
+      setNewFolderName(renameFolder.folder.folderName);
+    }
+  }, [renameFolder]);
 
   // Search logic
   useEffect(() => {
@@ -791,12 +806,11 @@ function AllFile() {
                               className="hover:bg-[#06044B] hover:text-white p-2 cursor-pointer transition-colors duration-200"
                               onClick={(e) => {
                                 e.stopPropagation(); // Prevent background click
-                                const newName = prompt(
-                                  "Enter new folder name:",
-                                  folder.folderName
-                                );
-                                if (newName)
-                                  handleRenameFolder(folder, newName);
+                                setRenameFolder({
+                                  isOpen: true,
+                                  folder: folder,
+                                });
+                                setOpenFolderMenuIndex(null);
                               }}
                             >
                               Rename
@@ -938,6 +952,74 @@ function AllFile() {
                           ></path>
                         </svg>
                       )}
+                    </button>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+
+          {/* Folder rename dialog */}
+          <AnimatePresence>
+            {renameFolder.isOpen && renameFolder.folder && (
+              <>
+                {/* Backdrop blur overlay */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setRenameFolder({ isOpen: false, folder: null });
+                  }}
+                />
+
+                {/* Folder rename dialog */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="bg-white p-6 rounded-lg shadow-xl w-80 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
+                  onClick={(e) => e.stopPropagation()} // Prevent background click
+                >
+                  <h2 className="text-lg font-semibold mb-4">Rename Folder</h2>
+                  <input
+                    type="text"
+                    value={newFolderName}
+                    onChange={(e) => setNewFolderName(e.target.value)}
+                    className="w-full border p-2 rounded mb-4 focus:ring-2 focus:ring-[#06044B] focus:border-transparent transition-all duration-200"
+                    placeholder="New folder name"
+                    autoFocus
+                  />
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent background click
+                        setRenameFolder({ isOpen: false, folder: null });
+                        setNewFolderName("");
+                      }}
+                      className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition-colors duration-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent background click
+                        if (renameFolder.folder && newFolderName.trim()) {
+                          handleRenameFolder(
+                            renameFolder.folder,
+                            newFolderName
+                          );
+                          setRenameFolder({ isOpen: false, folder: null });
+                          setNewFolderName("");
+                        }
+                      }}
+                      className="px-4 py-2 bg-[#06044B] text-white rounded hover:bg-[#06044B]/90 transition-colors duration-200"
+                    >
+                      Rename
                     </button>
                   </div>
                 </motion.div>
