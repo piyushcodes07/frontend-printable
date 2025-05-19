@@ -1,116 +1,104 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
 import LeftSectionElement from "./LeftSectionElement";
 import RightSectionElement from "./RightSectionElement";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
+
 interface ConvertDropDownProps {
-  isOpen: boolean;
-  onToggle: (open: boolean) => void;
+    isOpen: boolean;
+    onToggle: (open: boolean) => void;
 }
 
-export default function ConvertDropdown({
-  isOpen,
-  onToggle,
-}: ConvertDropDownProps) {
-  const [activeSection, setActiveSection] = useState<"from-pdf" | "to-pdf">(
-    "from-pdf",
-  );
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const router=useRouter();
-  const handleConvert=(filename: string)=>{
-    sessionStorage.setItem("fileName",filename);
-    router.push("/from-pdf-conversion"); 
-  }
-  const handleConverttoPdf=(filename: string)=>{
-    sessionStorage.setItem("fileName",filename);
-    router.push("/to-pdf-conversion"); 
-  }
-  
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        onToggle(false);
-        setActiveSection("from-pdf");
-      }
-    };
+export default function ConvertDropdown({ isOpen, onToggle }: ConvertDropDownProps) {
+    const [activeSection, setActiveSection] = useState<"from-pdf" | "to-pdf">("from-pdf");
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen, onToggle]);
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                onToggle(false);
+                setActiveSection("from-pdf");
+            }
+        };
 
-  return (
-    <div className="relative hover:text-[#61e987]">
-      <button
-        onClick={() => onToggle(!isOpen)}
-        className="px-3 py-2 text-sm font-medium flex items-center hover:cursor-pointer hover:underline"
-      >
-        Convert ▼
-      </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            ref={dropdownRef}
-            animate={{ opacity: 1, scale: 1 }}
-            initial={{ opacity: 0, scale: 0.95 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-            className="absolute top-full left-0 mt-6 w-[655px] h-[421px] bg-[#E6E6ED] text-black rounded-md shadow-xl z-50 p-4 flex gap-4"
-          >
-            {/* Left Section */}
-            <motion.div className="bg-[#FFFFFF] rounded-md z-50 p-4 w-3/5">
-              <h5 className="text-xs mb-4">Convert</h5>
-              <div className="flex flex-col space-y-2">
-                <LeftSectionElement
-                  text="Convert from PDF"
-                  onClick={() => setActiveSection("from-pdf")}
-                  src="/ai.png"
-                />
-                <LeftSectionElement
-                  text="Convert to PDF"
-                  onClick={() => setActiveSection("to-pdf")}
-                  src="/ai.png"
-                />
-              </div>
-            </motion.div>
+        if (isOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isOpen, onToggle]);
 
-            {/* Right Section */}
-            <motion.div className="bg-[#FFFFFF] rounded-md z-50 p-4 w-2/5">
-              {activeSection === "from-pdf" ? (
-                <motion.div>
-                  <h5 className="text-xs mb-4">Convert from PDF</h5>
-                  <div className="flex flex-col space-y-2">
-                    <RightSectionElement text="PDF to Word" src="/docx.png"  onClick={()=>handleConvert('word')}/>
-                    <RightSectionElement text="PDF to Excel" src="/excel.png" onClick={()=>handleConvert('excel')} />
-                    <RightSectionElement text="PDF to PPT" src="/ppt.png" onClick={()=>handleConvert('ppt')}/>
-                    <RightSectionElement text="PDF to JPG" src="/img.png" onClick={()=>handleConvert('jpg')}/>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div>
-                  <h5 className="text-xs mb-4">Convert to PDF</h5>
-                  <div className="flex flex-col space-y-2">
-                    <RightSectionElement text="Word to PDF" src="/docx.png" onClick={()=>handleConverttoPdf('word')}/>
-                    <RightSectionElement text="Excel to PDF" src="/excel.png" onClick={()=>handleConverttoPdf('excel')}/>
-                    <RightSectionElement text="PPT to PDF" src="/ppt.png" onClick={()=>handleConverttoPdf('ppt')}/>
-                    <RightSectionElement text="JPG to PDF" src="/img.png" onClick={()=>handleConverttoPdf('jpg')}/>
-                    <RightSectionElement text="PDF OCR" src="/ocr.png" onClick={()=>handleConverttoPdf('ocr')}/>
-                  </div>
-                </motion.div>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+    return (
+        <div className="relative hover:text-[#61e987]">
+            <button
+                onClick={() => onToggle(!isOpen)}
+                className="px-3 py-2 text-sm font-medium flex items-center hover:cursor-pointer hover:underline">
+                Convert ▼
+            </button>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        ref={dropdownRef}
+                        animate={{ opacity: 1, scale: 1 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                        className="absolute top-full left-0 mt-6 w-[655px] h-[421px] bg-[#E6E6ED] text-black rounded-md shadow-xl z-50 p-4 flex gap-4">
+                        {/* Left Section */}
+                        <motion.div className="bg-[#FFFFFF] rounded-md z-50 p-4 w-3/5">
+                            <h5 className="text-xs mb-4">Convert</h5>
+                            <div className="flex flex-col space-y-2">
+                                <LeftSectionElement
+                                    text="Convert from PDF"
+                                    onClick={() => setActiveSection("from-pdf")}
+                                    src="/ai.png"
+                                />
+                                <LeftSectionElement
+                                    text="Convert to PDF"
+                                    onClick={() => setActiveSection("to-pdf")}
+                                    src="/ai.png"
+                                />
+                            </div>
+                        </motion.div>
+
+                        {/* Right Section */}
+                        <motion.div className="bg-[#FFFFFF] rounded-md z-50 p-4 w-2/5">
+                            {activeSection === "from-pdf" ? (
+                                <motion.div>
+                                    <h5 className="text-xs mb-4">Convert from PDF</h5>
+                                    <div className="flex flex-col space-y-2">
+                                        <RightSectionElement text="PDF to Word" src="/docx.png" link="/pdf/to/word" />
+                                        <RightSectionElement
+                                            text="PDF to Excel"
+                                            src="/excel.png"
+                                            link="/pdf/to/excel"
+                                        />
+                                        <RightSectionElement text="PDF to PPT" src="/ppt.png" link="/pdf/to/ppt" />
+                                        <RightSectionElement text="PDF to JPG" src="/img.png" link="/pdf/to/image" />
+                                    </div>
+                                </motion.div>
+                            ) : (
+                                <motion.div>
+                                    <h5 className="text-xs mb-4">Convert to PDF</h5>
+                                    <div className="flex flex-col space-y-2">
+                                        <RightSectionElement text="Word to PDF" src="/docx.png" link="/word/to/pdf" />
+                                        <RightSectionElement
+                                            text="Excel to PDF"
+                                            src="/excel.png"
+                                            link="/excel/to/pdf"
+                                        />
+                                        <RightSectionElement text="PPT to PDF" src="/ppt.png" link="/ppt/to/pdf" />
+                                        <RightSectionElement text="JPG to PDF" src="/img.png" link="/image/to/pdf" />
+                                        <RightSectionElement text="PDF OCR" src="/ocr.png" link="" />
+                                    </div>
+                                </motion.div>
+                            )}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
 }

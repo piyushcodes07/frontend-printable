@@ -20,6 +20,8 @@ export default function Converter() {
     const { source, target } = useParams<{ source: string; target: string }>();
     const [isFileUploaded, setIsFileUploaded] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [mediaFileName, setMediaFileName] = useState("");
+    const [mediaFileBlob, setMediaFileBlob] = useState<Blob | null>(null);
     const [mediaDownloadLink, setMediaDownloadLink] = useState("");
     const [fileName, setFileName] = useState<string | null>(null);
     const [progress, setProgress] = useState(0);
@@ -71,7 +73,6 @@ export default function Converter() {
                 responseType: "blob",
                 headers: { "Content-Type": "multipart/form-data" },
             });
-            setIsLoading(false);
 
             const contentDisposition = response.headers["content-disposition"];
             let filename = "downloaded-file";
@@ -83,19 +84,27 @@ export default function Converter() {
                 }
             }
 
-            // Create blob URL and trigger download
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
+            setMediaFileName(filename);
+            setMediaFileBlob(new Blob([response.data]));
         } catch (err) {
             console.error("Failed to convert:", err);
             alert("Failed to convert");
+        } finally {
+            setIsLoading(false);
         }
+    };
+
+    const handleMediaDownload = () => {
+        if (!mediaFileBlob) return;
+
+        const url = window.URL.createObjectURL(mediaFileBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = mediaFileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
     };
 
     useEffect(() => {
@@ -117,9 +126,9 @@ export default function Converter() {
                     clearInterval(interval);
                     return 100;
                 }
-                return prev + 20;
+                return prev + 5;
             });
-        }, 1000); // every 200ms progress 5%
+        }, 200); // every 200ms progress 5%
 
         return () => clearInterval(interval);
     }, []);
@@ -236,7 +245,9 @@ export default function Converter() {
                             <span className="font-bold border-b-2 border-dashed">{fileName}</span>
                         </p>
                         <div className="flex mt-4">
-                            <button className="flex gap-2 items-center justify-center bg-[#06044B] text-white border-r-2 border-white  rounded-l-lg text-[14px] w-[287px] h-[45px]">
+                            <button
+                                onClick={handleMediaDownload}
+                                className="cursor-pointer flex gap-2 items-center justify-center bg-[#06044B] text-white border-r-2 border-white  rounded-l-lg text-[14px] w-[287px] h-[45px]">
                                 <MdOutlineFileDownload />
                                 Download
                             </button>
