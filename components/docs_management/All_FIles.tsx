@@ -554,35 +554,13 @@ function AllFile() {
         <div className="flex items-center gap-x-4">
           <motion.h2
             whileHover={{ scale: 1.05 }}
-            className="font-semibold text-[#555555] text-2xl cursor-pointer transition-all duration-200"
+            className="font-semibold  text-[#555555] text-2xl  cursor-pointer transition-all duration-200"
             onClick={() => {
               setFileselection("Root");
             }}
           >
-            Root
+            File Manager
           </motion.h2>
-          {fileSelection !== "Root" && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-x-2"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-5 w-5"
-              >
-                <path d="m9 18 6-6-6-6" />
-              </svg>
-              <p className="text-black text-2xl">{fileSelection}</p>
-            </motion.div>
-          )}
         </div>
         <div
           data-add-button="true"
