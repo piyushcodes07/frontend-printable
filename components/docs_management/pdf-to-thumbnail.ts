@@ -63,7 +63,7 @@ export async function renderPdfPageToCanvas(
   pdfDocument: pdfjsLib.PDFDocumentProxy,
   pageNumber: number,
   canvas: HTMLCanvasElement,
-  scale = 3
+  scale = 1.5
 ): Promise<void> {
   try {
     // Get the page

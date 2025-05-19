@@ -50,6 +50,7 @@ function AllFile() {
     null
   );
   const [folders, setFolders] = useState<FolderType[]>([]);
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [originalFolders, setOriginalFolders] = useState<FolderType[]>([]);
   const [fileSelection, setFileselection] = useState<string>("Root");
   const [searchText, setSearchText] = useState<string>("");
@@ -313,6 +314,9 @@ function AllFile() {
         method: "POST",
         body: formData,
       });
+      if (currentFolderId !== null) {
+        await handleMoveFile(fileId, currentFolderId);
+      }
 
       if (response.ok) {
         console.log("File uploaded successfully");
@@ -750,6 +754,7 @@ function AllFile() {
                       } rounded-lg p-2 min-w-[150px] w-1/5 cursor-pointer`}
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent background click
+                        setCurrentFolderId(folder.folderId);
                         setFileselection(folder.folderName);
                       }}
                     >
