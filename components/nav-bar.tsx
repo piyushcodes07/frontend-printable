@@ -36,7 +36,7 @@ export function NavBar() {
                 <MainLogo />
               </Link>
             </div>
-            <nav className="hidden md:ml-8 md:flex md:space-x-8">
+            <nav className="hidden md:ml-8 md:flex md:space-x-8 mr-2">
               {/* Tools Drop Down */}
               <ToolsDropDown
                 isOpen={activeDropdown === "tools"}
@@ -58,6 +58,12 @@ export function NavBar() {
                 className="px-3 py-2 text-sm font-medium hover:text-[#61e987]"
               >
                 Print & Deliver
+              </Link>
+              <Link
+                href={`/MarketPlace`}
+                className="px-3 py-2 text-sm font-medium hover:text-[#61e987]"
+              >
+                Marketplace
               </Link>
             </nav>
           </div>
