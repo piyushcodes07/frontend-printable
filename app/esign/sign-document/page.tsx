@@ -14,6 +14,7 @@ import {
   sendSignRequestEmail,
   UploadDocument,
 } from "../components/utils/apiCalls";
+import { Download } from "lucide-react";
 
 const DOMAIN_BASE_URL =
   process.env.NEXT_PUBLIC_DOMAIN_URL || "http://localhost:3000";
@@ -42,6 +43,20 @@ function SignDocument() {
   };
   const { user } = useUser();
   const { fileId, signers_email, signs, pdfData, updateSign } = useSignUrl();
+
+  const handleDownload = async () => {
+    console.log("clicked");
+    if (!pdfData || !signs || !fileName) {
+      throw new Error("Missing required data for saving document.");
+    }
+    const fileBlob = await drawSignatureOnPdf(pdfData, signs);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(fileBlob);
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   const uploadDocument = async () => {
     console.log(fileName);
@@ -218,6 +233,7 @@ function SignDocument() {
   return (
     <section className="sign-document text-black flex-1">
       <ToastContainer position="top-right" autoClose={3000} />
+
       <div className="doc-title flex items-center shadow-md absolute justify-center bg-white">
         <h1>file-name: {fileName || "Test.pdf"}</h1>
         <div className="icon">
@@ -329,6 +345,12 @@ function SignDocument() {
           className="DocumentArea flex w-[54%] overflow-y-scroll overflow-x-hidden"
           id="Document"
         >
+          <div
+            className="download-btn fixed hover:bg-green-400 z-50 my-10 mx-3 cursor-pointer p-2"
+            onClick={() => handleDownload()}
+          >
+            <Download size={20} />
+          </div>
           <DocumentView />
         </div>
         <div className="signingTool w-[23%] flex flex-col justify-between p-4 py-6">

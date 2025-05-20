@@ -131,6 +131,41 @@ input[type="color"] {
   }
 }
 
+.download-btn {
+  background: greenyellow;
+  border-radius: 10px;
+  border: 2px solid black;
+  animation: toAndFroMotion 1s ease-in-out infinite;
+}
+
+.download-btn:hover {
+  border-color: greenyellow;
+  animation-play-state: paused;
+  color: white;
+  background: black;
+}
+
+@keyframes toAndFroMotion {
+  0% {
+    transform: translateY(0px);
+    box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.25);
+  }
+  35% {
+    transform: translateY(7px);
+    box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.45);
+    /* small, dense shadow close to object */
+  }
+  70% {
+    transform: translateY(-7px);
+    box-shadow: 0px 30px 60px rgba(0, 0, 0, 0.15);
+    /* large, soft shadow = object far from ground */
+  }
+  100% {
+    transform: translateY(0px);
+    box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.25);
+  }
+}
+
 .animate-fade-slide {
   animation: fade-slide 0.3s ease-out forwards;
 }
