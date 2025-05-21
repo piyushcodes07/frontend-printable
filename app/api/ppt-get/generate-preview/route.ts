@@ -5,7 +5,6 @@ import { z } from "zod";
 
 // --- Schemas for individual slide type parameters ---
 const slideForIntroductionParams = z.object({
-  // imageSrc: z.string().describe("URL of the main slide image"), // Keep commented if not actively generating
   title: z.string().describe("Main heading of the slide"),
   overview: z.string().describe("Sub-heading or overview text"),
   description: z.string().describe("Body copy/description below the overview"),
@@ -13,7 +12,6 @@ const slideForIntroductionParams = z.object({
 });
 
 const slideConflictOverviewParams = z.object({
-  // imageSrc: z.string().describe("URL of the main slide image"), // Keep commented if not actively generating
   title: z.string().describe("Main heading of the slide"),
   sections: z
     .array(
@@ -53,7 +51,6 @@ const slideCircularProcesssParams = z.object({
 });
 
 // --- Schema for a single generated slide (AI chooses one of these) ---
-// The .describe() calls here are crucial for guiding the AI's choice.
 const individualGeneratedSlideSchema = z.discriminatedUnion("slideType", [
   z
     .object({
@@ -106,8 +103,7 @@ const allGeneratedSlidesSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const body = await request.json(); // Expects { slides: [{ title: string, bulletPoints: string[] }] }
-
+  const body = await request.json();
   if (!body.slides || !Array.isArray(body.slides) || body.slides.length === 0) {
     return Response.json(
       { error: "Missing or empty slides array in request body" },
@@ -115,10 +111,9 @@ export async function POST(request: Request) {
     );
   }
 
-  // Prepare the input for the AI, including an index for mapping later
   const slideRequests = body.slides.map(
     (slideInfo: { title: string; bulletPoints: string[] }, index: number) => ({
-      index, // To help AI map its output back and ensure order
+      index,
       title: slideInfo.title,
       bulletPoints: slideInfo.bulletPoints,
     }),
@@ -149,19 +144,11 @@ export async function POST(request: Request) {
 
   try {
     const { object: aiOutput } = await generateObject({
-      model: google("gemini-1.5-flash-8b"), // Or your preferred model
+      model: google("gemini-1.5-flash-8b"),
       schema: allGeneratedSlidesSchema,
       prompt: prompt,
-      // You might explore model-specific parameters here if needed, e.g., temperature,
-      // but the Vercel AI SDK aims to simplify this.
-      // Example (syntax might vary or not be supported by all model providers via SDK):
-      // modelProviderOptions: {
-      //    temperature: 0.7,
-      // }
     });
 
-    // The AI should return an object matching allGeneratedSlidesSchema.
-    // The prompt strongly requests order, but sorting is a good safeguard.
     const sortedGeneratedSlides = aiOutput.generatedSlides.sort(
       (a, b) => a.originalRequestIndex - b.originalRequestIndex,
     );
