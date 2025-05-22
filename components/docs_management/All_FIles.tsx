@@ -55,7 +55,8 @@ function AllFile() {
   const [fileSelection, setFileselection] = useState<string>("Root");
   const [searchText, setSearchText] = useState<string>("");
   const [visible, setVisible] = useState({ file: false });
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
+
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [isLoading, setIsLoading] = useState<{
     addFolder: boolean;
@@ -143,9 +144,7 @@ function AllFile() {
     setIsDataLoading(true);
     try {
       const response = await fetch(
-        `${API_URL}/fileManagement/getFiles/${
-          user?.id || "user_2wnUNxZtME63CvOzZpEWF6nLm3a"
-        }`,
+        `${API_URL}/fileManagement/getFiles/${user?.id}`,
         {
           method: "GET",
         }
@@ -154,7 +153,7 @@ function AllFile() {
       setFolders(result.data);
       setOriginalFolders(result.data); // Store original data for search filtering
     } catch (error) {
-      console.error("Error fetching folders:", error);
+      error("Error fetching folders:", error);
       toast({
         title: "Error",
         description: "Failed to load your files and folders",
@@ -168,7 +167,7 @@ function AllFile() {
   // Initial data fetch and refetch after actions
   useEffect(() => {
     fetchFolders();
-  }, []);
+  }, [user]);
 
   // Add this useEffect after the other useEffects
   useEffect(() => {
@@ -239,9 +238,10 @@ function AllFile() {
   const handleAddFolder = async () => {
     if (!folderName.trim()) return;
     setIsLoading((prev) => ({ ...prev, addFolder: true }));
+
     const payload = {
       folderName,
-      ownerId: user?.id || "user_2wnUNxZtME63CvOzZpEWF6nLm3a",
+      ownerId: user?.id,
     };
 
     try {
@@ -260,7 +260,7 @@ function AllFile() {
           description: `Folder "${folderName}" created successfully`,
         });
       } else {
-        console.error("Failed to add folder");
+        error("Failed to add folder");
         toast({
           title: "Error",
           description: "Failed to create folder",
@@ -268,7 +268,7 @@ function AllFile() {
         });
       }
     } catch (error) {
-      console.error("Error adding folder:", error);
+      error("Error adding folder:", error);
       toast({
         title: "Error",
         description: "Failed to create folder",
@@ -282,22 +282,22 @@ function AllFile() {
   // Upload file
   const uploadFile = async (file: File) => {
     if (!file) {
-      console.error("No file provided");
+      error("No file provided");
       return;
     }
 
     if (!fileSelection) {
-      console.error("No folder selected");
+      error("No folder selected");
       return;
     }
 
-    console.log("Uploading file:", file.name, "to folder:", fileSelection);
+    log("Uploading file:", file.name, "to folder:", fileSelection);
 
     setIsLoading((prev) => ({ ...prev, uploadFile: true }));
     const formData = new FormData();
     const fileId = String(Date.now());
     formData.append("file", file);
-    formData.append("ownerId", user?.id || "user_2wnUNxZtME63CvOzZpEWF6nLm3a");
+    formData.append("ownerId", user?.id as string);
     formData.append("fileId", fileId);
 
     // Find the current folder ID
@@ -309,7 +309,7 @@ function AllFile() {
     }
 
     try {
-      console.log("Sending request to upload file");
+      log("Sending request to upload file");
       const response = await fetch(`${API_URL}/esign/upload-document`, {
         method: "POST",
         body: formData,
@@ -319,7 +319,7 @@ function AllFile() {
       }
 
       if (response.ok) {
-        console.log("File uploaded successfully");
+        log("File uploaded successfully");
         await fetchFolders(); // Refetch data
         toast({
           title: "Success",
@@ -327,7 +327,7 @@ function AllFile() {
         });
       } else {
         const errorText = await response.text();
-        console.error("Failed to upload file:", errorText);
+        error("Failed to upload file:", errorText);
         toast({
           title: "Error",
           description: "Failed to upload file",
@@ -335,7 +335,7 @@ function AllFile() {
         });
       }
     } catch (error) {
-      console.error("Error uploading file:", error);
+      error("Error uploading file:", error);
       toast({
         title: "Error",
         description: "Failed to upload file",
@@ -347,10 +347,10 @@ function AllFile() {
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("File input change detected");
+    log("File input change detected");
     const file = e.target.files?.[0];
     if (file) {
-      console.log("File selected:", file.name);
+      log("File selected:", file.name);
       await uploadFile(file);
       // Reset the input so the same file can be selected again
       e.target.value = "";
@@ -377,7 +377,7 @@ function AllFile() {
           description: `Folder renamed to "${newName}" successfully`,
         });
       } else {
-        console.error("Failed to rename folder");
+        error("Failed to rename folder");
         toast({
           title: "Error",
           description: "Failed to rename folder",
@@ -385,7 +385,7 @@ function AllFile() {
         });
       }
     } catch (error) {
-      console.error("Error renaming folder:", error);
+      error("Error renaming folder:", error);
       toast({
         title: "Error",
         description: "Failed to rename folder",
@@ -413,7 +413,7 @@ function AllFile() {
           description: `Folder "${folder.folderName}" deleted successfully`,
         });
       } else {
-        console.error("Failed to delete folder");
+        error("Failed to delete folder");
         toast({
           title: "Error",
           description: "Failed to delete folder",
@@ -421,7 +421,7 @@ function AllFile() {
         });
       }
     } catch (error) {
-      console.error("Error deleting folder:", error);
+      error("Error deleting folder:", error);
       toast({
         title: "Error",
         description: "Failed to delete folder",
@@ -453,7 +453,7 @@ function AllFile() {
           description: "File moved successfully",
         });
       } else {
-        console.error("Failed to move file");
+        error("Failed to move file");
         toast({
           title: "Error",
           description: "Failed to move file",
@@ -461,7 +461,7 @@ function AllFile() {
         });
       }
     } catch (error) {
-      console.error("Error moving file:", error);
+      error("Error moving file:", error);
       toast({
         title: "Error",
         description: "Failed to move file",
@@ -481,7 +481,7 @@ function AllFile() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fileId,
-          ownerId: user?.id || "user_2wnUNxZtME63CvOzZpEWF6nLm3a",
+          ownerId: user?.id,
           fileName,
         }),
       });
@@ -494,7 +494,7 @@ function AllFile() {
           description: `File "${fileName}" deleted successfully`,
         });
       } else {
-        console.error("Failed to delete file");
+        error("Failed to delete file");
         toast({
           title: "Error",
           description: "Failed to delete file",
@@ -502,7 +502,7 @@ function AllFile() {
         });
       }
     } catch (error) {
-      console.error("Error deleting file:", error);
+      error("Error deleting file:", error);
       toast({
         title: "Error",
         description: "Failed to delete file",
