@@ -351,7 +351,7 @@ export default function DocumentManagement() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
-              <thead>
+              <thead className="bg-gray-200">
                 <tr className="text-left text-sm text-slate-500 border-b">
                   <th className="pb-3 font-normal px-4 lg:px-0 md:px-0 sm:px-0">
                     Name
