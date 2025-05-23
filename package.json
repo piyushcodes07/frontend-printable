@@ -13,6 +13,7 @@
     "@clerk/nextjs": "^6.15.0",
     "@heroicons/react": "^2.2.0",
     "@neondatabase/serverless": "^0.10.4",
+    "@tailwindcss/oxide": "^4.1.7",
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
