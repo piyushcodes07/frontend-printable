@@ -159,6 +159,7 @@ export default function ToolsDropDown({
                 <RightSectionElement
                   text="Compress PDF"
                   src="/tools/compress.png"
+                  link="/pdfcompress"
                 />
               </div>
               <div>

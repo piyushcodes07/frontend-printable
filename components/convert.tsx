@@ -33,7 +33,7 @@ const router =useRouter();
   
   useEffect(()=>{
     if(progress===100){ 
-        router.push('/from-pdf-conversion/Download')
+        router.push('/doc-conversion/Download')
     }
   },[progress,router])
   return (
@@ -64,5 +64,3 @@ const router =useRouter();
         </>
   )
 }
-
-export default Convert
