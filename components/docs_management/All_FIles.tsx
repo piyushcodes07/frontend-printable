@@ -291,7 +291,7 @@ function AllFile() {
       return;
     }
 
-    log("Uploading file:", file.name, "to folder:", fileSelection);
+    console.log("Uploading file:", file.name, "to folder:", fileSelection);
 
     setIsLoading((prev) => ({ ...prev, uploadFile: true }));
     const formData = new FormData();
@@ -309,7 +309,7 @@ function AllFile() {
     }
 
     try {
-      log("Sending request to upload file");
+      console.log("Sending request to upload file");
       const response = await fetch(`${API_URL}/esign/upload-document`, {
         method: "POST",
         body: formData,
@@ -319,7 +319,7 @@ function AllFile() {
       }
 
       if (response.ok) {
-        log("File uploaded successfully");
+        console.log("File uploaded successfully");
         await fetchFolders(); // Refetch data
         toast({
           title: "Success",
@@ -347,10 +347,10 @@ function AllFile() {
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    log("File input change detected");
+    console.log("File input change detected");
     const file = e.target.files?.[0];
     if (file) {
-      log("File selected:", file.name);
+      console.log("File selected:", file.name);
       await uploadFile(file);
       // Reset the input so the same file can be selected again
       e.target.value = "";
