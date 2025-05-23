@@ -153,7 +153,7 @@ function AllFile() {
       setFolders(result.data);
       setOriginalFolders(result.data); // Store original data for search filtering
     } catch (error) {
-      error("Error fetching folders:", error);
+      console.error("Error fetching folders:", error);
       toast({
         title: "Error",
         description: "Failed to load your files and folders",
