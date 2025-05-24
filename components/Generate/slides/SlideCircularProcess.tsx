@@ -15,50 +15,100 @@ export const SlideCircularProcesss = tool({
           description: z
             .string()
             .describe("Detail or explanation of this step"),
-        }),
+        })
       )
       .min(1)
       .max(8)
       .describe(
-        "Ordered list of steps to display around the circle, numbered by their index",
+        "Ordered list of steps to display around the circle, numbered by their index"
       ),
   }),
 });
 
 export const CircularSlideSchema = SlideCircularProcesss.parameters;
 
-type Step = z.infer<typeof CircularSlideSchema>["steps"][number];
-type CircularSlideProps = z.infer<typeof CircularSlideSchema>;
+type CircularSlideProps = z.infer<typeof CircularSlideSchema> & {
+  backgroundColor?: string;
+  headingColor?: string;
+  subHeadingColor?: string;
+  bulletColor?: string;
+};
 
 const positionClasses = [
-  "absolute top-[10%] left-1/2 -translate-x-1/2 text-center",
-  "absolute top-[35%] right-[5%] text-center",
-  "absolute top-[65%] right-[5%] text-center",
-  "absolute bottom-[10%] left-1/2 -translate-x-1/2 text-center",
-  "absolute top-[65%] left-[5%] text-center",
-  "absolute top-[35%] left-[5%] text-center",
-  "absolute top-[10%] right-1/2 translate-x-1/2 text-center",
-  "absolute bottom-[10%] right-1/2 translate-x-1/2 text-center",
+  "absolute top-[5%] left-1/2 -translate-x-1/2 text-center",
+  "absolute top-[20%] right-[10%] text-center",
+  "absolute bottom-[20%] right-[10%] text-center",
+  "absolute bottom-[5%] left-1/2 -translate-x-1/2 text-center",
+  "absolute bottom-[20%] left-[10%] text-center",
+  "absolute top-[20%] left-[10%] text-center",
 ];
 
-const CircularSlide: React.FC<CircularSlideProps> = ({ title, steps }) => {
+const CircularSlide: React.FC<CircularSlideProps> = ({
+  title,
+  steps,
+  backgroundColor = "#f5f0e6",
+  headingColor = "#1f433e",
+  subHeadingColor = "#1f433e",
+  bulletColor = "#2563eb",
+}) => {
   return (
-    <div className="relative w-full h-[450px] font-sans text-gray-100 bg-gray-900 p-4">
-      <h1 className="text-2xl mb-4">{title}</h1>
-      <div className="relative w-3/5 pb-[60%] mx-auto rounded-full border-8 border-gray-700">
-        {steps.map((step, idx) => (
+    <div
+      className="relative w-[1000px] h-[450px] p-8 rounded-xl shadow-lg"
+      style={{
+        backgroundColor,
+        maxWidth: "1050px",
+        margin: "0 auto",
+      }}
+    >
+      {/* Compact top-centered title */}
+      <h1
+        className="absolute top-8 left-1/2 transform -translate-x-1/2 text-2xl font-bold"
+        style={{ color: headingColor }}
+      >
+        {title}
+      </h1>
+
+      {/* Centered circle container remains the dominant element */}
+      <div className="absolute inset-0 flex justify-center items-center mt-15">
+        <div className="relative w-[350px] h-[350px]">
           <div
-            key={idx}
-            className={positionClasses[idx] || ""}
-            style={{ width: "30%" }}
-          >
-            <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center mx-auto mb-2">
-              <span className="text-gray-100">{idx + 1}</span>
+            className="absolute inset-0 rounded-full"
+            style={{
+              border: `2px dashed ${bulletColor}`,
+              opacity: 0.3,
+            }}
+          />
+          {steps.map((step, idx) => (
+            <div
+              key={idx}
+              className={positionClasses[idx] || ""}
+              style={{ width: "18%" }}
+            >
+              <div
+                className="w-5 h-5 rounded-full flex items-center justify-center mx-auto mb-1"
+                style={{
+                  backgroundColor: bulletColor,
+                  color: "#ffffff",
+                  boxShadow: `0 4px 12px ${bulletColor}40`,
+                }}
+              >
+                <span className="text-xs font-bold">{idx + 1}</span>
+              </div>
+              <h3
+                className="text-xs font-semibold mb-0.5 leading-tight"
+                style={{ color: headingColor }}
+              >
+                {step.heading}
+              </h3>
+              <p
+                className="text-xs leading-tight line-clamp-2"
+                style={{ color: subHeadingColor }}
+              >
+                {step.description}
+              </p>
             </div>
-            <h3 className="text-lg font-semibold mb-1">{step.heading}</h3>
-            <p className="text-sm">{step.description}</p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -1,12 +1,23 @@
 "use client";
-import SlideforIntroduction from "@/components/Generate/slides/slideForIntroduction";
+import SlideForIntroduction from "@/components/Generate/slides/slideForIntroduction";
 import { SlideConflictOverview } from "../Generate/slides/slideConflictOverview";
+import SlideCircularProcesss from "../Generate/slides/SlideCircularProcess";
+import SlideValidateIdea from "../Generate/slides/SlideValidateIdea";
+import SlideBusinessFlow from "../Generate/slides/SlideBusinessFlow";
+import SlideScaleOperations from "../Generate/slides/SlideScaleOperations";
+import SlideLongTermStrategy from "../Generate/slides/SlideLongTermStrategy";
+import TimelineSlide from "../Generate/slides/TimelineSlide";
 import { useUser } from "@clerk/nextjs";
-import { SlideCircularProcesss } from "../Generate/slides/SlideCircularProcess";
+
 const slideComponents: Record<string, any> = {
-  SlideForIntroduction: SlideforIntroduction,
+  SlideForIntroduction: SlideForIntroduction,
   SlideConflictOverview: SlideConflictOverview,
   SlideCircularProcesss: SlideCircularProcesss,
+  SlideValidateIdea: SlideValidateIdea,
+  SlideBusinessFlow: SlideBusinessFlow,
+  SlideScaleOperations: SlideScaleOperations,
+  SlideLongTermStrategy: SlideLongTermStrategy,
+  TimelineSlide: TimelineSlide,
 };
 
 export function SlideDeck({
