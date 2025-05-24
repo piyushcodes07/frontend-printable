@@ -59,7 +59,7 @@ const tools = [
 const routeMap = [
   {
     path: "/pdf/to/word",
-    keywords: ["pdf", "word", "doc"],
+    keywords: ["pdf", "word", "convert", "doc"],
     title: "PDF to Word",
     description: "Convert PDF documents to editable Word files",
     icon: FaFileWord,
@@ -68,7 +68,7 @@ const routeMap = [
   },
   {
     path: "/pdf/to/excel",
-    keywords: ["pdf", "excel", "sheet", "xls"],
+    keywords: ["pdf", "convert", "excel", "sheet", "xls"],
     title: "PDF to Excel",
     description: "Extract data from PDF to Excel spreadsheets",
     icon: FaFileExcel,
@@ -77,7 +77,7 @@ const routeMap = [
   },
   {
     path: "/pdf/to/ppt",
-    keywords: ["pdf", "ppt", "powerpoint"],
+    keywords: ["pdf", "convert", "ppt", "powerpoint"],
     title: "PDF to PowerPoint",
     description: "Convert PDF pages to PowerPoint slides",
     icon: FaFilePowerpoint,
@@ -86,7 +86,7 @@ const routeMap = [
   },
   {
     path: "/pdf/to/image",
-    keywords: ["pdf", "image", "jpg", "png"],
+    keywords: ["pdf", "image", "convert", "jpg", "png"],
     title: "PDF to Image",
     description: "Convert PDF pages to high-quality images",
     icon: FaFileImage,
@@ -95,7 +95,7 @@ const routeMap = [
   },
   {
     path: "/pdfcompress",
-    keywords: ["pdf", "compress", "reduce"],
+    keywords: ["pdf", "compress", "reduce", "size"],
     title: "Compress PDF",
     description: "Reduce PDF file size without losing quality",
     icon: FaCompress,
@@ -104,7 +104,7 @@ const routeMap = [
   },
   {
     path: "/drop-file",
-    keywords: ["upload", "drop"],
+    keywords: ["upload", "drop", "save", "file"],
     title: "Upload Files",
     description: "Upload and manage your documents",
     icon: FaUpload,
@@ -214,7 +214,7 @@ const getRouteFromQuery = (query: string) => {
       suggested_route = route;
     }
   }
-  if (matchAccuracy < 0.3) return null;
+  if (matchAccuracy < 0.2) return null;
 
   return suggested_route; // return the full route object
 };
