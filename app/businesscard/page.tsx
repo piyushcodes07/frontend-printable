@@ -1,7 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { FaSearch, FaMicrophone, FaMapMarkerAlt, FaShoppingCart, FaListUl, FaPencilAlt } from 'react-icons/fa';
+import { FaSearch, FaMicrophone, FaMapMarkerAlt, FaSave, FaShoppingCart, FaListUl, FaPencilAlt } from 'react-icons/fa';
 import { X } from 'lucide-react';
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -83,22 +83,28 @@ useEffect(() => {
       {/* Search Bar */}
       <div className="flex items-center mb-6">
   <div className="relative w-[800px] flex-shrink-0">
-    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-    <FaMicrophone className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer" />
+    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: '#000000' }} />
+    <FaMicrophone className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer" style={{ color: '#000000' }} />
     <input
       type="text"
-      placeholder="Search products..."
+      placeholder="Search"
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
       className="w-full h-[40px] rounded-md border px-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#1D1F4F]"
+      style={{
+        backgroundColor: '#06044B29',
+        boxShadow: '0 4px 6px #D9D9D9',
+        color: '#000000',         
+        borderColor: 'transparent'
+      }}
     />
   </div>
 
   {/* Increased margin-left for bigger gap */}
   <div className="flex items-center ml-88 space-x-6 flex-shrink-0">
-    <FaMapMarkerAlt className="text-gray-600 cursor-pointer" />
-    <FaShoppingCart className="text-gray-600 cursor-pointer" />
-    <FaListUl className="text-gray-600 cursor-pointer" />
+    <FaMapMarkerAlt className="text-gray-600 cursor-pointer" style={{ color: '#000000' }}/>
+    <FaShoppingCart className="text-gray-600 cursor-pointer" style={{ color: '#000000' }}/>
+    <FaListUl className="text-gray-600 cursor-pointer" style={{ color: '#000000' }}/>
   </div>
 </div>
 
@@ -331,7 +337,7 @@ useEffect(() => {
 
 
 
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-[1cm]">
   <span 
   className="text-lg text-gray-700 cursor-pointer"
   onClick={() => console.log('Arrow clicked!')}
@@ -363,7 +369,7 @@ useEffect(() => {
         {/* Image Section */}
         <div className="flex flex-col" style={{ height: '400px' }}>
   <div
-  className="rounded-lg p-2 relative cursor-pointer flex-grow flex justify-center items-center"
+  className="rounded-lg p-2 relative cursor-pointer flex-grow flex justify-center items-center mb-[1cm]"
   style={{ 
     minHeight: '350px',
     boxShadow: 'inset 0 10px 20px rgba(0, 0, 0, 0.4)'
@@ -448,7 +454,7 @@ useEffect(() => {
           </div>
 
           {/* Thumbnail navigation */}
-<div className="flex items-center justify-center mt-4 gap-2">
+<div className="flex items-center justify-center mt-4 gap-2 ">
       <button onClick={handlePrev} className="px-2 text-lg">{'<'}</button>
       {thumbnails.map((src, index) => (
         <img
@@ -464,17 +470,19 @@ useEffect(() => {
   </div>
 
   {/* Right side - Details */}
-  <div className="flex flex-col h-full p-4 justify-between">
+  <div className="flex flex-col h-full p-4 justify-between -mt-[0.5cm]">
     {/* Top: Title & Price */}
-    <div>
-      <h2 className="text-lg font-semibold mb-2">Business Card [Standard]</h2>
-      <p className="text-sm mb-2">
-        Price: <span className="text-lg font-bold">Rs 299/-</span>
-      </p>
-    </div>
+    <div className="flex items-center justify-between mb-[0.5cm]">
+  <h2 className="text-3xl font-semibold">Business Card [Standard]</h2>
+  <FaSave className="text-2xl text-gray-700 cursor-pointer hover:text-black" />
+</div>
+      <p className="text-sm mb-2 font-bold">
+  Price: <span className="text-lg font-semibold">Rs 299/-</span>
+</p>
+
 
     {/* Middle: List with flex-grow */}
-    <ul className="text-sm text-gray-700 list-disc pl-5 mb-4 flex-grow overflow-auto">
+    <ul className="text-sm text-gray-700 list-disc pl-5 mb-4 flex-grow overflow-auto mt-[1cm]">
       <li>4000+ design options available</li>
       <li>Standard glossy or matte paper included</li>
       <li>Need help in designing? You can avail our Design Services</li>
@@ -491,7 +499,7 @@ useEffect(() => {
     </ul>
 
     {/* Bottom: Color and Quantity controls */}
-    <div className="flex justify-between items-center">
+    <div className="flex justify-between items-center mb-[0.5cm]">
       <div>
         <p className="text-sm mb-1">Color:</p>
         <div className="flex gap-2">
@@ -501,159 +509,293 @@ useEffect(() => {
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <button
-          className="border rounded px-2 py-1"
-          onClick={() => setQuantity(Math.max(1, quantity - 1))}
-        >
-          -
-        </button>
-        <span className="text-sm">{quantity}</span>
-        <button
-          className="border rounded px-2 py-1"
-          onClick={() => setQuantity(quantity + 1)}
-        >
-          +
-        </button>
-      </div>
+      <div className="flex items-center gap-3 bg-[#CDCDDB] px-3 py-1.5 rounded-lg">
+  <button
+    className="rounded-lg px-2 py-0 bg-[#CDCDDB] text-2xl"
+    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+  >
+    -
+  </button>
+  <span className="text-sm">{quantity}</span>
+  <button
+    className="rounded-lg px-2 py-0 bg-[#CDCDDB] text-2xl"
+    onClick={() => setQuantity(quantity + 1)}
+  >
+    +
+  </button>
+</div>
+
+
     </div>
 
 
          {/* Action Buttons */}
-<div className="flex gap-4 w-full mt-8">
-  <button className="flex-1 bg-[#1D1F4F] text-white py-2 rounded hover:bg-[#15173a] transition">
-    Add to Cart
-  </button>
-  <button className="flex-1 border border-[#1D1F4F] text-[#1D1F4F] py-2 rounded hover:bg-[#f0f0f0] transition">
+<div className="flex gap-[1cm] w-full mt-8 mb-[1cm]">
+  <button className="flex-1 bg-[#1F1D5D] text-white py-2 rounded-lg hover:bg-[#CDCDDB] transition">
     Buy Now
+  </button>
+  <button className="flex-1 bg-[#1D1F4F] text-white py-2 rounded-lg hover:bg-[#CDCDDB] transition">
+    Add to Cart
   </button>
 </div>
 
+
         </div>
       </div>
+
+      {/* Availability Section */}
+<div className="mt-10">
+  <h3 className="font-semibold text-lg mb-4">Availability</h3>
+
+  <div className="py-3">
+    <div
+      className="flex justify-between items-center cursor-pointer"
+      onClick={() => toggleFAQ('return')}
+    >
+      <span className="font-medium text-sm">Specifications</span>
+      {faqOpen.return ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+    </div>
+    {faqOpen.return && (
+      <p className="text-sm text-gray-700 mt-2">
+        Brand kaco
+      </p>
+    )}
+  </div>
+</div>
+
 
       {/* FAQ Section */}
-      <div className="mt-10">
-        <h3 className="font-semibold text-lg mb-4">Frequently Asked Question</h3>
+<div className="mt-10">
+  <h3 className="font-semibold text-lg mb-4">Frequently Asked Question</h3>
 
-        <div className="border-t py-3">
-          <div
-            className="flex justify-between items-center cursor-pointer"
-            onClick={() => toggleFAQ('return')}
-          >
-            <span className="font-medium text-sm">How do I return a product?</span>
-            {faqOpen.return ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </div>
-          {faqOpen.return && (
-            <p className="text-sm text-gray-700 mt-2">
-              You can initiate a return from your order history page.
-            </p>
-          )}
-        </div>
+  <div className="py-3">
+    <div
+      className="flex justify-between items-center cursor-pointer"
+      onClick={() => toggleFAQ('return')}
+    >
+      <span className="font-medium text-sm">How do I return a product?</span>
+      {faqOpen.return ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+    </div>
+    {faqOpen.return && (
+      <p className="text-sm text-gray-700 mt-2">
+        You can initiate a return from your order history page.
+      </p>
+    )}
+  </div>
 
-        <div className="border-t py-3">
-          <div
-            className="flex justify-between items-center cursor-pointer"
-            onClick={() => toggleFAQ('refund')}
-          >
-            <span className="font-medium text-sm">
-              How long will it take to receive my refund?
-            </span>
-            {faqOpen.refund ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </div>
-          {faqOpen.refund && (
-            <p className="text-sm text-gray-700 mt-2">
-              Refunds are typically processed within 5-7 business days.
-            </p>
-          )}
-        </div>
-      </div>
+  <div className="py-3">
+    <div
+      className="flex justify-between items-center cursor-pointer"
+      onClick={() => toggleFAQ('refund')}
+    >
+      <span className="font-medium text-sm">
+        How long will it take to receive my refund?
+      </span>
+      {faqOpen.refund ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+    </div>
+    {faqOpen.refund && (
+      <p className="text-sm text-gray-700 mt-2">
+        Refunds are typically processed within 5-7 business days.
+      </p>
+    )}
+  </div>
+</div>
+
 
       {/* Merged Top Picks Section */}
-      <div className="mt-24">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Top Picks</h3>
-          <a href="#" className="text-sm text-[#5B5B9E] hover:underline">View all</a>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {[
-            {
-              brand: 'Kaco',
-              name: 'Klip 0.5mm Gel Pen',
-              price: '₹899.10',
-              original: '₹999.00',
-              colors: ['#000000', '#7B1E1E', '#5A0000'],
-            },
-            {
-              brand: 'Kaco',
-              name: 'Klip 0.5mm Gel Pen',
-              price: '₹899.10',
-              original: '₹999.00',
-              colors: ['#000000', '#7B1E1E', '#5A0000'],
-            },
-            {
-              brand: 'Kaco',
-              name: 'Klip 0.5mm Gel Pen',
-              price: '₹899.10',
-              original: '₹999.00',
-              colors: ['#000000', '#7B1E1E', '#5A0000'],
-            },
-            {
-              brand: 'Kaco',
-              name: 'Klip 0.5mm Gel Pen',
-              price: '₹899.10',
-              original: '₹999.00',
-              colors: ['#000000', '#7B1E1E', '#5A0000'],
-            },
-            {
-              brand: 'Solo',
-              name: 'Solo 5 Subject Notebook A5',
-              price: '₹256.10',
-              original: '₹285.00',
-              colors: ['#FFDA00', '#E6007E', '#5A0000'],
-            },
-            {
-              brand: 'XI Eleven',
-              name: 'Manifestation A5',
-              price: '₹350',
-              original: '',
-              colors: ['#1C1C4B', '#500000'],
-            },
-            {
-              brand: 'Kangaroo',
-              name: 'DP-800 paper Punch',
-              price: '₹1,885.10',
-              original: '₹1,985.00',
-              colors: ['#000000'],
-            },
-          ].map((product, i) => (
-            <div key={i} className="border rounded-lg p-3 shadow-sm">
-              <img
-                src="/modal.png"
-                alt={product.name}
-                className="w-full h-32 object-contain mb-2"
+<div className="mt-24">
+  <div className="flex justify-between items-center mb-4">
+    <h3 className="text-lg font-semibold">Top Picks</h3>
+    <a href="#" className="text-sm text-[#5B5B9E] hover:underline">View all</a>
+  </div>
+
+  <div className="overflow-x-auto">
+    <div className="flex gap-[1cm] w-max snap-x snap-mandatory px-2">
+      {[
+        {
+          brand: 'Kaco',
+          name: 'Klip 0.5mm Gel Pen',
+          price: '₹899.10',
+          original: '₹999.00',
+          colors: ['#000000', '#7B1E1E', '#5A0000'],
+          image: '/gelpen.png',
+        },
+        {
+          brand: 'Kaco',
+          name: 'Klip 0.5mm Gel Pen',
+          price: '₹899.10',
+          original: '₹999.00',
+          colors: ['#000000', '#7B1E1E', '#5A0000'],
+          image: '/black gelpen.png',
+        },
+        {
+          brand: 'Kaco',
+          name: 'Klip 0.5mm Gel Pen',
+          price: '₹899.10',
+          original: '₹999.00',
+          colors: ['#000000', '#7B1E1E', '#5A0000'],
+          image: '/gelpen.png',
+        },
+        {
+          brand: 'Kaco',
+          name: 'Klip 0.5mm Gel Pen',
+          price: '₹899.10',
+          original: '₹999.00',
+          colors: ['#000000', '#7B1E1E', '#5A0000'],
+          image: '/gelpen.png',
+        },
+        {
+          brand: 'Solo',
+          name: 'Solo 5 Subject Notebook A5',
+          price: '₹256.10',
+          original: '₹285.00',
+          colors: ['#FFDA00', '#E6007E', '#5A0000'],
+          image: '/black gelpen.png',
+        },
+        {
+          brand: 'XI Eleven',
+          name: 'Manifestation A5',
+          price: '₹350',
+          original: '',
+          colors: ['#1C1C4B', '#500000'],
+          image: '/black gelpen.png',
+        },
+      ].map((product, i) => (
+        <div
+          key={i}
+          className="min-w-[180px] snap-start border rounded-lg p-3 shadow-2xl bg-white"
+          style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.4)' }}
+        >
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-32 object-contain mb-2"
+          />
+          <p className="text-xs text-gray-500">{product.brand}</p>
+          <p className="text-sm font-medium mb-1">{product.name}</p>
+          <div className="flex items-center gap-2 text-sm mb-1">
+            <span className="font-semibold">{product.price}</span>
+            {product.original && (
+              <span className="line-through text-gray-400">{product.original}</span>
+            )}
+          </div>
+          <div className="flex gap-1">
+            {product.colors.map((color, idx) => (
+              <span
+                key={idx}
+                className="w-4 h-4 rounded-full border"
+                style={{ backgroundColor: color }}
               />
-              <p className="text-xs text-gray-500">{product.brand}</p>
-              <p className="text-sm font-medium mb-1">{product.name}</p>
-              <div className="flex items-center gap-2 text-sm mb-1">
-                <span className="font-semibold">{product.price}</span>
-                {product.original && (
-                  <span className="line-through text-gray-400">{product.original}</span>
-                )}
-              </div>
-              <div className="flex gap-1">
-                {product.colors.map((color, idx) => (
-                  <span
-                    key={idx}
-                    className="w-4 h-4 rounded-full border"
-                    style={{ backgroundColor: color }}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      ))}
     </div>
+  </div>
+</div>
+
+
+
+<div className="mt-24">
+  <div className="flex justify-between items-center mb-4">
+    <h3 className="text-lg font-semibold">Top Picks</h3>
+    <a href="#" className="text-sm text-[#5B5B9E] hover:underline">View all </a>
+  </div>
+
+  <div className="overflow-x-auto">
+    <div className="flex gap-[1cm] w-max snap-x snap-mandatory">
+      {[
+        {
+          brand: 'Kaco',
+          name: 'Klip 0.5mm Gel Pen',
+          price: '₹899.10',
+          original: '₹999.00',
+          colors: ['#000000', '#7B1E1E', '#5A0000'],
+          image: '/gelpen.png',
+        },
+        {
+          brand: 'Solo',
+          name: 'Solo 5 Subject Notebook A5',
+          price: '₹256.10',
+          original: '₹285.00',
+          colors: ['#FFDA00', '#E6007E', '#5A0000'],
+          image: '/notebook.png',
+        },
+        {
+          brand: 'XI Eleven',
+          name: 'Manifestation A5',
+          price: '₹350',
+          original: '',
+          colors: ['#1C1C4B', '#500000'],
+          image: '/manifestation.png',
+        },
+        {
+          brand: 'Kangaroo',
+          name: 'DP-800 paper Punch',
+          price: '₹1,885.10',
+          original: '₹1,985.00',
+          colors: ['#000000'],
+          image: '/gelpen.png',
+        },
+        {
+          brand: 'Kaco',
+          name: 'Klip 0.5mm Gel Pen',
+          price: '₹899.10',
+          original: '₹999.00',
+          colors: ['#000000', '#7B1E1E', '#5A0000'],
+          image: '/black gelpen.png',
+        },
+        {
+          brand: 'Kaco',
+          name: 'Klip 0.5mm Gel Pen',
+          price: '₹899.10',
+          original: '₹999.00',
+          colors: ['#000000', '#7B1E1E', '#5A0000'],
+          image: '/gelpen.png',
+        },
+        {
+          brand: 'Kaco',
+          name: 'Klip 0.5mm Gel Pen',
+          price: '₹899.10',
+          original: '₹999.00',
+          colors: ['#000000', '#7B1E1E', '#5A0000'],
+          image: '/gelpen.png',
+        },
+      ].map((product, i) => (
+        <div
+          key={i}
+          className="min-w-[180px] snap-start border rounded-lg p-3 shadow-2xl bg-white"
+          style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.4)' }}
+        >
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-32 object-contain mb-2"
+          />
+          <p className="text-xs text-gray-500">{product.brand}</p>
+          <p className="text-sm font-medium mb-1">{product.name}</p>
+          <div className="flex items-center gap-2 text-sm mb-1">
+            <span className="font-semibold">{product.price}</span>
+            {product.original && (
+              <span className="line-through text-gray-400">{product.original}</span>
+            )}
+          </div>
+          <div className="flex gap-1">
+            {product.colors.map((color, idx) => (
+              <span
+                key={idx}
+                className="w-4 h-4 rounded-full border"
+                style={{ backgroundColor: color }}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+
+</div>
   );
 }
