@@ -28,6 +28,9 @@ export default function PrintablePage() {
   const { order, dispatch } = useOrder();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const { user } = useUser();
+
   const [statusMessage, setStatusMessage] = useState<{
     text: string;
     isError?: boolean;
@@ -43,7 +46,9 @@ export default function PrintablePage() {
       setUploadError(null);
       setStatusMessage(null);
 
-      const results = await Promise.all(acceptedFiles.map(uploadFile));
+      const results = await Promise.all(
+        acceptedFiles.map((file) => uploadFile(file, user?.id))
+      );
       const successCount = results.filter(Boolean).length;
       const failCount = acceptedFiles.length - successCount;
 
@@ -58,7 +63,7 @@ export default function PrintablePage() {
 
       setIsUploading(false);
     },
-    [dispatch],
+    [dispatch]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -196,7 +201,11 @@ export default function PrintablePage() {
           {statusMessage && (
             <Alert
               variant={statusMessage.isError ? "destructive" : "default"}
-              className={`mb-4 ${statusMessage.isError ? "bg-red-50 border-red-200" : "bg-[#f0fdf4] border-[#90f0ab]"}`}
+              className={`mb-4 ${
+                statusMessage.isError
+                  ? "bg-red-50 border-red-200"
+                  : "bg-[#f0fdf4] border-[#90f0ab]"
+              }`}
             >
               {statusMessage.isError ? (
                 <AlertCircle className="h-4 w-4" />
@@ -215,7 +224,11 @@ export default function PrintablePage() {
           {/* Drop Area */}
           <div
             {...getRootProps()}
-            className={`border-2 border-dashed ${isDragActive ? "border-[#61e987] bg-[#f0fdf4]" : "border-[#d9d9d9] bg-[#e6e6ed]"}
+            className={`border-2 border-dashed ${
+              isDragActive
+                ? "border-[#61e987] bg-[#f0fdf4]"
+                : "border-[#d9d9d9] bg-[#e6e6ed]"
+            }
                                  rounded-lg p-8 mb-6 flex flex-col items-center justify-center cursor-pointer transition-colors`}
           >
             <input {...getInputProps()} />
@@ -293,7 +306,7 @@ export default function PrintablePage() {
                         fileItem.id,
                         fileItem.fileName,
                         index,
-                        setStatusMessage,
+                        setStatusMessage
                       );
                     }}
                     disabled={fileItem.uploading}

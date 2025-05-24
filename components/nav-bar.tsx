@@ -48,7 +48,7 @@ export function NavBar() {
                 onToggle={(open) => setActiveDropdown(open ? "convert" : null)}
               />
               <Link
-                href="#"
+                href="/esign"
                 className="px-3 py-2 text-sm font-medium hover:text-[#61e987]"
               >
                 E - Sign
@@ -57,6 +57,7 @@ export function NavBar() {
                 href={`/print-and-deliver/${User.user?.id}`}
                 className="px-3 py-2 text-sm font-medium hover:text-[#61e987]"
               >
+                {" "}
                 Print & Deliver
               </Link>
             </nav>
