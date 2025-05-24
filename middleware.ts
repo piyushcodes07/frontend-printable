@@ -6,6 +6,7 @@ import {
 const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
   "/esign/document(.*)",
+  "/docs_management(.*)",
   "/print-and-deliver(.*)",
 ]);
 
