@@ -6,6 +6,8 @@ import { FileIcon, Upload } from "lucide-react";
 import PDFThumbnail from "./pdf-canvas-thumbnail"; // Assuming this is a separate component
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import { ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 
 interface FileType {
   fileId: string;
@@ -74,6 +76,20 @@ const FileSection: React.FC<FileSectionProps> = ({
         };
         dispatch({ type: "ADD_DOCUMENT", payload: newDoc });
         break;
+      case "sign":
+        //document other than pdf must be convert into pdf first then process
+        console.log("sign");
+        const type = file.fileName.split(".").pop()?.toLowerCase();
+        console.log(type);
+        if (type === "pdf") {
+          router.push(
+            `/esign/sign-document?fileId=${file.fileId}&fileName=${file.fileName}`
+          );
+        } else {
+          console.log("error");
+          toast.error("only pdf file is allowed!!");
+        }
+        break;
 
       default:
         break;
@@ -131,6 +147,7 @@ const FileSection: React.FC<FileSectionProps> = ({
       className="flex flex-col justify-start w-full mt-12"
       onClick={(e) => e.stopPropagation()}
     >
+      <ToastContainer />
       <p className="text-black mb-6 font-medium">
         {searchText.trim() !== ""
           ? `Search Results for "${searchText}"`
@@ -322,7 +339,7 @@ const FileSection: React.FC<FileSectionProps> = ({
                           e.stopPropagation();
                           setOpenFileMenuIndex(null);
                           console.log("renames");
-                          // Handle rename file logic if needed
+                          handleTransition(item, "sign");
                         }}
                       >
                         Sign Document
