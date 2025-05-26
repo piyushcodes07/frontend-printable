@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   FileText,
   Printer,
@@ -37,6 +37,9 @@ export default function PrintablePage() {
   } | null>(null);
   const router = useRouter();
   const { deleteFile, uploadFile } = UseStorage();
+  useEffect(() => {
+    console.log(order);
+  }, [order]);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -47,7 +50,7 @@ export default function PrintablePage() {
       setStatusMessage(null);
 
       const results = await Promise.all(
-        acceptedFiles.map((file) => uploadFile(file, user?.id))
+        acceptedFiles.map((file) => uploadFile(file))
       );
       const successCount = results.filter(Boolean).length;
       const failCount = acceptedFiles.length - successCount;

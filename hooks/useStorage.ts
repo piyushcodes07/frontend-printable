@@ -6,10 +6,7 @@ const API_BASE_URL =
 export default function UseStorage() {
   const { order, dispatch } = useOrder();
 
-  const uploadFile = async (
-    file: File,
-    ownerId: string
-  ): Promise<DocumentItem | null> => {
+  const uploadFile = async (file: File): Promise<DocumentItem | null> => {
     try {
       const formData = new FormData();
 
@@ -26,6 +23,7 @@ export default function UseStorage() {
       }
 
       const data = await response.json();
+      console.log(data.fileUrl);
 
       // Ensure new documents default to "All" pages
       const newDoc: DocumentItem = {
