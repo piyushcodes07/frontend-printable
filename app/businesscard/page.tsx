@@ -134,7 +134,7 @@ useEffect(() => {
 
       {/* Dropdown content - rendered only if dropdownOpen is true */}
       {dropdownOpen && (
-        <div className="absolute left-0 bg-white border rounded shadow-md mt-1 w-48 z-20 p-1 space-y-1">
+        <div className="absolute left-0 bg-white rounded shadow-md mt-1 w-48 z-20 p-1 space-y-1">
           {/* Pens submenu */}
           <div className="relative">
   <button
@@ -163,7 +163,7 @@ useEffect(() => {
   </button>
 
   {pensOpen && (
-    <div className="bg-white border rounded shadow-md mt-1 w-full">
+    <div className="bg-white rounded shadow-md mt-1 w-full">
       <button className="w-full text-left px-4 py-2 text-sm text-[#1D1F4F] hover:bg-gray-100">Gel Pens</button>
       <button className="w-full text-left px-4 py-2 text-sm text-[#1D1F4F] hover:bg-gray-100">Ball Pens</button>
       <button className="w-full text-left px-4 py-2 text-sm text-[#1D1F4F] hover:bg-gray-100">Roller Ball Pens</button>
@@ -201,7 +201,7 @@ useEffect(() => {
     </svg>
   </button>
   {notebooksOpen && (
-    <div className="bg-white border rounded shadow-md mt-1 w-full">
+    <div className="bg-white rounded shadow-md mt-1 w-full">
       <button className="w-full text-left px-4 py-2 text-sm text-[#1D1F4F] hover:bg-gray-100">A5 Notebooks</button>
       <button className="w-full text-left px-4 py-2 text-sm text-[#1D1F4F] hover:bg-gray-100">Spiral Notebooks</button>
       <button className="w-full text-left px-4 py-2 text-sm text-[#1D1F4F] hover:bg-gray-100">Hardcover Notebooks</button>
@@ -237,7 +237,7 @@ useEffect(() => {
     </svg>
   </button>
   {pencilsOpen && (
-    <div className="bg-white border rounded shadow-md mt-1 w-full">
+    <div className="bg-white rounded shadow-md mt-1 w-full">
       <button className="w-full text-left px-4 py-2 text-sm text-[#1D1F4F] hover:bg-gray-100">HB Pencils</button>
       <button className="w-full text-left px-4 py-2 text-sm text-[#1D1F4F] hover:bg-gray-100">Colored Pencils</button>
       <button className="w-full text-left px-4 py-2 text-sm text-[#1D1F4F] hover:bg-gray-100">Mechanical Pencils</button>
@@ -286,7 +286,7 @@ useEffect(() => {
 
       {/* Dropdown menu */}
       {officeOpen && (
-        <div className="absolute left-0 mt-1 w-48 bg-white border rounded shadow-md z-20 p-2 space-y-1">
+        <div className="absolute left-0 bg-white rounded shadow-md mt-1 w-48 z-20 p-1 space-y-1">
           <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded">
             Folders
           </button>
@@ -324,7 +324,7 @@ useEffect(() => {
   </button>
 
   {artOpen && (
-    <div className="absolute left-0 mt-1 w-48 bg-white border rounded shadow-md z-20 p-2 space-y-1">
+    <div className="absolute left-0 bg-white rounded shadow-md mt-1 w-48 z-20 p-1 space-y-1">
       <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded">Brushes</button>
       <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded">Paints</button>
       <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 rounded">Sketch Pads</button>
@@ -369,16 +369,17 @@ useEffect(() => {
         {/* Image Section */}
         <div className="flex flex-col" style={{ height: '400px' }}>
   <div
-  className="rounded-lg p-2 relative cursor-pointer flex-grow flex justify-center items-center mb-[1cm]"
+  className="rounded-lg p-2 relative flex-grow flex justify-center items-center mb-[1cm]"
   style={{ 
     minHeight: '350px',
     boxShadow: 'inset 0 10px 20px rgba(0, 0, 0, 0.4)'
   }}
-  onClick={handleFlip}
 >
   <img
+  onClick={handleFlip}
     src={thumbnails[currentIndex]}
     alt="Business Card"
+    className='cursor-pointer'
     style={{ maxWidth: '60%', maxHeight: '60%' }}
   />
   <p className="text-center text-sm text-gray-500 mt-4 w-full absolute bottom-2 left-0">
@@ -389,13 +390,19 @@ useEffect(() => {
       e.stopPropagation();
       setShowEdit(true);
     }}
-    className="absolute top-2 right-2 text-xl"
+    className="absolute top-2 right-2 text-xl cursor-pointer"
   >
     <FaPencilAlt />
-  </button>
-{showEdit && (
-  <div className="min-h-screen bg-white flex items-center justify-center p-6">
-    <div className="flex w-full max-w-7xl border rounded-2xl overflow-hidden shadow-md">
+  </button>{showEdit && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center">
+    {/* Transparent overlay to block background clicks */}
+    <div
+      className="absolute inset-0 bg-transparent"
+      onClick={() => setShowEdit(false)}
+    />
+
+    {/* Modal content */}
+    <div className="relative bg-white w-full max-w-7xl border rounded-2xl overflow-hidden shadow-md flex z-50">
       {/* Left Preview */}
       <div className="w-6/12 bg-white flex items-center justify-center p-10">
         <div className="bg-white rounded-lg shadow-md p-4 w-[300px] h-[180px] flex items-center justify-center">
@@ -405,24 +412,36 @@ useEffect(() => {
             className="object-contain max-h-full max-w-full"
           />
         </div>
-      </div>  
+      </div>
 
       {/* Right Form */}
       <div className="w-6/12 bg-[#E6E6EE] p-8 relative rounded-r-2xl">
         {/* Close Icon */}
-        <button className="absolute top-4 right-4 text-black" onClick={() => setShowEdit(false)}>
-  <X />
-</button>
+        <button
+          className="absolute top-4 right-4 text-black cursor-pointer"
+          onClick={() => setShowEdit(false)}
+        >
+          <X />
+        </button>
 
         <h2 className="text-2xl font-medium text-center mb-6">Enter your Details</h2>
 
         <div className="flex gap-4">
           {/* Left column inputs */}
           <div className="flex flex-col gap-3 w-1/2">
-            <input placeholder="Name" className="px-3 py-2 rounded border border-gray-400 bg-white" />
-            <input placeholder="Company Name" className="px-3 py-2 rounded border border-gray-400 bg-white" />
-            <input placeholder="Mobile number" className="px-3 py-2 rounded border border-gray-400 bg-white" />
-            <input placeholder="Office Contact No." className="px-3 py-2 rounded border border-gray-400 bg-white" />
+            <>
+  <input placeholder="Name" className="input-hover px-3 py-2 rounded border border-gray-400 bg-white hover:bg-[#CDCDDB] cursor-default" />
+  <input placeholder="Company Name" className="input-hover px-3 py-2 rounded border border-gray-400 bg-white hover:bg-[#CDCDDB] cursor-default" />
+  <input placeholder="Mobile number" className="input-hover px-3 py-2 rounded border border-gray-400 bg-white hover:bg-[#CDCDDB] cursor-default" />
+  <input placeholder="Office Contact No." className="input-hover px-3 py-2 rounded border border-gray-400 bg-white hover:bg-[#CDCDDB] cursor-default" />
+
+  <style jsx>{`
+    .input-hover:hover::placeholder {
+      color: black;
+    }
+  `}</style>
+</>
+
           </div>
 
           {/* Upload box */}
@@ -446,10 +465,59 @@ useEffect(() => {
             </div>
           </div>
         </div>
+        {/* Additional Inputs */}
+      <div className="flex flex-col gap-3 mt-4">
+        <>
+  <input
+    placeholder="Address"
+    className="address-input px-3 py-2 rounded border border-gray-400 bg-white hover:bg-[#CDCDDB] cursor-default transition-colors"
+  />
+
+  <style jsx>{`
+    .address-input:hover::placeholder {
+      color: black;
+    }
+  `}</style>
+</>
+
+        <>
+  <input
+    placeholder="Website"
+    className="px-3 py-2 rounded border border-gray-400 bg-white hover:bg-[#CDCDDB] cursor-default transition-colors"
+  />
+
+  <style jsx>{`
+    input:hover::placeholder {
+      color: black;
+    }
+  `}</style>
+</>
+
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex justify-between items-center pt-6">
+        <div className="flex gap-2 w-[calc(100%-120px)]">
+          <button className="bg-[#1F1F6B] text-white px-4 py-2 rounded w-1/2 hover:bg-[#CDCDDB] hover:text-black transition-colors duration-300">
+  Buy Now
+</button>
+<button className="bg-[#1F1F6B] text-white px-4 py-2 rounded w-1/2 hover:bg-[#CDCDDB] hover:text-black transition-colors duration-300">
+  Add to Cart
+</button>
+        </div>
+
+        {/* Quantity Selector */}
+        <div className="flex items-center gap-3 bg-white border border-gray-300 px-3 py-1 rounded ml-4">
+          <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
+          <span className="min-w-[10px] text-center">{quantity}</span>
+          <button onClick={() => setQuantity(quantity + 1)}>+</button>
+        </div>
+      </div>
       </div>
     </div>
   </div>
 )}
+
 
           </div>
 
