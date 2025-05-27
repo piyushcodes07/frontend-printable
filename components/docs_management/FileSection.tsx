@@ -80,7 +80,7 @@ const FileSection: React.FC<FileSectionProps> = ({
         //document other than pdf must be convert into pdf first then process
         console.log("sign");
         const type = file.fileName.split(".").pop()?.toLowerCase();
-        console.log(type);
+        console.log(type, file.fileName);
         if (type === "pdf") {
           router.push(
             `/esign/sign-document?fileId=${file.fileId}&fileName=${file.fileName}`

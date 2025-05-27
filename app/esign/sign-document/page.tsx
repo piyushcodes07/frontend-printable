@@ -25,7 +25,7 @@ function SignDocument() {
   const file = window
     ? JSON.parse(sessionStorage.getItem("file") as string)
     : null;
-  const [fileName, setFileName] = useState(file.fileName);
+  const [fileName, setFileName] = useState(file?.fileName || null);
   const [documentId, setDocumentId] = useState("");
   useEffect(() => {
     setFileName((searchParams.get("fileName") as string) || file.fileName);
