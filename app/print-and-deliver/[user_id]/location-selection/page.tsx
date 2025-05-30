@@ -1,6 +1,7 @@
 "use client";
 /// <reference types="google.maps" />
 
+import { useOrder, DocumentItem } from "@/context/orderContext";
 import { useState, useEffect, useRef } from "react";
 import {
   MapPin,
@@ -92,6 +93,22 @@ declare global {
 }
 
 export default function LocationSelectionPage() {
+  const handelOrderSubmit = async () => {
+    const orderFinal = {
+      ...order,
+    };
+    const result = await fetch(`http://localhost:5000/api/order/`, {
+      method: "POST",
+      body: JSON.stringify({ ...order, merchantId: selectedMerchant }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log({ ...orderFinal, merchantId: selectedMerchant });
+    const res = await result.json();
+    console.log(res);
+  };
+  const { order, dispatch } = useOrder();
   const [selectedMerchant, setSelectedMerchant] = useState<String | null>(null);
   const [deliveryOption, setDeliveryOption] =
     useState<DeliveryOption>("pickup");
@@ -250,7 +267,7 @@ export default function LocationSelectionPage() {
 
       const script = document.createElement("script");
       script.src = `https://maps.googleapis.com/maps/api/js?key=${
-        process.env.NEXT_PUBLIC_Maps_API_KEY || "YOUR_API_KEY"
+        process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_API_KEY"
       }&libraries=places`;
       script.async = true;
       script.defer = true;
@@ -793,6 +810,7 @@ export default function LocationSelectionPage() {
           <Button
             className="w-full mt-6 bg-[#61e987] hover:bg-[#61e987]/90 text-[#06044b] font-medium"
             disabled={!selectedMerchant || isLoadingMerchants}
+            onClick={handelOrderSubmit}
           >
             Confirm Selection
           </Button>
