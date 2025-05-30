@@ -1,5 +1,28 @@
 "use client";
+
 /// <reference types="google.maps" />
+
+interface MerchantInfo {
+  merchantId: string;
+  shopName: string;
+  latitude: string;
+  longitude: string;
+  MerchantImages: any[]; // You can replace `any` with a more specific type if you know the structure of images
+  averageRating: string;
+  ratingCount: number;
+  googleDistance: string;
+  duration: string;
+  durationInTraffic: string;
+}
+
+type MerchantService = {
+  id: string;
+  merchantId: string;
+  serviceId: string;
+  serviceName: string; // Ensure this is correctly defined
+  isActive: boolean;
+  // Any other properties can go here
+};
 
 import { useState, useEffect, useRef } from "react";
 import {
@@ -20,34 +43,27 @@ import { cn } from "@/lib/utils"; // Assuming this exists
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
 
-interface Merchant {
-  merchantId: string;
-  shopName: string;
-  MerchantImages: any[]; // You can replace `any` with a more specific type if you know what kind of images these are
-  averageRating: string;
-  ratingCount: number;
-  googleDistance: string;
-  duration: string;
-  durationInTraffic: string;
-}
-
 // Mock merchant data
-const MERCHANTS: Merchant[] = [
+const MERCHANTS: MerchantInfo[] = [
   {
     merchantId: "merchant_1",
     shopName: "Print Master Shop",
+    latitude: "40.7128",
+    longitude: "-74.006",
     MerchantImages: ["/placeholder.svg?height=150&width=300"],
-    averageRating: "4.80",
+    averageRating: "4.8",
     ratingCount: 123,
-    googleDistance: "N/A", // Distance ki value aapke data mein nahi thi, placeholder diya hai
-    duration: "N/A", // Same as above
-    durationInTraffic: "N/A", // Same as above
+    googleDistance: "N/A", // Replace with actual value if available
+    duration: "N/A", // Replace with actual value if available
+    durationInTraffic: "N/A", // Replace with actual value if available
   },
   {
     merchantId: "merchant_2",
     shopName: "Quality Print Solutions",
+    latitude: "40.7168",
+    longitude: "-73.9861",
     MerchantImages: ["/placeholder.svg?height=150&width=300"],
-    averageRating: "4.90",
+    averageRating: "4.9",
     ratingCount: 500,
     googleDistance: "N/A",
     duration: "N/A",
@@ -56,8 +72,10 @@ const MERCHANTS: Merchant[] = [
   {
     merchantId: "merchant_3",
     shopName: "Quick Print Services",
+    latitude: "40.7308",
+    longitude: "-73.9973",
     MerchantImages: ["/placeholder.svg?height=150&width=300"],
-    averageRating: "3.50",
+    averageRating: "3.5",
     ratingCount: 56,
     googleDistance: "N/A",
     duration: "N/A",
@@ -80,7 +98,9 @@ declare global {
 }
 
 export default function LocationSelectionPage() {
-  const [selectedMerchant, setSelectedMerchant] = useState<String | null>(null);
+  const [selectedMerchant, setSelectedMerchant] = useState<MerchantInfo | null>(
+    null
+  );
   const [deliveryOption, setDeliveryOption] =
     useState<DeliveryOption>("pickup");
   const [searchQuery, setSearchQuery] = useState("");
@@ -91,9 +111,12 @@ export default function LocationSelectionPage() {
     lat: number;
     lng: number;
   } | null>(null);
-  const [nearbyMerchants, setNearbyMerchants] = useState<Merchant[]>([]);
-  // Initial state can be empty or default
+  const [nearbyMerchants, setNearbyMerchants] = useState<MerchantInfo[]>([]); // Initial state can be empty or default
   const [isLoadingMerchants, setIsLoadingMerchants] = useState(true); // Start as loading
+  const [merchantServices, setMerchantServices] = useState<{
+    [key: string]: MerchantService[];
+  }>({});
+  const [selectedMerchantId, setSelectedMerchantId] = useState<string>("");
 
   const mapRef = useRef<HTMLDivElement | null>(null);
 
@@ -111,9 +134,10 @@ export default function LocationSelectionPage() {
     merchant.shopName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Get user's location (this function now always attempts to get location)
   const getUserLocation = () => {
-    setLocationPermission("loading");
-    setIsLoadingMerchants(true);
+    setLocationPermission("loading"); // Set loading state before attempting
+    setIsLoadingMerchants(true); // Indicate merchants are loading
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -124,6 +148,7 @@ export default function LocationSelectionPage() {
         setUserLocation(userCoords);
         setLocationPermission("granted");
 
+        // In a real app, you would fetch nearby merchants based on location
         // Wrap fetch in an async IIFE
         (async () => {
           try {
@@ -135,7 +160,6 @@ export default function LocationSelectionPage() {
             if (!response.ok) {
               console.log("Error while fetching Merchant data");
             } else {
-              console.log("Nearby merchants:", data);
               setNearbyMerchants(data);
             }
           } catch (e) {
@@ -151,9 +175,10 @@ export default function LocationSelectionPage() {
         if (error.code === error.PERMISSION_DENIED) {
           setLocationPermission("denied");
         } else {
-          setLocationPermission("denied");
+          // Handle other potential errors like position unavailable
+          setLocationPermission("denied"); // Or a new 'error' state
         }
-        setIsLoadingMerchants(false);
+        setIsLoadingMerchants(false); // Stop loading on error
       },
       {
         enableHighAccuracy: true,
@@ -163,7 +188,41 @@ export default function LocationSelectionPage() {
     );
   };
 
-  console.log("checking merchant", nearbyMerchants);
+  const fetchMerchantServices = async (merchantId: string) => {
+    try {
+      const serviceResponse = await fetch(
+        `http://localhost:5000/api/service/merchant/services?merchantId=${merchantId}`
+      );
+
+      if (!serviceResponse.ok) {
+        throw new Error(
+          `Failed to fetch services for Merchant ID: ${merchantId}`
+        );
+      }
+
+      const servicesData = await serviceResponse.json();
+      const data = servicesData.data;
+
+      // Now the type of prevServices is inferred correctly
+      setMerchantServices((prevServices) => ({
+        ...prevServices,
+        [merchantId]: data, // Add services for the specific merchantId
+      }));
+    } catch (e) {
+      console.log("Error fetching services:", e);
+    }
+  };
+
+  useEffect(() => {
+    // Check if nearbyMerchants has data and is not loading
+    if (!isLoadingMerchants && nearbyMerchants.length > 0) {
+      // Loop through each merchant and call the API
+      nearbyMerchants.forEach((merchant) => {
+        const { merchantId } = merchant;
+        fetchMerchantServices(merchantId);
+      });
+    }
+  }, [nearbyMerchants, isLoadingMerchants]); // Dependencies to watch for changes
 
   // Check geolocation support and permission on mount
   useEffect(() => {
@@ -248,11 +307,13 @@ export default function LocationSelectionPage() {
     loadGoogleMapsScript();
   }, []); // Empty dependency array means this runs once on mount
 
-  // Initialize map without markers
+  // Initialize map
   const initializeMap = () => {
     if (!mapRef.current) return;
 
+    // Default to New York City coordinates or a placeholder
     const defaultCenter = { lat: 40.7128, lng: -74.006 };
+    // Use user location as center if available, otherwise default
     const initialCenter = userLocation || defaultCenter;
 
     const mapOptions: google.maps.MapOptions = {
@@ -267,38 +328,112 @@ export default function LocationSelectionPage() {
       },
     };
 
+    // Create new map
     if (window.google && window.google.maps) {
       const map = new window.google.maps.Map(mapRef.current, mapOptions);
       googleMapRef.current = map;
 
-      // Clear existing markers (if any)
+      // Clear existing markers (important if initializeMap is called multiple times)
       markersRef.current.forEach((marker) => marker.setMap(null));
-      markersRef.current = [];
+      markersRef.current = []; // Clear the array
+
+      // Add markers for each merchant
+      // Use nearbyMerchants instead of static MERCHANTS if you implement location-based filtering later
+      (userLocation ? nearbyMerchants : MERCHANTS).forEach((merchant) => {
+        // Example: show nearby if location available, else all
+        const marker = new window.google.maps.Marker({
+          position: {
+            lat: parseFloat(merchant.latitude),
+            lng: parseFloat(merchant.longitude),
+          },
+          map,
+          title: merchant.shopName,
+          icon: {
+            url:
+              "data:image/svg+xml;charset=UTF-8," +
+              encodeURIComponent(`
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="36"
+                  height="36"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#06044b"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3" fill="#61e987"></circle>
+                </svg>,
+              `),
+            scaledSize: new google.maps.Size(36, 36),
+          },
+        });
+
+        // Add click event to marker
+        marker.addListener("click", () => {
+          setSelectedMerchant(merchant);
+
+          // Scroll to the merchant in the list
+          const element = document.getElementById(
+            `merchant-${merchant.merchantId}`
+          );
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        });
+
+        markersRef.current.push(marker);
+      });
 
       setMapLoaded(true);
 
-      // Update user location marker if available
+      // If we already have user location, update the map
       if (userLocation) {
         updateUserLocationOnMap(userLocation);
       }
     }
   };
 
-  // User location update function (kept if you want to show user location marker)
+  // Update user location on map whenever userLocation state changes
+  useEffect(() => {
+    if (mapLoaded && googleMapRef.current && userLocation) {
+      updateUserLocationOnMap(userLocation);
+    } else if (
+      mapLoaded &&
+      googleMapRef.current &&
+      !userLocation &&
+      userMarkerRef.current
+    ) {
+      // Remove user marker if user location becomes null
+      userMarkerRef.current.setMap(null);
+      userMarkerRef.current = null;
+    }
+    // Center map on default if map is loaded and no user location
+    if (mapLoaded && googleMapRef.current && !userLocation) {
+      const defaultCenter = { lat: 40.7128, lng: -74.006 };
+      googleMapRef.current.panTo(defaultCenter);
+      googleMapRef.current.setZoom(12); // Maybe zoom out a bit for a wider view
+    }
+  }, [userLocation, mapLoaded]);
+
+  // Update user location on map utility function
   const updateUserLocationOnMap = (location: { lat: number; lng: number }) => {
     if (!googleMapRef.current) return;
 
+    // Center map on user location
     googleMapRef.current.panTo(location);
-
+    // Only zoom in if zoom is less than 14, to avoid jarring jumps
     const zoom = googleMapRef.current.getZoom();
     if (zoom !== undefined && zoom < 14) {
       googleMapRef.current.setZoom(14);
     }
 
-    // If you want to show user marker, keep this, else comment out or remove
+    // Add or update user marker
     if (userMarkerRef.current) {
       userMarkerRef.current.setPosition(location);
-      userMarkerRef.current.setMap(googleMapRef.current);
+      userMarkerRef.current.setMap(googleMapRef.current); // Ensure marker is visible
     } else {
       userMarkerRef.current = new window.google.maps.Marker({
         position: location,
@@ -308,16 +443,89 @@ export default function LocationSelectionPage() {
           url:
             "data:image/svg+xml;charset=UTF-8," +
             encodeURIComponent(`
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#06044b" stroke="#ffffff" stroke-width="2">
-              <circle cx="12" cy="12" r="10" fill="#61e987" stroke="#06044b" stroke-width="2"/>
-              <circle cx="12" cy="12" r="3" fill="#ffffff"/>
-            </svg>`),
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="#06044b"
+                stroke="#ffffff"
+                strokeWidth="2"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  fill="#61e987"
+                  stroke="#06044b"
+                  strokeWidth="2"
+                />
+                <circle cx="12" cy="12" r="3" fill="#ffffff" />
+              </svg>
+            `),
           scaledSize: new google.maps.Size(24, 24),
         },
-        zIndex: 1000,
+        zIndex: 1000, // Ensure user marker is on top
       });
     }
   };
+
+  useEffect(() => {
+    if (!googleMapRef.current || !mapLoaded) return;
+
+    // Center map on selected merchant if one is selected
+    if (selectedMerchant) {
+      // Find the selected merchant in MERCHANTS
+      const merchant = nearbyMerchants.find(
+        (m) => selectedMerchant?.merchantId === m.merchantId
+      );
+
+      if (merchant) {
+        const latitude = parseFloat(merchant.latitude); // Convert to float
+        const longitude = parseFloat(merchant.longitude); // Convert to float
+
+        // Ensure coordinates are valid
+        if (!isNaN(latitude) && !isNaN(longitude)) {
+          // Center map on the selected merchant's location
+          googleMapRef.current.panTo({ lat: latitude, lng: longitude });
+          googleMapRef.current.setZoom(15);
+
+          // Create a new marker for the selected merchant
+          const marker = new window.google.maps.Marker({
+            position: { lat: latitude, lng: longitude },
+            map: googleMapRef.current,
+            title: merchant.shopName,
+            icon: {
+              url:
+                "data:image/svg+xml;charset=UTF-8," +
+                encodeURIComponent(`
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#06044b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3" fill="#61e987"></circle>
+                </svg>
+              `),
+              scaledSize: new google.maps.Size(36, 36),
+            },
+          });
+
+          // Add the marker to the markers array
+          markersRef.current.push(marker);
+        } else {
+          alert("invalid Coordinates");
+        }
+      } else {
+        console.log(
+          "No merchant found for selectedMerchant ID:",
+          selectedMerchant?.merchantId
+        );
+      }
+    } else {
+      // If no merchant is selected, center back on user location or default
+      const center = userLocation || { lat: 40.7128, lng: -74.006 };
+      googleMapRef.current.panTo(center);
+      googleMapRef.current.setZoom(userLocation ? 14 : 12);
+    }
+  }, [selectedMerchant, mapLoaded, userLocation]); // Added userLocation dependency
 
   // Render star rating
   const renderStars = (rating: number) => {
@@ -590,78 +798,102 @@ export default function LocationSelectionPage() {
                 </p>
               </div>
             ) : filteredMerchants.length > 0 ? (
-              filteredMerchants.map((merchant) => (
-                <div
-                  key={merchant.merchantId}
-                  id={`merchant-${merchant.merchantId}`}
-                  className={cn(
-                    "border rounded-lg overflow-hidden transition-all",
-                    selectedMerchant === merchant.merchantId
-                      ? "border-[#61e987] bg-[#f0fdf4]"
-                      : "border-gray-200 hover:border-[#90f0ab]"
-                  )}
-                >
-                  <div
-                    className="flex cursor-pointer p-4"
-                    onClick={() => setSelectedMerchant(merchant.merchantId)}
-                  >
-                    {/* Merchant Image */}
-                    <div className="w-24 h-20 rounded overflow-hidden mr-4 flex-shrink-0">
-                      <img
-                        src={merchant.MerchantImages[0] || "/placeholder.svg"}
-                        alt={merchant.shopName}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+              filteredMerchants.map((merchant) => {
+                // Access the services for the current merchant using its merchantId
+                const merchantS = merchantServices[merchant.merchantId] || []; // Fallback to empty array if no services
 
-                    {/* Merchant Details */}
-                    <div className="flex-grow">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-medium text-[#06044b]">
-                          {merchant.shopName}
-                        </h4>
-                        <div className="w-5 h-5 rounded-full border-2 border-[#06044b] flex-shrink-0 flex items-center justify-center">
-                          {selectedMerchant === merchant.merchantId && (
-                            <div className="w-3 h-3 rounded-full bg-[#06044b]"></div>
+                return (
+                  <div
+                    key={merchant.merchantId}
+                    id={`merchant-${merchant.merchantId}`}
+                    className={cn(
+                      "border rounded-lg overflow-hidden transition-all",
+                      selectedMerchant?.merchantId === merchant.merchantId
+                        ? "border-[#61e987] bg-[#f0fdf4]"
+                        : "border-gray-200 hover:border-[#90f0ab]"
+                    )}
+                  >
+                    <div
+                      className="flex cursor-pointer p-4"
+                      onClick={() => setSelectedMerchant(merchant)}
+                    >
+                      {/* Merchant Image */}
+                      <div className="w-24 h-20 rounded overflow-hidden mr-4 flex-shrink-0">
+                        <img
+                          src={merchant.MerchantImages[0] || "/placeholder.svg"}
+                          alt={merchant.shopName}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      {/* Merchant Details */}
+                      <div className="flex-grow">
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-medium text-[#06044b]">
+                            {merchant.shopName}
+                          </h4>
+                          <div className="w-5 h-5 rounded-full border-2 border-[#06044b] flex-shrink-0 flex items-center justify-center">
+                            {selectedMerchant?.merchantId ===
+                              merchant.merchantId && (
+                              <div className="w-3 h-3 rounded-full bg-[#06044b]"></div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center mb-1">
+                          {renderStars(merchant.ratingCount)}
+                          <span className="text-xs text-gray-500 ml-1">
+                            ({merchant.averageRating})
+                          </span>
+                          <div className="flex items-center ml-3 text-xs text-gray-500">
+                            <Clock className="h-3 w-3 mr-1" />
+                            <span>{merchant.duration}</span>
+                          </div>
+                        </div>
+
+                        {/* Services for the Merchant */}
+                        <div className="mt-2">
+                          {merchantS.length > 0 ? (
+                            <div className="flex  flex-wrap gap-2 mt-2">
+                              {merchantS.map((service: any, index: any) => (
+                                <span
+                                  key={index}
+                                  className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
+                                >
+                                  {service.serviceName}
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500">
+                              No services available for this merchant.
+                            </p>
                           )}
                         </div>
-                      </div>
 
-                      <div className="flex items-center mb-1">
-                        {renderStars(merchant.ratingCount)}
-                        <span className="text-xs text-gray-500 ml-1">
-                          ({merchant.averageRating})
-                        </span>
-                        <div className="flex items-center ml-3 text-xs text-gray-500">
-                          <Clock className="h-3 w-3 mr-1" />
-                          <span>{merchant.duration}</span>
-                        </div>
-                      </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <div className="rounded px-1 py-1">
+                            <p className="text-[12px] text-gray-400">
+                              GoogleDistance : {merchant.googleDistance}
+                            </p>
+                          </div>
 
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <div className="rounded px-1 py-1">
-                          <p className="text-[12px] text-gray-400">
-                            GoogleDistance : {merchant.googleDistance}
-                          </p>
-                        </div>
-
-                        <div>
-                          <p className="text-[12px] text-gray-400">
-                            Duration in Traffic : {merchant.durationInTraffic}
-                          </p>
+                          <div>
+                            <p className="text-[12px] text-gray-400">
+                              Duration in Traffic : {merchant.durationInTraffic}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="text-center py-8">
                 <MapPinOff className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                 <p className="text-gray-500">
                   No merchants found matching your search.
                 </p>
-                {/* Optionally show all merchants if location failed/denied */}
                 {locationPermission !== "granted" &&
                   !isLoadingMerchants &&
                   MERCHANTS.length > 0 && (
