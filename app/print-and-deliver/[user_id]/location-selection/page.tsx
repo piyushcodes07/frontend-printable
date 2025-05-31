@@ -21,6 +21,12 @@ import { cn } from "@/lib/utils"; // Assuming this exists
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
 
+// --- React Toastify Imports ---
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useUser } from "@clerk/nextjs";
+// --- End React Toastify Imports ---
+
 interface Merchant {
   merchantId: string;
   shopName: string;
@@ -93,21 +99,88 @@ declare global {
 }
 
 export default function LocationSelectionPage() {
+  const { user } = useUser();
   const handelOrderSubmit = async () => {
+    if (!selectedMerchant) {
+      toast.error("Please select a merchant.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+        transition: Bounce,
+      });
+      return;
+    }
+
     const orderFinal = {
       ...order,
     };
-    const result = await fetch(`http://localhost:5000/api/order/`, {
-      method: "POST",
-      body: JSON.stringify({ ...order, merchantId: selectedMerchant }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    console.log({ ...orderFinal, merchantId: selectedMerchant });
-    const res = await result.json();
-    console.log(res);
+
+    try {
+      const result = await fetch(`http://localhost:5000/api/order/`, {
+        method: "POST",
+        body: JSON.stringify({
+          ...order,
+          merchantId: selectedMerchant,
+          userId: user?.id || "1",
+          latitude: userLocation?.lat,
+          longitude: userLocation?.lng,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log({ ...orderFinal, merchantId: selectedMerchant });
+      const res = await result.json();
+      console.log(res);
+
+      if (result.ok) {
+        toast.success("🦄 Wow so easy! Order submitted successfully.", {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false, // Kept as per your example
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+        // Optionally, you can redirect or clear the form here
+      } else {
+        toast.error(
+          res.message || "Order submission failed. Please try again.",
+          {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "light",
+            transition: Bounce,
+          },
+        );
+      }
+    } catch (error) {
+      console.error("Error submitting order:", error);
+      toast.error("An unexpected error occurred. Please try again.", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+        transition: Bounce,
+      });
+    }
   };
+
   const { order, dispatch } = useOrder();
   const [selectedMerchant, setSelectedMerchant] = useState<String | null>(null);
   const [deliveryOption, setDeliveryOption] =
@@ -125,13 +198,10 @@ export default function LocationSelectionPage() {
 
   const mapRef = useRef<HTMLDivElement | null>(null);
   const googleMapRef = useRef<google.maps.Map | null>(null);
-  // Store a map of merchantId to marker for easy lookup
   const merchantMarkersRef = useRef<Map<string, google.maps.Marker>>(new Map());
   const userMarkerRef = useRef<google.maps.Marker | null>(null);
-  // Use a single InfoWindow instance to avoid multiple popups
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
 
-  // Filter merchants based on search query
   const filteredMerchants = nearbyMerchants.filter((merchant) =>
     merchant.shopName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
@@ -165,8 +235,6 @@ export default function LocationSelectionPage() {
               setNearbyMerchants(MERCHANTS); // Fallback to mock
             } else {
               console.log("Nearby merchants from API:", data);
-              // Ensure that API response data has latitude and longitude as strings
-              // and potentially an 'address' field. If not, you may need to map/transform data.
               const apiMerchants: Merchant[] = data.map((item: any) => ({
                 merchantId: item.merchantId,
                 shopName: item.shopName,
@@ -178,7 +246,7 @@ export default function LocationSelectionPage() {
                 googleDistance: item.googleDistance || "N/A",
                 duration: item.duration || "N/A",
                 durationInTraffic: item.durationInTraffic || "N/A",
-                address: item.address || "Address not available", // Assuming API returns address
+                address: item.address || "Address not available",
               }));
               setNearbyMerchants(apiMerchants);
             }
@@ -278,21 +346,16 @@ export default function LocationSelectionPage() {
     loadGoogleMapsScript();
   }, []);
 
-  // Use a separate useEffect to handle merchant marker creation/updates
   useEffect(() => {
     if (mapLoaded && googleMapRef.current) {
-      // Clear existing merchant markers
       merchantMarkersRef.current.forEach((marker) => marker.setMap(null));
-      merchantMarkersRef.current.clear(); // Clear the map of markers
+      merchantMarkersRef.current.clear();
 
-      // Create a single InfoWindow instance if it doesn't exist
       if (!infoWindowRef.current) {
         infoWindowRef.current = new window.google.maps.InfoWindow();
       }
 
-      // Add new markers for nearbyMerchants
       nearbyMerchants.forEach((merchant) => {
-        // Only create a marker if coordinates are available
         if (merchant.latitude && merchant.longitude) {
           const merchantCoords = {
             lat: parseFloat(merchant.latitude),
@@ -320,8 +383,6 @@ export default function LocationSelectionPage() {
             zIndex: 900,
           });
 
-          // Store the infoWindow content directly on the marker for easy access
-          // Use optional chaining for merchant.address in case it's not present
           marker.infoWindowContent = `
             <div style="font-family: sans-serif; padding: 5px; text-align: center; color: #06044b;">
               <strong style="font-size: 1.1em;">${merchant.shopName}</strong>
@@ -330,16 +391,13 @@ export default function LocationSelectionPage() {
           `;
 
           marker.addListener("click", () => {
-            setSelectedMerchant(merchant.merchantId); // This will trigger the effect below
-            // Close any currently open info window
+            setSelectedMerchant(merchant.merchantId);
             if (infoWindowRef.current) {
               infoWindowRef.current.close();
             }
-            // Set new content and open the single info window
             infoWindowRef.current?.setContent(marker.infoWindowContent);
             infoWindowRef.current?.open(googleMapRef.current, marker);
 
-            // Scroll to the merchant in the list
             const element = document.getElementById(
               `merchant-${merchant.merchantId}`,
             );
@@ -352,16 +410,14 @@ export default function LocationSelectionPage() {
         }
       });
 
-      // Close InfoWindow when clicking on the map itself
       googleMapRef.current.addListener("click", () => {
         if (infoWindowRef.current) {
           infoWindowRef.current.close();
         }
       });
     }
-  }, [nearbyMerchants, mapLoaded]); // Reruns when nearbyMerchants data or mapLoaded status changes
+  }, [nearbyMerchants, mapLoaded]);
 
-  // EFFECT TO PAN TO SELECTED MERCHANT ON MAP
   useEffect(() => {
     if (selectedMerchant && googleMapRef.current && mapLoaded) {
       const selectedMerchantData = nearbyMerchants.find(
@@ -378,23 +434,24 @@ export default function LocationSelectionPage() {
           lng: parseFloat(selectedMerchantData.longitude),
         };
         googleMapRef.current.panTo(selectedCoords);
-        googleMapRef.current.setZoom(15); // Zoom in a bit for selected merchant
+        googleMapRef.current.setZoom(15);
 
-        // Find the marker for the selected merchant and open its info window
-        const marker = merchantMarkersRef.current.get(selectedMerchant);
+        const marker = merchantMarkersRef.current.get(
+          selectedMerchant as string,
+        ); // Added type assertion
         if (marker && infoWindowRef.current) {
-          infoWindowRef.current.close(); // Close any existing info window
+          infoWindowRef.current.close();
           infoWindowRef.current.setContent(marker.infoWindowContent);
           infoWindowRef.current.open(googleMapRef.current, marker);
         }
       }
     }
-  }, [selectedMerchant, nearbyMerchants, mapLoaded]); // Reruns when selectedMerchant, nearbyMerchants, or mapLoaded changes
+  }, [selectedMerchant, nearbyMerchants, mapLoaded]);
 
   const initializeMap = () => {
     if (!mapRef.current) return;
 
-    const defaultCenter = { lat: 40.7128, lng: -74.006 }; // Example: New York City
+    const defaultCenter = { lat: 40.7128, lng: -74.006 };
     const initialCenter = userLocation || defaultCenter;
 
     const mapOptions: google.maps.MapOptions = {
@@ -405,7 +462,7 @@ export default function LocationSelectionPage() {
       streetViewControl: false,
       zoomControl: true,
       zoomControlOptions: {
-        position: google.maps.ControlPosition.RIGHT_TOP,
+        position: window.google.maps.ControlPosition.RIGHT_TOP,
       },
     };
 
@@ -455,7 +512,7 @@ export default function LocationSelectionPage() {
 
       userMarkerRef.current.addListener("click", () => {
         if (infoWindowRef.current) {
-          infoWindowRef.current.close(); // Close any other open InfoWindow
+          infoWindowRef.current.close();
         }
         infoWindowRef.current?.setContent(`
           <div style="font-family: sans-serif; padding: 5px; text-align: center; color: #06044b;">
@@ -463,8 +520,8 @@ export default function LocationSelectionPage() {
           </div>
         `);
         infoWindowRef.current?.open(
-          googleMapRef.current,
-          userMarkerRef.current,
+          googleMapRef.current!, // Added non-null assertion
+          userMarkerRef.current!, // Added non-null assertion
         );
       });
     }
@@ -574,6 +631,22 @@ export default function LocationSelectionPage() {
 
   return (
     <div className="min-h-screen bg-[#dffbe7] flex flex-col">
+      {/* --- ToastContainer --- */}
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false} // Kept as per your example, though true is more common
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
+      {/* --- End ToastContainer --- */}
+
       {/* <NavBar /> */}
       <div className="flex-1 flex flex-col items-center py-12 px-4">
         <div className="max-w-3xl w-full text-center mb-8">
@@ -739,7 +812,6 @@ export default function LocationSelectionPage() {
                 >
                   <div
                     className="flex cursor-pointer p-4"
-                    // MODIFIED: On click, set selected merchant and trigger map pan/info window
                     onClick={() => setSelectedMerchant(merchant.merchantId)}
                   >
                     <div className="w-24 h-20 rounded overflow-hidden mr-4 flex-shrink-0">
@@ -798,7 +870,7 @@ export default function LocationSelectionPage() {
                 </p>
                 {locationPermission !== "granted" &&
                   !isLoadingMerchants &&
-                  MERCHANTS.length > 0 && (
+                  MERCHANTS.length > 0 && ( // Check MERCHANTS.length to show fallback message correctly
                     <p className="text-sm text-gray-500 mt-2">
                       Showing all available merchants instead.
                     </p>
