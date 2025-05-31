@@ -1,8 +1,8 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_ROOT_URL}`;
 export const GetFiles = async (fileId: string, userId: string) => {
   try {
     const res = await fetch(
-      `${API_BASE_URL}/api/esign/sign-document/${fileId}/${userId}`
+      `${API_BASE_URL}/api/esign/sign-document/${fileId}/${userId}`,
     );
     const data = await res.json();
     if (data.success) return data.response;
@@ -33,7 +33,7 @@ export const UploadDocument = async (formData: any) => {
 export const GetDocumentSignRecord = async (userId: string) => {
   return await fetch(
     `${API_BASE_URL}/api/esign/getRecords?ownerId=${userId}`,
-    { cache: "no-store" } // disables cache
+    { cache: "no-store" }, // disables cache
   );
 };
 export const sendSignRequestEmail = async (payload: any) => {

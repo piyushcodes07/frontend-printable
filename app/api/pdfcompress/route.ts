@@ -17,21 +17,21 @@ export async function POST(req: NextRequest) {
     // Note the key change from "file" to "fileInput".
     const backendFormData = new FormData();
     backendFormData.append("fileInput", file, file.name);
-    backendFormData.append("optimizeLevel", "5"); 
-    backendFormData.append("expectedOutputSize", ""); 
+    backendFormData.append("optimizeLevel", "5");
+    backendFormData.append("expectedOutputSize", "");
     backendFormData.append("linearize", "false");
     backendFormData.append("normalize", "false");
     backendFormData.append("grayscale", "false");
 
     const backendResponse = await fetch(
-      "http://localhost:8080/api/v1/misc/compress-pdf",
+      `${process.env.NEXT_PUBLIC_STIRLING_ROOT_URL}/api/v1/misc/compress-pdf`,
       {
         method: "POST",
         body: backendFormData,
         headers: {
           Accept: "application/pdf",
         },
-      }
+      },
     );
 
     if (!backendResponse.ok) {
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
       `Error processing PDF: ${
         error instanceof Error ? error.message : "Unknown error"
       }`,
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

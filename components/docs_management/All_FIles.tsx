@@ -25,7 +25,7 @@ interface FolderType {
   files: FileType[];
 }
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = `${process.env.NEXT_PUBLIC_BACKEND_ROOT_URL}/api`;
 
 function formatFileSize(bytes: number): string {
   if (bytes === 0) return "0 Bytes";
@@ -44,10 +44,10 @@ function AllFile() {
   const [createFolder, setCreateFolder] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [openFolderMenuIndex, setOpenFolderMenuIndex] = useState<number | null>(
-    null
+    null,
   );
   const [openFileMenuIndex, setOpenFileMenuIndex] = useState<string | null>(
-    null
+    null,
   );
   const [folders, setFolders] = useState<FolderType[]>([]);
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
@@ -107,7 +107,7 @@ function AllFile() {
           currentRef &&
           !currentRef.contains(event.target as Node) &&
           !(event.target as HTMLElement).closest(
-            `[data-folder-menu="${openFolderMenuIndex}"]`
+            `[data-folder-menu="${openFolderMenuIndex}"]`,
           )
         ) {
           setOpenFolderMenuIndex(null);
@@ -117,10 +117,10 @@ function AllFile() {
       // Close file menus if clicked outside
       if (openFileMenuIndex !== null) {
         const fileMenuRef = document.querySelector(
-          `[data-file-menu="${openFileMenuIndex}"]`
+          `[data-file-menu="${openFileMenuIndex}"]`,
         );
         const fileMenuButton = document.querySelector(
-          `[data-file-menu-button="${openFileMenuIndex}"]`
+          `[data-file-menu-button="${openFileMenuIndex}"]`,
         );
         if (
           fileMenuRef &&
@@ -147,7 +147,7 @@ function AllFile() {
         `${API_URL}/fileManagement/getFiles/${user?.id}`,
         {
           method: "GET",
-        }
+        },
       );
       const result: { msg: string; data: FolderType[] } = await response.json();
       setFolders(result.data);
@@ -302,7 +302,7 @@ function AllFile() {
 
     // Find the current folder ID
     const currentFolder = folders.find(
-      (folder) => folder.folderName === fileSelection
+      (folder) => folder.folderName === fileSelection,
     );
     if (currentFolder?.folderId) {
       formData.append("folderId", currentFolder.folderId);
@@ -366,7 +366,7 @@ function AllFile() {
         `${API_URL}/fileManagement/renameFolder/${folder.folderId}/${newName}`,
         {
           method: "PATCH",
-        }
+        },
       );
 
       if (response.ok) {
@@ -402,7 +402,7 @@ function AllFile() {
         `${API_URL}/fileManagement/deleteFolder/${folder.folderId}`,
         {
           method: "DELETE",
-        }
+        },
       );
 
       if (response.ok) {
@@ -442,7 +442,7 @@ function AllFile() {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ fileId, folderId }),
-        }
+        },
       );
 
       if (response.ok) {
@@ -754,7 +754,7 @@ function AllFile() {
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent background click and folder selection
                           setOpenFolderMenuIndex(
-                            openFolderMenuIndex === idx ? null : idx
+                            openFolderMenuIndex === idx ? null : idx,
                           );
                         }}
                       >
@@ -994,7 +994,7 @@ function AllFile() {
                         if (renameFolder.folder && newFolderName.trim()) {
                           handleRenameFolder(
                             renameFolder.folder,
-                            newFolderName
+                            newFolderName,
                           );
                           setRenameFolder({ isOpen: false, folder: null });
                           setNewFolderName("");
@@ -1027,7 +1027,7 @@ function AllFile() {
             {/* Get the current folder's files */}
             {(() => {
               const currentFolder = folders.find(
-                (folder) => folder.folderName === fileSelection
+                (folder) => folder.folderName === fileSelection,
               );
               const files = currentFolder?.files || [];
 
@@ -1185,7 +1185,7 @@ function AllFile() {
                                     if (e.target.value) {
                                       handleMoveFile(
                                         item.fileId,
-                                        e.target.value
+                                        e.target.value,
                                       );
                                     }
                                   }}
@@ -1201,7 +1201,7 @@ function AllFile() {
                                         >
                                           {folder.folderName}
                                         </option>
-                                      )
+                                      ),
                                   )}
                                 </select>
                               </div>

@@ -20,8 +20,7 @@ import { BreadcrumbLink } from "@/components/ui/breadcrumb";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import UseStorage from "@/hooks/useStorage";
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_ROOT_URL}`;
 
 export default function PrintablePage() {
   const User = useUser();
@@ -47,7 +46,7 @@ export default function PrintablePage() {
       setStatusMessage(null);
 
       const results = await Promise.all(
-        acceptedFiles.map((file) => uploadFile(file, user?.id))
+        acceptedFiles.map((file) => uploadFile(file, user?.id)),
       );
       const successCount = results.filter(Boolean).length;
       const failCount = acceptedFiles.length - successCount;
@@ -63,7 +62,7 @@ export default function PrintablePage() {
 
       setIsUploading(false);
     },
-    [dispatch]
+    [dispatch],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -306,7 +305,7 @@ export default function PrintablePage() {
                         fileItem.id,
                         fileItem.fileName,
                         index,
-                        setStatusMessage
+                        setStatusMessage,
                       );
                     }}
                     disabled={fileItem.uploading}

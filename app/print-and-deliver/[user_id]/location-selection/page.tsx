@@ -120,19 +120,22 @@ export default function LocationSelectionPage() {
     };
 
     try {
-      const result = await fetch(`http://localhost:5000/api/order/`, {
-        method: "POST",
-        body: JSON.stringify({
-          ...order,
-          merchantId: selectedMerchant,
-          userId: user?.id || "1",
-          latitude: userLocation?.lat,
-          longitude: userLocation?.lng,
-        }),
-        headers: {
-          "Content-Type": "application/json",
+      const result = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_ROOT_URL}/api/order/`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            ...order,
+            merchantId: selectedMerchant,
+            userId: user?.id || "1",
+            latitude: userLocation?.lat,
+            longitude: userLocation?.lng,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       console.log({ ...orderFinal, merchantId: selectedMerchant });
       const res = await result.json();
@@ -226,7 +229,7 @@ export default function LocationSelectionPage() {
         (async () => {
           try {
             const response = await fetch(
-              `http://localhost:5000/api/user/nearest-merchants?lat=${userCoords.lat}&long=${userCoords.lng}`,
+              `${process.env.NEXT_PUBLIC_BACKEND_ROOT_URL}/api/user/nearest-merchants?lat=${userCoords.lat}&long=${userCoords.lng}`,
             );
             const data = await response.json();
 
