@@ -4,7 +4,7 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
 
   const backendResponse = await fetch(
-    "http://localhost:8080/api/v1/misc/flatten",
+    `${process.env.NEXT_PUBLIC_STIRLING_ROOT_URL}/api/v1/misc/flatten`,
     {
       method: "POST",
       body: formData,

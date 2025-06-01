@@ -1,5 +1,7 @@
 "use client";
+/// <reference types="google.maps" />
 
+import { useOrder, DocumentItem } from "@/context/orderContext";
 import { useState, useEffect, useRef } from "react";
 import {
   MapPin,
@@ -14,60 +16,71 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { NavBar } from "@/components/nav-bar"; // Assuming this exists
+// import { NavBar } from "@/components/nav-bar"; // Assuming this exists
 import { cn } from "@/lib/utils"; // Assuming this exists
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
 
-// Mock merchant data
-const MERCHANTS = [
+// --- React Toastify Imports ---
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useUser } from "@clerk/nextjs";
+// --- End React Toastify Imports ---
+
+interface Merchant {
+  merchantId: string;
+  shopName: string;
+  latitude: string | null; // UPDATED: Latitude as string (from API response)
+  longitude: string | null; // UPDATED: Longitude as string (from API response)
+  MerchantImages: any[];
+  averageRating: string;
+  ratingCount: number;
+  googleDistance: string;
+  duration: string;
+  durationInTraffic: string;
+  address?: string; // ADDED: Address can be optional if not always returned or needed for InfoWindow
+}
+
+// Mock merchant data - UPDATED WITH LATITUDE AND LONGITUDE
+const MERCHANTS: Merchant[] = [
   {
-    id: 1,
-    name: "Print Master Shop",
+    merchantId: "merchant_1",
+    shopName: "Print Master Shop",
+    latitude: "40.7150", // Example coordinates
+    longitude: "-74.0080", // Example coordinates
+    MerchantImages: ["/placeholder.svg?height=150&width=300"],
+    averageRating: "4.80",
+    ratingCount: 123,
+    googleDistance: "0.5 km",
+    duration: "2 mins",
+    durationInTraffic: "2 mins",
     address: "123 Main St, New York, NY 10001",
-    rating: 4.8,
-    reviews: 123,
-    delivery: "Same day",
-    services: [
-      "Poster Printing",
-      "Photo Books",
-      "Business Cards",
-      "Document Printing",
-    ],
-    coordinates: { lat: 40.7128, lng: -74.006 },
-    image: "/placeholder.svg?height=150&width=300",
   },
   {
-    id: 2,
-    name: "Quality Print Solutions",
-    address: "555 Lexington Ave, New York, NY 10017",
-    rating: 4.9,
-    reviews: 500,
-    delivery: "Same day",
-    services: [
-      "Poster Printing",
-      "Photo Books",
-      "Business Cards",
-      "Document Printing",
-    ],
-    coordinates: { lat: 40.7168, lng: -73.9861 },
-    image: "/placeholder.svg?height=150&width=300",
+    merchantId: "merchant_2",
+    shopName: "Quality Print Solutions",
+    latitude: "40.7090", // Example coordinates
+    longitude: "-74.0120", // Example coordinates
+    MerchantImages: ["/placeholder.svg?height=150&width=300"],
+    averageRating: "4.90",
+    ratingCount: 500,
+    googleDistance: "1.2 km",
+    duration: "5 mins",
+    durationInTraffic: "6 mins",
+    address: "456 Oak Ave, New York, NY 10004",
   },
   {
-    id: 3,
-    name: "Quick Print Services",
-    address: "789 Fifth Ave, New York, NY 10003",
-    rating: 3.5,
-    reviews: 56,
-    delivery: "Next Day",
-    services: [
-      "Poster Printing",
-      "Photo Books",
-      "Business Cards",
-      "Document Printing",
-    ],
-    coordinates: { lat: 40.7308, lng: -73.9973 },
-    image: "/placeholder.svg?height=150&width=300",
+    merchantId: "merchant_3",
+    shopName: "Quick Print Services",
+    latitude: "40.7200", // Example coordinates
+    longitude: "-73.9950", // Example coordinates
+    MerchantImages: ["/placeholder.svg?height=150&width=300"],
+    averageRating: "3.50",
+    ratingCount: 56,
+    googleDistance: "2.1 km",
+    duration: "8 mins",
+    durationInTraffic: "10 mins",
+    address: "789 Pine Ln, New York, NY 10002",
   },
 ];
 
@@ -86,36 +99,119 @@ declare global {
 }
 
 export default function LocationSelectionPage() {
-  const [selectedMerchant, setSelectedMerchant] = useState<number | null>(null);
+  const { user } = useUser();
+  const handelOrderSubmit = async () => {
+    if (!selectedMerchant) {
+      toast.error("Please select a merchant.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+        transition: Bounce,
+      });
+      return;
+    }
+
+    const orderFinal = {
+      ...order,
+    };
+
+    try {
+      const result = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_ROOT_URL}/api/order/`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            ...order,
+            merchantId: selectedMerchant,
+            userId: user?.id || "1",
+            latitude: userLocation?.lat,
+            longitude: userLocation?.lng,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      console.log({ ...orderFinal, merchantId: selectedMerchant });
+      const res = await result.json();
+      console.log(res);
+
+      if (result.ok) {
+        toast.success("🦄 Wow so easy! Order submitted successfully.", {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false, // Kept as per your example
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+        // Optionally, you can redirect or clear the form here
+      } else {
+        toast.error(
+          res.message || "Order submission failed. Please try again.",
+          {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "light",
+            transition: Bounce,
+          },
+        );
+      }
+    } catch (error) {
+      console.error("Error submitting order:", error);
+      toast.error("An unexpected error occurred. Please try again.", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+        transition: Bounce,
+      });
+    }
+  };
+
+  const { order, dispatch } = useOrder();
+  const [selectedMerchant, setSelectedMerchant] = useState<String | null>(null);
   const [deliveryOption, setDeliveryOption] =
     useState<DeliveryOption>("pickup");
   const [searchQuery, setSearchQuery] = useState("");
   const [mapLoaded, setMapLoaded] = useState(false);
   const [locationPermission, setLocationPermission] =
-    useState<LocationPermissionStatus>("loading"); // Start as loading
+    useState<LocationPermissionStatus>("loading");
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
-  const [nearbyMerchants, setNearbyMerchants] = useState(MERCHANTS); // Initial state can be empty or default
-  const [isLoadingMerchants, setIsLoadingMerchants] = useState(true); // Start as loading
+  const [nearbyMerchants, setNearbyMerchants] = useState<Merchant[]>([]);
+  const [isLoadingMerchants, setIsLoadingMerchants] = useState(true);
 
-  const mapRef = useRef<HTMLDivElement>(null);
-  const googleMapRef = useRef(null);
-  const markersRef = useRef([]);
-  const userMarkerRef = useRef(null);
+  const mapRef = useRef<HTMLDivElement | null>(null);
+  const googleMapRef = useRef<google.maps.Map | null>(null);
+  const merchantMarkersRef = useRef<Map<string, google.maps.Marker>>(new Map());
+  const userMarkerRef = useRef<google.maps.Marker | null>(null);
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
 
-  // Filter merchants based on search query
-  const filteredMerchants = nearbyMerchants.filter(
-    (merchant) =>
-      merchant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      merchant.address.toLowerCase().includes(searchQuery.toLowerCase()),
+  const filteredMerchants = nearbyMerchants.filter((merchant) =>
+    merchant.shopName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  // Get user's location (this function now always attempts to get location)
   const getUserLocation = () => {
-    setLocationPermission("loading"); // Set loading state before attempting
-    setIsLoadingMerchants(true); // Indicate merchants are loading
+    setLocationPermission("loading");
+    setIsLoadingMerchants(true);
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -126,27 +222,54 @@ export default function LocationSelectionPage() {
         setUserLocation(userCoords);
         setLocationPermission("granted");
 
-        // In a real app, you would fetch nearby merchants based on location
-        // For now, we'll simulate a delay and use our mock data
-        setTimeout(() => {
-          setNearbyMerchants(MERCHANTS); // Use mock data for simulation
-          setIsLoadingMerchants(false);
+        if (googleMapRef.current) {
+          updateUserLocationOnMap(userCoords);
+        }
 
-          // Update map to show user location if map is already loaded
-          if (mapLoaded && googleMapRef.current) {
-            updateUserLocationOnMap(userCoords);
+        (async () => {
+          try {
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_BACKEND_ROOT_URL}/api/user/nearest-merchants?lat=${userCoords.lat}&long=${userCoords.lng}`,
+            );
+            const data = await response.json();
+
+            if (!response.ok) {
+              console.log("Error while fetching Merchant data:", data);
+              setNearbyMerchants(MERCHANTS); // Fallback to mock
+            } else {
+              console.log("Nearby merchants from API:", data);
+              const apiMerchants: Merchant[] = data.map((item: any) => ({
+                merchantId: item.merchantId,
+                shopName: item.shopName,
+                latitude: item.latitude ? String(item.latitude) : null,
+                longitude: item.longitude ? String(item.longitude) : null,
+                MerchantImages: item.MerchantImages || [],
+                averageRating: item.averageRating || "0.00",
+                ratingCount: item.ratingCount || 0,
+                googleDistance: item.googleDistance || "N/A",
+                duration: item.duration || "N/A",
+                durationInTraffic: item.durationInTraffic || "N/A",
+                address: item.address || "Address not available",
+              }));
+              setNearbyMerchants(apiMerchants);
+            }
+          } catch (e) {
+            console.log("Error while calling API", e);
+            setNearbyMerchants(MERCHANTS); // Fallback to mock
+          } finally {
+            setIsLoadingMerchants(false);
           }
-        }, 1000);
+        })();
       },
       (error) => {
         console.error("Geolocation error:", error);
         if (error.code === error.PERMISSION_DENIED) {
           setLocationPermission("denied");
         } else {
-          // Handle other potential errors like position unavailable
-          setLocationPermission("denied"); // Or a new 'error' state
+          setLocationPermission("denied");
         }
-        setIsLoadingMerchants(false); // Stop loading on error
+        setIsLoadingMerchants(false);
+        setNearbyMerchants(MERCHANTS);
       },
       {
         enableHighAccuracy: true,
@@ -156,16 +279,14 @@ export default function LocationSelectionPage() {
     );
   };
 
-  // Check geolocation support and permission on mount
   useEffect(() => {
     if (!navigator.geolocation) {
       setLocationPermission("unsupported");
-      setIsLoadingMerchants(false); // Stop loading if unsupported
-      setNearbyMerchants(MERCHANTS); // Show all merchants if unsupported
+      setIsLoadingMerchants(false);
+      setNearbyMerchants(MERCHANTS);
       return;
     }
 
-    // Use Permissions API if available
     if (navigator.permissions && navigator.permissions.query) {
       navigator.permissions
         .query({ name: "geolocation" })
@@ -174,50 +295,40 @@ export default function LocationSelectionPage() {
             permissionStatus.state as LocationPermissionStatus,
           );
 
-          // --- MODIFICATION START ---
-          // If permission is granted or prompt, attempt to get location
           if (
             permissionStatus.state === "granted" ||
             permissionStatus.state === "prompt"
           ) {
-            // We call getUserLocation here, which handles setting loading states internally
             getUserLocation();
           } else {
-            // If permission is denied or any other state where we can't prompt automatically
-            setIsLoadingMerchants(false); // Stop loading if we aren't requesting location
-            // Optionally, load default merchants or based on a fallback location
-            setNearbyMerchants(MERCHANTS); // Example: load all merchants
+            setIsLoadingMerchants(false);
+            setNearbyMerchants(MERCHANTS);
           }
-          // --- MODIFICATION END ---
 
-          // Listen for permission changes
           permissionStatus.onchange = () => {
             setLocationPermission(
               permissionStatus.state as LocationPermissionStatus,
             );
             if (permissionStatus.state === "granted") {
-              getUserLocation(); // Get location if permission is granted later
+              getUserLocation();
             } else if (permissionStatus.state === "denied") {
-              setIsLoadingMerchants(false); // Stop loading if permission becomes denied
-              setNearbyMerchants(MERCHANTS); // Example: load all merchants
-              setUserLocation(null); // Clear user location
+              setIsLoadingMerchants(false);
+              setNearbyMerchants(MERCHANTS);
+              setUserLocation(null);
             }
           };
         })
         .catch(() => {
-          // If permissions API fails, fallback to direct call (which prompts)
           console.warn(
             "Permissions API failed, falling back to direct geolocation.",
           );
           getUserLocation();
         });
     } else {
-      // Fallback for browsers that don't support permissions API - direct call will prompt
       getUserLocation();
     }
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
-  // Load Google Maps script
   useEffect(() => {
     const loadGoogleMapsScript = () => {
       if (window.google?.maps) {
@@ -226,8 +337,9 @@ export default function LocationSelectionPage() {
       }
 
       const script = document.createElement("script");
-      // Ensure YOUR_API_KEY is replaced or environment variable is set
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_API_KEY"}&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${
+        process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_API_KEY"
+      }&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = () => initializeMap();
@@ -235,15 +347,114 @@ export default function LocationSelectionPage() {
     };
 
     loadGoogleMapsScript();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
-  // Initialize map
+  useEffect(() => {
+    if (mapLoaded && googleMapRef.current) {
+      merchantMarkersRef.current.forEach((marker) => marker.setMap(null));
+      merchantMarkersRef.current.clear();
+
+      if (!infoWindowRef.current) {
+        infoWindowRef.current = new window.google.maps.InfoWindow();
+      }
+
+      nearbyMerchants.forEach((merchant) => {
+        if (merchant.latitude && merchant.longitude) {
+          const merchantCoords = {
+            lat: parseFloat(merchant.latitude),
+            lng: parseFloat(merchant.longitude),
+          };
+
+          const merchantIcon = {
+            url:
+              "data:image/svg+xml;charset=UTF-8," +
+              encodeURIComponent(
+                `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#06044b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3" fill="#61e987"></circle>
+                </svg>`,
+              ),
+            scaledSize: new window.google.maps.Size(40, 40),
+            anchor: new window.google.maps.Point(20, 40),
+          };
+
+          const marker = new window.google.maps.Marker({
+            position: merchantCoords,
+            map: googleMapRef.current,
+            title: merchant.shopName,
+            icon: merchantIcon,
+            zIndex: 900,
+          });
+
+          marker.infoWindowContent = `
+            <div style="font-family: sans-serif; padding: 5px; text-align: center; color: #06044b;">
+              <strong style="font-size: 1.1em;">${merchant.shopName}</strong>
+              ${merchant.address ? `<p style="font-size: 0.8em; margin-top: 5px; color: #555;">${merchant.address}</p>` : ""}
+            </div>
+          `;
+
+          marker.addListener("click", () => {
+            setSelectedMerchant(merchant.merchantId);
+            if (infoWindowRef.current) {
+              infoWindowRef.current.close();
+            }
+            infoWindowRef.current?.setContent(marker.infoWindowContent);
+            infoWindowRef.current?.open(googleMapRef.current, marker);
+
+            const element = document.getElementById(
+              `merchant-${merchant.merchantId}`,
+            );
+            if (element) {
+              element.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+          });
+
+          merchantMarkersRef.current.set(merchant.merchantId, marker);
+        }
+      });
+
+      googleMapRef.current.addListener("click", () => {
+        if (infoWindowRef.current) {
+          infoWindowRef.current.close();
+        }
+      });
+    }
+  }, [nearbyMerchants, mapLoaded]);
+
+  useEffect(() => {
+    if (selectedMerchant && googleMapRef.current && mapLoaded) {
+      const selectedMerchantData = nearbyMerchants.find(
+        (m) => m.merchantId === selectedMerchant,
+      );
+
+      if (
+        selectedMerchantData &&
+        selectedMerchantData.latitude &&
+        selectedMerchantData.longitude
+      ) {
+        const selectedCoords = {
+          lat: parseFloat(selectedMerchantData.latitude),
+          lng: parseFloat(selectedMerchantData.longitude),
+        };
+        googleMapRef.current.panTo(selectedCoords);
+        googleMapRef.current.setZoom(15);
+
+        const marker = merchantMarkersRef.current.get(
+          selectedMerchant as string,
+        ); // Added type assertion
+        if (marker && infoWindowRef.current) {
+          infoWindowRef.current.close();
+          infoWindowRef.current.setContent(marker.infoWindowContent);
+          infoWindowRef.current.open(googleMapRef.current, marker);
+        }
+      }
+    }
+  }, [selectedMerchant, nearbyMerchants, mapLoaded]);
+
   const initializeMap = () => {
     if (!mapRef.current) return;
 
-    // Default to New York City coordinates or a placeholder
     const defaultCenter = { lat: 40.7128, lng: -74.006 };
-    // Use user location as center if available, otherwise default
     const initialCenter = userLocation || defaultCenter;
 
     const mapOptions: google.maps.MapOptions = {
@@ -254,176 +465,82 @@ export default function LocationSelectionPage() {
       streetViewControl: false,
       zoomControl: true,
       zoomControlOptions: {
-        position: google.maps.ControlPosition.RIGHT_TOP,
+        position: window.google.maps.ControlPosition.RIGHT_TOP,
       },
     };
 
-    // Create new map
     if (window.google && window.google.maps) {
       const map = new window.google.maps.Map(mapRef.current, mapOptions);
       googleMapRef.current = map;
-
-      // Clear existing markers (important if initializeMap is called multiple times)
-      markersRef.current.forEach((marker) => marker.setMap(null));
-      markersRef.current = []; // Clear the array
-
-      // Add markers for each merchant
-      // Use nearbyMerchants instead of static MERCHANTS if you implement location-based filtering later
-      (userLocation ? nearbyMerchants : MERCHANTS).forEach((merchant) => {
-        // Example: show nearby if location available, else all
-        const marker = new window.google.maps.Marker({
-          position: merchant.coordinates,
-          map,
-          title: merchant.name,
-          icon: {
-            url:
-              "data:image/svg+xml;charset=UTF-8," +
-              encodeURIComponent(
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="36"
-                  height="36"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#06044b"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3" fill="#61e987"></circle>
-                </svg>,
-              ),
-            scaledSize: new google.maps.Size(36, 36),
-          },
-        });
-
-        // Add click event to marker
-        marker.addListener("click", () => {
-          setSelectedMerchant(merchant.id);
-
-          // Scroll to the merchant in the list
-          const element = document.getElementById(`merchant-${merchant.id}`);
-          if (element) {
-            element.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
-        });
-
-        markersRef.current.push(marker);
-      });
-
       setMapLoaded(true);
 
-      // If we already have user location, update the map
       if (userLocation) {
         updateUserLocationOnMap(userLocation);
       }
     }
   };
 
-  // Update user location on map whenever userLocation state changes
-  useEffect(() => {
-    if (mapLoaded && googleMapRef.current && userLocation) {
-      updateUserLocationOnMap(userLocation);
-    } else if (
-      mapLoaded &&
-      googleMapRef.current &&
-      !userLocation &&
-      userMarkerRef.current
-    ) {
-      // Remove user marker if user location becomes null
-      userMarkerRef.current.setMap(null);
-      userMarkerRef.current = null;
-    }
-    // Center map on default if map is loaded and no user location
-    if (mapLoaded && googleMapRef.current && !userLocation) {
-      const defaultCenter = { lat: 40.7128, lng: -74.006 };
-      googleMapRef.current.panTo(defaultCenter);
-      googleMapRef.current.setZoom(12); // Maybe zoom out a bit for a wider view
-    }
-  }, [userLocation, mapLoaded]);
-
-  // Update user location on map utility function
   const updateUserLocationOnMap = (location: { lat: number; lng: number }) => {
     if (!googleMapRef.current) return;
 
-    // Center map on user location
     googleMapRef.current.panTo(location);
-    // Only zoom in if zoom is less than 14, to avoid jarring jumps
     if (googleMapRef.current.getZoom() < 14) {
       googleMapRef.current.setZoom(14);
     }
 
-    // Add or update user marker
+    const userIcon = {
+      url:
+        "data:image/svg+xml;charset=UTF-8," +
+        encodeURIComponent(
+          `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="#06044b" stroke="#ffffff" stroke-width="2">
+            <circle cx="12" cy="12" r="10" fill="#06044b" stroke="#ffffff" stroke-width="2"/>
+            <circle cx="12" cy="12" r="4" fill="#61e987"/>
+          </svg>`,
+        ),
+      scaledSize: new window.google.maps.Size(30, 30),
+      anchor: new window.google.maps.Point(15, 15),
+    };
+
     if (userMarkerRef.current) {
       userMarkerRef.current.setPosition(location);
-      userMarkerRef.current.setMap(googleMapRef.current); // Ensure marker is visible
+      userMarkerRef.current.setMap(googleMapRef.current);
     } else {
       userMarkerRef.current = new window.google.maps.Marker({
         position: location,
         map: googleMapRef.current,
         title: "Your Location",
-        icon: {
-          url:
-            "data:image/svg+xml;charset=UTF-8," +
-            encodeURIComponent(
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="#06044b"
-                stroke="#ffffff"
-                strokeWidth="2"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  fill="#61e987"
-                  stroke="#06044b"
-                  strokeWidth="2"
-                />
-                <circle cx="12" cy="12" r="3" fill="#ffffff" />
-              </svg>,
-            ),
-          scaledSize: new google.maps.Size(24, 24),
-        },
-        zIndex: 1000, // Ensure user marker is on top
+        icon: userIcon,
+        zIndex: 1000,
+      });
+
+      userMarkerRef.current.addListener("click", () => {
+        if (infoWindowRef.current) {
+          infoWindowRef.current.close();
+        }
+        infoWindowRef.current?.setContent(`
+          <div style="font-family: sans-serif; padding: 5px; text-align: center; color: #06044b;">
+            <strong>Your Location</strong>
+          </div>
+        `);
+        infoWindowRef.current?.open(
+          googleMapRef.current!, // Added non-null assertion
+          userMarkerRef.current!, // Added non-null assertion
+        );
       });
     }
   };
 
-  // Update map when selected merchant changes
-  useEffect(() => {
-    if (!googleMapRef.current || !mapLoaded) return;
-
-    // Center map on selected merchant if one is selected
-    if (selectedMerchant) {
-      const merchant = MERCHANTS.find((m) => m.id === selectedMerchant);
-      if (merchant) {
-        googleMapRef.current.panTo(merchant.coordinates);
-        googleMapRef.current.setZoom(15);
-      }
-    } else {
-      // If no merchant is selected, center back on user location or default
-      const center = userLocation || { lat: 40.7128, lng: -74.006 };
-      googleMapRef.current.panTo(center);
-      googleMapRef.current.setZoom(userLocation ? 14 : 12);
-    }
-  }, [selectedMerchant, mapLoaded, userLocation]); // Added userLocation dependency
-
-  // Render star rating
   const renderStars = (rating: number) => {
+    const numericRating = parseFloat(rating.toString());
     return (
       <div className="flex items-center">
         {[1, 2, 3, 4, 5].map((star) => (
           <svg
             key={star}
             className={`w-4 h-4 ${
-              star <= Math.floor(rating)
+              star <= Math.floor(numericRating)
                 ? "text-yellow-400"
-                : star - 0.5 <= rating // Handle half stars
+                : star - 0.5 <= numericRating
                   ? "text-yellow-400"
                   : "text-gray-300"
             }`}
@@ -434,15 +551,13 @@ export default function LocationSelectionPage() {
           </svg>
         ))}
         <span className="ml-1 text-sm text-gray-500">
-          ({rating.toFixed(1)})
+          ({numericRating.toFixed(1)})
         </span>
       </div>
     );
   };
 
-  // Render location permission message
   const renderLocationPermissionMessage = () => {
-    // Don't show message if permission is granted and we have a location
     if (locationPermission === "granted" && userLocation) return null;
 
     if (locationPermission === "denied") {
@@ -455,12 +570,11 @@ export default function LocationSelectionPage() {
               browser settings to see nearby merchants.
             </AlertDescription>
           </div>
-          {/* This button is only shown if permission was denied */}
           <Button
             variant="outline"
             size="sm"
             className="mt-2 border-yellow-300 text-yellow-700 hover:bg-yellow-50"
-            onClick={getUserLocation} // Use getUserLocation directly
+            onClick={getUserLocation}
           >
             Try Again
           </Button>
@@ -472,7 +586,6 @@ export default function LocationSelectionPage() {
       locationPermission === "loading" ||
       (locationPermission === "prompt" && isLoadingMerchants)
     ) {
-      // Show loading when trying to get location, or when prompt state is active and we're loading
       return (
         <Alert className="mb-4 bg-[#f0fdf4] border-[#90f0ab]">
           <div className="flex items-center">
@@ -487,7 +600,6 @@ export default function LocationSelectionPage() {
                 : "Please allow location access to find printing locations near you."}
             </AlertDescription>
           </div>
-          {/* No button needed here, as the prompt is triggered by getUserLocation already */}
         </Alert>
       );
     }
@@ -503,7 +615,6 @@ export default function LocationSelectionPage() {
       );
     }
 
-    // If permission is prompt but not loading, show a static message (optional, depends on UX)
     if (locationPermission === "prompt" && !isLoadingMerchants) {
       return (
         <Alert className="mb-4 bg-[#f0fdf4] border-[#90f0ab]">
@@ -523,7 +634,22 @@ export default function LocationSelectionPage() {
 
   return (
     <div className="min-h-screen bg-[#dffbe7] flex flex-col">
-      {/* Assuming NavBar is meant to be here */}
+      {/* --- ToastContainer --- */}
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false} // Kept as per your example, though true is more common
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
+      {/* --- End ToastContainer --- */}
+
       {/* <NavBar /> */}
       <div className="flex-1 flex flex-col items-center py-12 px-4">
         <div className="max-w-3xl w-full text-center mb-8">
@@ -537,7 +663,6 @@ export default function LocationSelectionPage() {
           </p>
         </div>
 
-        {/* Process Steps */}
         <div className="flex justify-center items-center w-full max-w-2xl mb-12 overflow-x-auto py-4">
           <div className="flex flex-col items-center flex-shrink-0">
             <div className="w-16 h-16 rounded-full bg-[#61e987] flex items-center justify-center">
@@ -597,7 +722,6 @@ export default function LocationSelectionPage() {
           </div>
         </div>
 
-        {/* Location Selection Card */}
         <div className="bg-white rounded-xl p-8 w-full max-w-2xl border border-[#90f0ab] mb-6">
           <div className="flex items-center mb-6">
             <div className="w-12 h-12 rounded-full bg-[#f0fdf4] flex items-center justify-center mr-4">
@@ -611,10 +735,8 @@ export default function LocationSelectionPage() {
             </div>
           </div>
 
-          {/* Location Permission Message */}
           {renderLocationPermissionMessage()}
 
-          {/* Delivery Options Toggle */}
           <div className="bg-[#f0fdf4] rounded-full p-1 flex mb-6">
             <button
               className={cn(
@@ -644,7 +766,6 @@ export default function LocationSelectionPage() {
 
           <h3 className="font-medium mb-3">Select Printing Location</h3>
 
-          {/* Search Input */}
           <div className="relative mb-4">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-4 w-4 text-gray-400" />
@@ -658,20 +779,17 @@ export default function LocationSelectionPage() {
             />
           </div>
 
-          {/* Map */}
           <div
             ref={mapRef}
             className="w-full h-[200px] rounded-lg mb-4 bg-gray-100 overflow-hidden"
           ></div>
 
-          {/* Divider */}
           <div className="flex items-center my-6">
             <div className="flex-grow h-px bg-gray-200"></div>
             <span className="px-4 text-sm text-gray-500">Or</span>
             <div className="flex-grow h-px bg-gray-200"></div>
           </div>
 
-          {/* Merchant List */}
           <div className="space-y-4">
             {isLoadingMerchants &&
             !userLocation &&
@@ -686,64 +804,62 @@ export default function LocationSelectionPage() {
             ) : filteredMerchants.length > 0 ? (
               filteredMerchants.map((merchant) => (
                 <div
-                  key={merchant.id}
-                  id={`merchant-${merchant.id}`}
+                  key={merchant.merchantId}
+                  id={`merchant-${merchant.merchantId}`}
                   className={cn(
                     "border rounded-lg overflow-hidden transition-all",
-                    selectedMerchant === merchant.id
+                    selectedMerchant === merchant.merchantId
                       ? "border-[#61e987] bg-[#f0fdf4]"
                       : "border-gray-200 hover:border-[#90f0ab]",
                   )}
                 >
                   <div
                     className="flex cursor-pointer p-4"
-                    onClick={() => setSelectedMerchant(merchant.id)}
+                    onClick={() => setSelectedMerchant(merchant.merchantId)}
                   >
-                    {/* Merchant Image */}
                     <div className="w-24 h-20 rounded overflow-hidden mr-4 flex-shrink-0">
                       <img
-                        src={merchant.image || "/placeholder.svg"}
-                        alt={merchant.name}
+                        src={merchant.MerchantImages[0] || "/placeholder.svg"}
+                        alt={merchant.shopName}
                         className="w-full h-full object-cover"
                       />
                     </div>
 
-                    {/* Merchant Details */}
                     <div className="flex-grow">
                       <div className="flex justify-between items-start">
                         <h4 className="font-medium text-[#06044b]">
-                          {merchant.name}
+                          {merchant.shopName}
                         </h4>
                         <div className="w-5 h-5 rounded-full border-2 border-[#06044b] flex-shrink-0 flex items-center justify-center">
-                          {selectedMerchant === merchant.id && (
+                          {selectedMerchant === merchant.merchantId && (
                             <div className="w-3 h-3 rounded-full bg-[#06044b]"></div>
                           )}
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500 mb-1">
-                        {merchant.address}
-                      </p>
+
                       <div className="flex items-center mb-1">
-                        {renderStars(merchant.rating)}
+                        {renderStars(parseFloat(merchant.averageRating))}
                         <span className="text-xs text-gray-500 ml-1">
-                          ({merchant.reviews})
+                          ({merchant.ratingCount})
                         </span>
                         <div className="flex items-center ml-3 text-xs text-gray-500">
                           <Clock className="h-3 w-3 mr-1" />
-                          <span>{merchant.delivery}</span>
+                          <span>{merchant.duration}</span>
                         </div>
                       </div>
 
-                      {/* Services */}
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {merchant.services.map((service, index) => (
-                          <span
-                            key={index}
-                            className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
-                          >
-                            {service}
-                          </span>
-                        ))}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className="rounded px-1 py-1">
+                          <p className="text-[12px] text-gray-400">
+                            Distance : {merchant.googleDistance}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-[12px] text-gray-400">
+                            Traffic : {merchant.durationInTraffic}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -755,10 +871,9 @@ export default function LocationSelectionPage() {
                 <p className="text-gray-500">
                   No merchants found matching your search.
                 </p>
-                {/* Optionally show all merchants if location failed/denied */}
                 {locationPermission !== "granted" &&
                   !isLoadingMerchants &&
-                  MERCHANTS.length > 0 && (
+                  MERCHANTS.length > 0 && ( // Check MERCHANTS.length to show fallback message correctly
                     <p className="text-sm text-gray-500 mt-2">
                       Showing all available merchants instead.
                     </p>
@@ -767,20 +882,17 @@ export default function LocationSelectionPage() {
             )}
           </div>
 
-          {/* Confirm Button */}
           <Button
             className="w-full mt-6 bg-[#61e987] hover:bg-[#61e987]/90 text-[#06044b] font-medium"
             disabled={!selectedMerchant || isLoadingMerchants}
+            onClick={handelOrderSubmit}
           >
             Confirm Selection
           </Button>
         </div>
 
-        {/* Navigation Buttons */}
         <div className="flex justify-between w-full max-w-2xl">
           <Link href="/print-options">
-            {" "}
-            {/* Replace with actual previous page */}
             <Button
               variant="outline"
               className="flex items-center gap-2 border-[#d0d0d0] text-[#555555]"
@@ -789,7 +901,6 @@ export default function LocationSelectionPage() {
               Back
             </Button>
           </Link>
-          {/* Replace with actual next page */}
           <Link
             href={
               selectedMerchant
@@ -806,7 +917,6 @@ export default function LocationSelectionPage() {
           </Link>
         </div>
       </div>
-      {/* Assuming NavBar is meant to be here or a footer */}
       {/* <NavBar /> */}
     </div>
   );

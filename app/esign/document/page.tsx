@@ -11,13 +11,13 @@ import { useSignUrl } from "../useSign";
 import { drawSignatureOnPdf } from "../components/utils/pdfUtils";
 import TimeLine from "../components/timeLine";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_ROOT_URL}`;
 
 const PdfViewer = dynamic(
   () => import("../components/pdfLoader").then((mod) => mod.default),
   {
     ssr: false,
-  }
+  },
 );
 
 interface FileData {
@@ -62,14 +62,14 @@ export default function SignDocument() {
         resetSign();
 
         toast.success(
-          response.msg || "signed and saved document successfully!!"
+          response.msg || "signed and saved document successfully!!",
         );
         // Refresh file data to update status
         const FileData = await GetFiles(fileId, user?.id as string);
         setFileUrl(FileData.fileUrl);
         const found = FileData.info.find(
           (info: any) =>
-            info.ownerId === user?.id && info.signeeSignStatus === "pending"
+            info.ownerId === user?.id && info.signeeSignStatus === "pending",
         );
 
         found ? setToEdit(true) : setToEdit(false);
@@ -100,7 +100,7 @@ export default function SignDocument() {
           (info: any) =>
             info.ownerId === user?.id &&
             info.signeeEmail === user?.primaryEmailAddress?.emailAddress &&
-            info.signeeSignStatus === "pending"
+            info.signeeSignStatus === "pending",
         );
         console.log("value of :", found);
         found ? setToEdit(true) : setToEdit(false);

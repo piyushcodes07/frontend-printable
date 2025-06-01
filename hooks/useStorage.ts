@@ -1,14 +1,13 @@
 import { useOrder, DocumentItem } from "@/context/orderContext"; // Ensure DocumentItem is imported
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_ROOT_URL}`;
 
 export default function UseStorage() {
   const { order, dispatch } = useOrder();
 
   const uploadFile = async (
     file: File,
-    ownerId: string
+    ownerId: string,
   ): Promise<DocumentItem | null> => {
     try {
       const formData = new FormData();
@@ -21,7 +20,7 @@ export default function UseStorage() {
 
       if (!response.ok) {
         throw new Error(
-          `Upload failed: ${response.status} ${response.statusText}` // Corrected template literal
+          `Upload failed: ${response.status} ${response.statusText}`, // Corrected template literal
         );
       }
 
@@ -69,18 +68,18 @@ export default function UseStorage() {
     fileName: string,
     index: number,
     setStatusMessage: (
-      status: { text: string; isError?: boolean } | null
-    ) => void // More specific type
+      status: { text: string; isError?: boolean } | null,
+    ) => void, // More specific type
   ) => {
     try {
       const response = await fetch(
         `${API_BASE_URL}/api/file/${encodeURIComponent(fileId)}`,
-        { method: "DELETE" }
+        { method: "DELETE" },
       );
 
       if (!response.ok) {
         throw new Error(
-          `Delete failed: ${response.status} ${response.statusText}` // Corrected template literal
+          `Delete failed: ${response.status} ${response.statusText}`, // Corrected template literal
         );
       }
 

@@ -48,7 +48,7 @@ type Action =
 const initialOrder: Order = {
   userId: "1",
   merchantId: "1",
-  status: "declined",
+  status: "pending",
   totalAmount: 320,
   paymentMethod: "Credit Card",
   fulfillmentType: "takeaway",
@@ -78,7 +78,7 @@ function orderReducer(state: Order, action: Action): Order {
       return {
         ...state,
         documents: state.documents.map((doc, i) =>
-          i === action.index ? action.payload : doc,
+          i === action.index ? action.payload : doc
         ),
       };
 
