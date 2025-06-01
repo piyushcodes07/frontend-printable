@@ -17,7 +17,7 @@ import {
 import { Download } from "lucide-react";
 
 const DOMAIN_BASE_URL =
-  process.env.NEXT_PUBLIC_DOMAIN_URL || "http://localhost:3000";
+  process.env.FRONTEND_PRINTABLE_URL || "http://localhost:3000";
 
 function SignDocument() {
   const searchParams = useSearchParams();
@@ -68,7 +68,7 @@ function SignDocument() {
     const updatedSigns = signs.map((sign, index) =>
       sign.type === "documentId"
         ? { ...sign, value: `Printable.com Document ID: ${fileId}` }
-        : sign
+        : sign,
     );
 
     // Update the signs state
