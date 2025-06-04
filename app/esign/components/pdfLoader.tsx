@@ -5,6 +5,7 @@ import PdfCanvasPage from "./pdfCanvasPage";
 import { drawSignatureOnPdf } from "./utils/pdfUtils";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 import { useSignUrl } from "../useSign";
+import { SignData } from "../components/utils/pdfUtils";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js`;
 
@@ -20,14 +21,15 @@ const PdfLoader = ({ pdfUrl }: { pdfUrl: string }) => {
     const pdf = await loadingTask.promise;
     const pages = [];
     for (let i = 1; i <= pdf.numPages; i++) {
-      const options = {
+      const options: SignData = {
         type: "documentId" as "documentId",
-        value: "",
+        value: "true", // Make sure it's a string
         color: "#80919E",
         fontSize: 10,
         signSize: { width: 100, height: 30 },
         position: { x: 380, y: 5, pageIndex: i - 1 },
       };
+
       addSign(options);
       const page = await pdf.getPage(i);
       const rotation = page.rotate;

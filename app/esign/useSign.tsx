@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState } from "react";
 export interface SignData {
   type: "sign" | "text" | "date" | "checkbox" | "initials" | "documentId";
   signUrl?: string;
-  value?: string | boolean;
+  value?: string | boolean ;
   checked?: boolean;
   fontSize?: number;
   color?: string;

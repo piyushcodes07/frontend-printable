@@ -1,10 +1,20 @@
 "use client";
 
+export interface SignData {
+  type: "sign" | "text" | "date" | "checkbox" | "initials" | "documentId";
+  signUrl?: string;
+  value?: string | undefined;
+  checked?: boolean;
+  fontSize?: number;
+  color?: string;
+  signSize: { width: number; height: number };
+  position: { x: number; y: number; pageIndex: number | null };
+}
+
 import type React from "react";
 import { useRef, useEffect, useState } from "react";
 import { useSignUrl } from "../useSign";
 import { Rnd } from "react-rnd";
-import type { SignData } from "../useSign";
 import { useUser } from "@clerk/nextjs";
 import EditCard from "./editCard";
 
@@ -68,7 +78,11 @@ const PdfCanvasPage = ({
       try {
         await renderTask.promise;
       } catch (error) {
-        if (error?.name === "RenderingCancelledException") {
+        if (typeof error === "object" &&
+    error !== null &&
+    "name" in error &&
+    (error as any).name === "RenderingCancelledException"
+  ) {
           console.log("Previous render cancelled");
         } else {
           console.error("Render error:", error);

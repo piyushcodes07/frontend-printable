@@ -125,7 +125,7 @@ function SignDocument() {
     }
   };
 
-  const handleSignRequest = async (e) => {
+  const handleSignRequest = async (e : any) => {
     e.preventDefault();
     if (!signers_email || signers_email.length === 0) {
       toast.error("Missing signee for sending request.");
@@ -160,7 +160,7 @@ function SignDocument() {
         await sendSignRequestEmail(payload);
         toast.success("Sign request sent successfully.");
       }
-    } catch (err) {
+    } catch (err : any) {
       toast.error(`Failed to send sign request: ${err.message}`);
       console.error("Error:", err);
     } finally {
@@ -168,7 +168,7 @@ function SignDocument() {
     }
   };
 
-  const handleSaveSign = async (e) => {
+  const handleSaveSign = async (e : any) => {
     e.preventDefault();
     if (!signs || signs.length === 0) {
       toast.error("No signatures to save.");
@@ -184,7 +184,7 @@ function SignDocument() {
         await uploadDocument();
         toast.success("Document saved successfully.");
       }
-    } catch (err) {
+    } catch (err: any) {
       toast.error(`Failed to save signatures: ${err.message}`);
       console.error("Error:", err);
     } finally {
@@ -192,7 +192,7 @@ function SignDocument() {
     }
   };
 
-  const renderButton = (label, onClick, color) => {
+  const renderButton = (label: string, onClick: any, color:string) => {
     // Validate color to prevent invalid class names
     const validColors = ["green", "blue", "yellow"];
     const buttonColor = validColors.includes(color) ? color : "gray";

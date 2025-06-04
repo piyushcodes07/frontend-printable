@@ -1,6 +1,6 @@
-"use client";
+"use client"
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState  , Suspense} from "react";
 import { useFileContext } from "../pdfcompress/FileContext";
 
 export default function UploadPage() {
@@ -141,6 +141,7 @@ export default function UploadPage() {
   };
 
   return (
+ 
     <div className="relative w-full min-h-screen bg-[#e8e8ec] flex flex-col items-center">
       {/* Top White Bar */}
       <div className="w-full bg-white h-10 shadow-md flex items-center justify-start mb-6 px-4">
@@ -352,5 +353,6 @@ export default function UploadPage() {
         </div>
       )}
     </div>
+   
   );
 }

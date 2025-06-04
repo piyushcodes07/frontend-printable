@@ -1,15 +1,13 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import { useSearchParams } from "next/navigation";
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url
-).toString();
+// Legacy worker entry file
+pdfjs.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/legacy/build/pdf.worker.entry.js");
+
 function PdfViewer() {
   const [showUploading, setShowUploading] = useState(true);
   const [progressBar, setProgressBar] = useState(0);
@@ -54,6 +52,7 @@ function PdfViewer() {
       }, 300);
     }
   }, [showFlattening]);
+
   useEffect(() => {
     const updateWidth = () => {
       if (containerRef.current) {
@@ -248,3 +247,4 @@ function PdfViewer() {
 }
 
 export default PdfViewer;
+

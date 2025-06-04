@@ -44,10 +44,10 @@ function AllFile() {
   const [createFolder, setCreateFolder] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [openFolderMenuIndex, setOpenFolderMenuIndex] = useState<number | null>(
-    null,
+    null
   );
   const [openFileMenuIndex, setOpenFileMenuIndex] = useState<string | null>(
-    null,
+    null
   );
   const [folders, setFolders] = useState<FolderType[]>([]);
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
@@ -107,7 +107,7 @@ function AllFile() {
           currentRef &&
           !currentRef.contains(event.target as Node) &&
           !(event.target as HTMLElement).closest(
-            `[data-folder-menu="${openFolderMenuIndex}"]`,
+            `[data-folder-menu="${openFolderMenuIndex}"]`
           )
         ) {
           setOpenFolderMenuIndex(null);
@@ -117,10 +117,10 @@ function AllFile() {
       // Close file menus if clicked outside
       if (openFileMenuIndex !== null) {
         const fileMenuRef = document.querySelector(
-          `[data-file-menu="${openFileMenuIndex}"]`,
+          `[data-file-menu="${openFileMenuIndex}"]`
         );
         const fileMenuButton = document.querySelector(
-          `[data-file-menu-button="${openFileMenuIndex}"]`,
+          `[data-file-menu-button="${openFileMenuIndex}"]`
         );
         if (
           fileMenuRef &&
@@ -147,7 +147,7 @@ function AllFile() {
         `${API_URL}/fileManagement/getFiles/${user?.id}`,
         {
           method: "GET",
-        },
+        }
       );
       const result: { msg: string; data: FolderType[] } = await response.json();
       setFolders(result.data);
@@ -260,7 +260,7 @@ function AllFile() {
           description: `Folder "${folderName}" created successfully`,
         });
       } else {
-        error("Failed to add folder");
+        console.error("Failed to add folder");
         toast({
           title: "Error",
           description: "Failed to create folder",
@@ -268,7 +268,7 @@ function AllFile() {
         });
       }
     } catch (error) {
-      error("Error adding folder:", error);
+      console.error("Error adding folder:", error);
       toast({
         title: "Error",
         description: "Failed to create folder",
@@ -282,12 +282,12 @@ function AllFile() {
   // Upload file
   const uploadFile = async (file: File) => {
     if (!file) {
-      error("No file provided");
+      console.error("No file provided");
       return;
     }
 
     if (!fileSelection) {
-      error("No folder selected");
+      console.error("No folder selected");
       return;
     }
 
@@ -302,7 +302,7 @@ function AllFile() {
 
     // Find the current folder ID
     const currentFolder = folders.find(
-      (folder) => folder.folderName === fileSelection,
+      (folder) => folder.folderName === fileSelection
     );
     if (currentFolder?.folderId) {
       formData.append("folderId", currentFolder.folderId);
@@ -327,7 +327,7 @@ function AllFile() {
         });
       } else {
         const errorText = await response.text();
-        error("Failed to upload file:", errorText);
+        console.error("Failed to upload file:", errorText);
         toast({
           title: "Error",
           description: "Failed to upload file",
@@ -335,7 +335,7 @@ function AllFile() {
         });
       }
     } catch (error) {
-      error("Error uploading file:", error);
+      console.error("Error uploading file:", error);
       toast({
         title: "Error",
         description: "Failed to upload file",
@@ -366,7 +366,7 @@ function AllFile() {
         `${API_URL}/fileManagement/renameFolder/${folder.folderId}/${newName}`,
         {
           method: "PATCH",
-        },
+        }
       );
 
       if (response.ok) {
@@ -377,7 +377,7 @@ function AllFile() {
           description: `Folder renamed to "${newName}" successfully`,
         });
       } else {
-        error("Failed to rename folder");
+        console.error("Failed to rename folder");
         toast({
           title: "Error",
           description: "Failed to rename folder",
@@ -385,7 +385,7 @@ function AllFile() {
         });
       }
     } catch (error) {
-      error("Error renaming folder:", error);
+      console.error("Error renaming folder:", error);
       toast({
         title: "Error",
         description: "Failed to rename folder",
@@ -402,7 +402,7 @@ function AllFile() {
         `${API_URL}/fileManagement/deleteFolder/${folder.folderId}`,
         {
           method: "DELETE",
-        },
+        }
       );
 
       if (response.ok) {
@@ -413,7 +413,7 @@ function AllFile() {
           description: `Folder "${folder.folderName}" deleted successfully`,
         });
       } else {
-        error("Failed to delete folder");
+        console.error("Failed to delete folder");
         toast({
           title: "Error",
           description: "Failed to delete folder",
@@ -421,7 +421,7 @@ function AllFile() {
         });
       }
     } catch (error) {
-      error("Error deleting folder:", error);
+      console.error("Error deleting folder:", error);
       toast({
         title: "Error",
         description: "Failed to delete folder",
@@ -442,7 +442,7 @@ function AllFile() {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ fileId, folderId }),
-        },
+        }
       );
 
       if (response.ok) {
@@ -453,7 +453,7 @@ function AllFile() {
           description: "File moved successfully",
         });
       } else {
-        error("Failed to move file");
+        console.error("Failed to move file");
         toast({
           title: "Error",
           description: "Failed to move file",
@@ -461,7 +461,7 @@ function AllFile() {
         });
       }
     } catch (error) {
-      error("Error moving file:", error);
+      console.error("Error moving file:", error);
       toast({
         title: "Error",
         description: "Failed to move file",
@@ -494,7 +494,7 @@ function AllFile() {
           description: `File "${fileName}" deleted successfully`,
         });
       } else {
-        error("Failed to delete file");
+        console.error("Failed to delete file");
         toast({
           title: "Error",
           description: "Failed to delete file",
@@ -502,7 +502,7 @@ function AllFile() {
         });
       }
     } catch (error) {
-      error("Error deleting file:", error);
+      console.error("Error deleting file:", error);
       toast({
         title: "Error",
         description: "Failed to delete file",
@@ -754,7 +754,7 @@ function AllFile() {
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent background click and folder selection
                           setOpenFolderMenuIndex(
-                            openFolderMenuIndex === idx ? null : idx,
+                            openFolderMenuIndex === idx ? null : idx
                           );
                         }}
                       >
@@ -777,7 +777,9 @@ function AllFile() {
                       <AnimatePresence>
                         {openFolderMenuIndex === idx && (
                           <motion.div
-                            ref={(el) => (folderMenuRefs.current[idx] = el)}
+                            ref={(el) => {
+                              folderMenuRefs.current[idx] = el;
+                            }}
                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -994,7 +996,7 @@ function AllFile() {
                         if (renameFolder.folder && newFolderName.trim()) {
                           handleRenameFolder(
                             renameFolder.folder,
-                            newFolderName,
+                            newFolderName
                           );
                           setRenameFolder({ isOpen: false, folder: null });
                           setNewFolderName("");
@@ -1027,7 +1029,7 @@ function AllFile() {
             {/* Get the current folder's files */}
             {(() => {
               const currentFolder = folders.find(
-                (folder) => folder.folderName === fileSelection,
+                (folder) => folder.folderName === fileSelection
               );
               const files = currentFolder?.files || [];
 
@@ -1185,7 +1187,7 @@ function AllFile() {
                                     if (e.target.value) {
                                       handleMoveFile(
                                         item.fileId,
-                                        e.target.value,
+                                        e.target.value
                                       );
                                     }
                                   }}
@@ -1201,7 +1203,7 @@ function AllFile() {
                                         >
                                           {folder.folderName}
                                         </option>
-                                      ),
+                                      )
                                   )}
                                 </select>
                               </div>

@@ -8,10 +8,10 @@ function hexToRgb(hex: string) {
   const b = bigint & 255;
   return rgb(r / 255, g / 255, b / 255);
 }
-interface SignData {
+export interface SignData {
   type: "sign" | "text" | "date" | "checkbox" | "initials" | "documentId";
   signUrl?: string;
-  value?: string;
+  value?: string | boolean;
   checked?: boolean;
   fontSize?: number;
   color?: string;
@@ -60,9 +60,12 @@ export const drawSignatureOnPdf = async (
     ) {
       const fontSize = sign.fontSize || 12;
       const baselineOffset = fontSize * 1.2;
-
       const yPosition = height - sign.position.y - baselineOffset;
-      page.drawText(sign.value || "", {
+
+      // Convert boolean value to string
+      const textValue = typeof sign.value === "boolean" ? String(sign.value) : sign.value || "";
+
+      page.drawText(textValue, {
         x: sign.position.x,
         y: yPosition,
         size: fontSize,
@@ -96,3 +99,5 @@ export const drawSignatureOnPdf = async (
   const blob = new Blob([pdfBytes], { type: "application/pdf" });
   return blob;
 };
+
+

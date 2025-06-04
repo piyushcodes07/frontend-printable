@@ -8,7 +8,7 @@ const page = () => {
     const [selectedOption, setSelectedOption] = useState('');
     const [isSelect,setIsSelect]=useState(false);
    const router=useRouter();
-    const handleChange = (event) => {
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const value=event.target.value;
       setSelectedOption(value);
      

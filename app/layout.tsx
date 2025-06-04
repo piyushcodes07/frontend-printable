@@ -9,7 +9,7 @@ import {
 } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { NavBar } from "@/components/nav-bar"; // Make sure the path is correct\
+import { NavBar } from "@/components/nav-bar";
 import { FileProvider } from "./pdfcompress/FileContext";
 
 const geistSans = Geist({
@@ -41,7 +41,7 @@ export default function RootLayout({
           <NavBar />
           <FileProvider>
           {children}
-          </ FileProvider >
+          </FileProvider>
         </body>
       </html>
     </ClerkProvider>

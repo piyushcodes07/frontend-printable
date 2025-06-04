@@ -7,7 +7,7 @@ interface SigneeType {
   lastName: string;
   email: string;
   bg: string;
-  outline: string;
+  outline?: string ;
 }
 
 interface SigneeProps {

@@ -45,9 +45,14 @@ export default function PrintablePage() {
       setUploadError(null);
       setStatusMessage(null);
 
-      const results = await Promise.all(
-        acceptedFiles.map((file) => uploadFile(file, user?.id)),
-      );
+if (!user?.id) {
+  throw new Error("User ID missing");
+}
+
+const results = await Promise.all(
+  acceptedFiles.map((file) => uploadFile(file, user.id)),
+);
+
       const successCount = results.filter(Boolean).length;
       const failCount = acceptedFiles.length - successCount;
 

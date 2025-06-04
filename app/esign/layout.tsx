@@ -1,10 +1,8 @@
 import SignProvider from "./useSign";
-export function Layout({ children }: { children: React.ReactNode }) {
+import { ReactNode } from "react";
+
+export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <>
-      <SignProvider>{children}</SignProvider>
-    </>
+    <SignProvider>{children}</SignProvider>
   );
 }
-
-export default Layout;
