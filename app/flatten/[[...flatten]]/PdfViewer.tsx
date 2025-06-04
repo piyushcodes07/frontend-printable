@@ -1,13 +1,14 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
+// import * as pdfjs from "pdfjs-dist/legacy/build/pdf";
 import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import { useSearchParams } from "next/navigation";
 
 // Legacy worker entry file
 pdfjs.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/legacy/build/pdf.worker.entry.js");
-
+// pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js`;
 function PdfViewer() {
   const [showUploading, setShowUploading] = useState(true);
   const [progressBar, setProgressBar] = useState(0);
@@ -247,4 +248,3 @@ function PdfViewer() {
 }
 
 export default PdfViewer;
-
