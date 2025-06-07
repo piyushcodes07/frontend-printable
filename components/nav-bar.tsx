@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, Settings, Bell, ShoppingBag, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,30 @@ import {
 import MainLogo from "@/public/main-log";
 import ConvertDropDown from "@/components/Convert/ConvertDropDown";
 import ToolsDropDown from "./Tools/ToolsDropDown";
+import { motion, AnimatePresence } from "framer-motion";
+
+// Update the mobileMenuVariants to match the dropdownContentVariants
+const mobileMenuVariants = {
+  initial: {
+    height: 0,
+    opacity: 0,
+    y: -10,
+  },
+  animate: {
+    height: "auto",
+    opacity: 1,
+    y: 0,
+  },
+  exit: {
+    height: 0,
+    opacity: 0,
+    y: -10,
+  },
+  transition: {
+    duration: 0.3,
+    ease: "easeInOut",
+  },
+};
 
 export function NavBar() {
   const User = useUser();
@@ -24,9 +48,44 @@ export function NavBar() {
   const [activeDropdown, setActiveDropdown] = useState<
     "tools" | "convert" | null
   >(null);
+  const [mobileActiveSection, setMobileActiveSection] = useState<
+    "tools" | "convert" | null
+  >(null);
+
+  // Add useEffect to reset mobileActiveSection when menu closes
+  useEffect(() => {
+    if (!isMenuOpen) {
+      setMobileActiveSection(null);
+    }
+  }, [isMenuOpen]);
+
+  // Updated handleMobileSectionClick function
+  const handleMobileSectionClick = (section: "tools" | "convert" | null) => {
+    if (section === mobileActiveSection) {
+      // If clicking the same section, just close that section
+      setMobileActiveSection(null);
+    } else {
+      // If clicking a different section, switch to that section
+      setMobileActiveSection(section);
+    }
+  };
+
+  // Update the menu button click handler
+  const handleMenuToggle = () => {
+    setIsMenuOpen(!isMenuOpen);
+    if (isMenuOpen) {
+      // Reset dropdown state when closing menu
+      setMobileActiveSection(null);
+    }
+  };
+
+  const closeNavbar = () => {
+    setIsMenuOpen(false);
+    setMobileActiveSection(null);
+  };
 
   return (
-    <header className="bg-[#06044b] text-white w-full ">
+    <header className="bg-[#06044b] text-white w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Desktop Navigation */}
@@ -144,7 +203,7 @@ export function NavBar() {
               variant="ghost"
               size="icon"
               className="text-white hover:bg-[#06044b]/50"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onClick={handleMenuToggle}
             >
               {isMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -157,96 +216,163 @@ export function NavBar() {
       </div>
 
       {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-[#06044b] border-t border-[#ffffff]/10 py-2">
-          <div className="px-4 pt-2 pb-3 space-y-1">
-            <Link
-              href="#"
-              className="block px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Tools
-            </Link>
-            <Link
-              href="#"
-              className="block px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Convert
-            </Link>
-            <Link
-              href="#"
-              className="block px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              E - Sign
-            </Link>
-            <Link
-              href="#"
-              className="block px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Print & Deliver
-            </Link>
-            <Link
-              href="#"
-              className="block px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Resources
-            </Link>
-          </div>
-          <div className="px-4 py-3 border-t border-[#ffffff]/10">
-            <div className="relative mb-3">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" />
-              </div>
-              <Input
-                type="text"
-                placeholder="Search"
-                className="pl-10 pr-4 py-2 bg-white text-black rounded-full w-full focus:outline-none focus:ring-2 focus:ring-[#61e987]"
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex space-x-4">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-white hover:bg-[#06044b]/50"
-                >
-                  <Settings className="h-5 w-5" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-white hover:bg-[#06044b]/50"
-                >
-                  <Bell className="h-5 w-5" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-white hover:bg-[#06044b]/50"
-                >
-                  <ShoppingBag className="h-5 w-5" />
-                </Button>
-              </div>
+      <AnimatePresence mode="wait">
+        {isMenuOpen && (
+          <motion.div
+            className="md:hidden bg-[#06044b] border-t border-[#ffffff]/10 py-2"
+            variants={mobileMenuVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{
+              duration: 0.3,
+              ease: "easeInOut",
+              opacity: { duration: 0.2 },
+              height: { duration: 0.3 },
+            }}
+            style={{ overflow: "hidden" }}
+          >
+            <div className="px-4 pt-2 pb-3 space-y-1">
+              <button
+                className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
+                onClick={() =>
+                  handleMobileSectionClick(
+                    mobileActiveSection === "tools" ? null : "tools"
+                  )
+                }
+              >
+                Tools
+              </button>
 
-              <SignedOut>
-                <SignUpButton>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-white hover:bg-[#06044b]/50 border-white"
+              <AnimatePresence mode="wait">
+                {mobileActiveSection === "tools" && (
+                  <motion.div
+                    variants={mobileMenuVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    transition={{
+                      duration: 0.3,
+                      ease: "easeInOut",
+                    }}
                   >
-                    Sign Up
-                  </Button>
-                </SignUpButton>
-              </SignedOut>
+                    <ToolsDropDown
+                      isOpen={true}
+                      onToggle={() => handleMobileSectionClick("tools")}
+                      isMobile={true}
+                      closeNavbar={closeNavbar}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <button
+                className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
+                onClick={() =>
+                  handleMobileSectionClick(
+                    mobileActiveSection === "convert" ? null : "convert"
+                  )
+                }
+              >
+                Convert
+              </button>
+
+              <AnimatePresence mode="wait">
+                {mobileActiveSection === "convert" && (
+                  <motion.div
+                    variants={mobileMenuVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    transition={{
+                      duration: 0.3,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <ConvertDropDown
+                      isOpen={true}
+                      onToggle={() => handleMobileSectionClick("convert")}
+                      isMobile={true}
+                      closeNavbar={closeNavbar}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <Link
+                href="#"
+                className="block px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                E - Sign
+              </Link>
+              <Link
+                href="#"
+                className="block px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Print & Deliver
+              </Link>
+              <Link
+                href="#"
+                className="block px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Resources
+              </Link>
             </div>
-          </div>
-        </div>
-      )}
+            <div className="px-4 py-3 border-t border-[#ffffff]/10">
+              <div className="relative mb-3">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-4 w-4 text-gray-400" />
+                </div>
+                <Input
+                  type="text"
+                  placeholder="Search"
+                  className="pl-10 pr-4 py-2 bg-white text-black rounded-full w-full focus:outline-none focus:ring-2 focus:ring-[#61e987]"
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex space-x-4">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-[#06044b]/50"
+                  >
+                    <Settings className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-[#06044b]/50"
+                  >
+                    <Bell className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-[#06044b]/50"
+                  >
+                    <ShoppingBag className="h-5 w-5" />
+                  </Button>
+                </div>
+
+                <SignedOut>
+                  <SignUpButton>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-white hover:bg-[#06044b]/50 border-white"
+                    >
+                      Sign Up
+                    </Button>
+                  </SignUpButton>
+                </SignedOut>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
