@@ -98,7 +98,6 @@ export default function SignDocument() {
         setFileUrl(FileData.fileUrl);
         const found = FileData.info.some(
           (info: any) =>
-            info.ownerId === user?.id &&
             info.signeeEmail === user?.primaryEmailAddress?.emailAddress &&
             info.signeeSignStatus === "pending"
         );
