@@ -28,11 +28,11 @@ export default function DocumentView() {
     fileId: searchParams.get("fileId"),
     fileName: searchParams.get("fileName"),
   };
-  console.log(params);
+  // console.log(params);
   const { fileId, fileName } = params;
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   useEffect(() => {
-    console.log(params);
+    // console.log(params);
     if (fileId && fileName) {
       setFileUrl(
         `https://blog-storage-printable.s3.amazonaws.com/documents/${fileId}_${fileName}`
@@ -46,7 +46,7 @@ export default function DocumentView() {
           if (url) {
             setFileUrl(url);
             const file = dataURLtoFile(url, fileName);
-            console.log(file);
+            // console.log(file);
           }
         }
       }

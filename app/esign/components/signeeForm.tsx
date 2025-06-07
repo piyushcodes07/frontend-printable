@@ -95,6 +95,7 @@ function SingerDetailsForm({ onlyOther }: { onlyOther: boolean }) {
     } else {
       updateSignerEmail(email);
     }
+    console.log(signers_email);
   }, [onlyOther, user]);
 
   const removeSignee = (index: number) => {

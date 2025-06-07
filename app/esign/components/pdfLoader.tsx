@@ -3,10 +3,10 @@
 import { useEffect, useState, useRef } from "react";
 import PdfCanvasPage from "./pdfCanvasPage";
 import { drawSignatureOnPdf } from "./utils/pdfUtils";
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
+
 import { useSignUrl } from "../useSign";
 import { SignData } from "../components/utils/pdfUtils";
-
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js`;
 
 const PdfLoader = ({ pdfUrl }: { pdfUrl: string }) => {
@@ -36,7 +36,7 @@ const PdfLoader = ({ pdfUrl }: { pdfUrl: string }) => {
       const viewport = page.getViewport({ scale: newScale, rotation });
       pages.push({ page, viewport });
     }
-
+    console.log("file url", url);
     const bytes = await fetch(url).then((res) => res.arrayBuffer());
     setPdfBuffer(bytes);
     setPdfData(bytes);

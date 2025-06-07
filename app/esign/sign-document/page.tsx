@@ -42,10 +42,9 @@ function SignDocument() {
     router.replace(`?${params.toString()}`); // no page reload
   };
   const { user } = useUser();
-  const { fileId, signers_email, signs, pdfData, updateSign } = useSignUrl();
+  const { signers_email, signs, pdfData, updateSign } = useSignUrl();
 
   const handleDownload = async () => {
-    console.log("clicked");
     if (!pdfData || !signs || !fileName) {
       throw new Error("Missing required data for saving document.");
     }
@@ -59,7 +58,6 @@ function SignDocument() {
   };
 
   const uploadDocument = async () => {
-    console.log(fileName);
     if (!pdfData || !signs || !fileName) {
       throw new Error("Missing required data for saving document.");
     }
@@ -91,7 +89,11 @@ function SignDocument() {
       const response = await UploadDocument(formData);
       const result = await response.json();
       const uploadedFileUrl = result.fileUrl.split("/");
-      const [fileId, fileName] = uploadedFileUrl.pop().split("_");
+      const str = uploadedFileUrl.pop();
+      const index = str.indexOf("_");
+
+      const fileId = str.slice(0, index);
+      const fileName = str.slice(index + 1);
 
       updateSearchParams(fileId, fileName);
       return { fileId, fileName };
@@ -102,7 +104,6 @@ function SignDocument() {
   };
 
   const saveSignedDocument = async () => {
-    console.log(pdfData);
     if (!pdfData || !signs || !fileName || !documentId) {
       throw new Error("Missing required data for saving document.");
     }
@@ -125,7 +126,7 @@ function SignDocument() {
     }
   };
 
-  const handleSignRequest = async (e : any) => {
+  const handleSignRequest = async (e: any) => {
     e.preventDefault();
     if (!signers_email || signers_email.length === 0) {
       toast.error("Missing signee for sending request.");
@@ -139,14 +140,20 @@ function SignDocument() {
         const link = `${DOMAIN_BASE_URL}/esign/document?id=${documentId}`;
         const payload = {
           requestedBy: user?.id,
-          fileIds: [fileId],
+          fileIds: [documentId],
           signers_email: [signers_email[signers_email.length - 1]],
           link,
-          signs,
         };
         await saveSignedDocument();
-        await sendSignRequestEmail(payload);
-        toast.success("Document saved and sign request sent successfully.");
+        const res = await sendSignRequestEmail(payload);
+        const response = await res.json();
+
+        if (response.success) {
+          toast.success("Document saved and sign request sent successfully.");
+        } else {
+          console.log(documentId);
+          toast.error(response.msg);
+        }
       } else {
         result = await uploadDocument();
         const link = `${DOMAIN_BASE_URL}/esign/document?id=${result.fileId}`;
@@ -155,12 +162,16 @@ function SignDocument() {
           fileIds: [result.fileId],
           signers_email: signers_email,
           link,
-          signs,
         };
-        await sendSignRequestEmail(payload);
-        toast.success("Sign request sent successfully.");
+        const res = await sendSignRequestEmail(payload);
+        const response = await res.json();
+        if (response.success) {
+          toast.success("Sign request sent successfully.");
+        } else {
+          toast.error(response.msg);
+        }
       }
-    } catch (err : any) {
+    } catch (err: any) {
       toast.error(`Failed to send sign request: ${err.message}`);
       console.error("Error:", err);
     } finally {
@@ -168,7 +179,7 @@ function SignDocument() {
     }
   };
 
-  const handleSaveSign = async (e : any) => {
+  const handleSaveSign = async (e: any) => {
     e.preventDefault();
     if (!signs || signs.length === 0) {
       toast.error("No signatures to save.");
@@ -192,7 +203,7 @@ function SignDocument() {
     }
   };
 
-  const renderButton = (label: string, onClick: any, color:string) => {
+  const renderButton = (label: string, onClick: any, color: string) => {
     // Validate color to prevent invalid class names
     const validColors = ["green", "blue", "yellow"];
     const buttonColor = validColors.includes(color) ? color : "gray";
