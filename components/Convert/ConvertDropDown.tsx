@@ -225,30 +225,35 @@ export default function ConvertDropdown({
                         src="/docx.png"
                         link="/word/to/pdf"
                         onClose={() => onToggle(false)}
+                        closeNavbar={closeNavbar} // Add this
                       />
                       <RightSectionElement
                         text="Excel to PDF"
                         src="/excel.png"
                         link="/excel/to/pdf"
                         onClose={() => onToggle(false)}
+                        closeNavbar={closeNavbar} // Add this
                       />
                       <RightSectionElement
                         text="PPT to PDF"
                         src="/ppt.png"
                         link="/ppt/to/pdf"
                         onClose={() => onToggle(false)}
+                        closeNavbar={closeNavbar} // Add this
                       />
                       <RightSectionElement
                         text="JPG to PDF"
                         src="/img.png"
                         link="/image/to/pdf"
                         onClose={() => onToggle(false)}
+                        closeNavbar={closeNavbar} // Add this
                       />
                       <RightSectionElement
                         text="PDF OCR"
                         src="/ocr.png"
                         link=""
                         onClose={() => onToggle(false)}
+                        closeNavbar={closeNavbar} // Add this
                       />
                     </motion.div>
                   )}
@@ -355,31 +360,35 @@ export default function ConvertDropdown({
                       src="/docx.png"
                       link="/word/to/pdf"
                       onClose={() => onToggle(false)}
-                      closeNavbar={closeNavbar}
+                      closeNavbar={closeNavbar} // Add this
                     />
                     <RightSectionElement
                       text="Excel to PDF"
                       src="/excel.png"
                       link="/excel/to/pdf"
                       onClose={() => onToggle(false)}
+                      closeNavbar={closeNavbar} // Add this
                     />
                     <RightSectionElement
                       text="PPT to PDF"
                       src="/ppt.png"
                       link="/ppt/to/pdf"
                       onClose={() => onToggle(false)}
+                      closeNavbar={closeNavbar} // Add this
                     />
                     <RightSectionElement
                       text="JPG to PDF"
                       src="/img.png"
                       link="/image/to/pdf"
                       onClose={() => onToggle(false)}
+                      closeNavbar={closeNavbar} // Add this
                     />
                     <RightSectionElement
                       text="PDF OCR"
                       src="/ocr.png"
                       link=""
                       onClose={() => onToggle(false)}
+                      closeNavbar={closeNavbar} // Add this
                     />
                   </div>
                 </motion.div>
