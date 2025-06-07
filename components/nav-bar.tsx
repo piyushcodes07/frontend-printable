@@ -19,7 +19,6 @@ import ConvertDropDown from "@/components/Convert/ConvertDropDown";
 import ToolsDropDown from "./Tools/ToolsDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Update the mobileMenuVariants to match the dropdownContentVariants
 const mobileMenuVariants = {
   initial: {
     height: 0,
@@ -52,7 +51,6 @@ export function NavBar() {
     "tools" | "convert" | null
   >(null);
 
-  // Add useEffect to reset mobileActiveSection when menu closes
   useEffect(() => {
     if (!isMenuOpen) {
       setMobileActiveSection(null);
@@ -300,25 +298,18 @@ export function NavBar() {
               </AnimatePresence>
 
               <Link
-                href="#"
+                href="/esign"
                 className="block px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >
                 E - Sign
               </Link>
               <Link
-                href="#"
+                href={`/print-and-deliver/${User.user?.id}`}
                 className="block px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Print & Deliver
-              </Link>
-              <Link
-                href="#"
-                className="block px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Resources
               </Link>
             </div>
             <div className="px-4 py-3 border-t border-[#ffffff]/10">
