@@ -1,6 +1,7 @@
 import React from "react";
 import { z } from "zod";
 import { tool } from "ai";
+import PptxGenJS from "pptxgenjs";
 
 export const SlideFlow = tool({
   description:
@@ -25,8 +26,8 @@ export const SlideFlow = tool({
 
 export const SlideFlowSchema = SlideFlow.parameters;
 
-type Props = z.infer<typeof SlideFlowSchema>;
-type sudoProps = Props & {
+export type Props = z.infer<typeof SlideFlowSchema>;
+export type sudoProps = Props & {
   backgroundColor: string;
   headingColor: string;
   subHeadingColor: string;
@@ -94,7 +95,7 @@ export const SlideBusinessFlow: React.FC<sudoProps> = ({
             >
               <img
                 src={step.iconSrc}
-                alt={step.heading}
+                alt=""
                 style={{ width: "28px", height: "28px" }}
               />
             </div>
@@ -116,5 +117,94 @@ export const SlideBusinessFlow: React.FC<sudoProps> = ({
     </div>
   );
 };
+
+export function generateBusinessFlowSlide(pptx: PptxGenJS, data: sudoProps) {
+  const {
+    title,
+    steps,
+    backgroundColor = "#f5f0e6",
+    headingColor = "#1f433e",
+    subHeadingColor = "#1f433e",
+  } = data;
+
+  const slide = pptx.addSlide();
+  slide.background = { color: backgroundColor };
+
+  // Add title - matching h1 styles from React component
+  slide.addText(title, {
+    x: 0.5,
+    y: 0.5,
+    w: 9,
+    h: 0.8,
+    fontSize: 28, // equivalent to 1.75rem
+    bold: true,
+    align: "center",
+    color: headingColor,
+    margin: 32, // equivalent to 2rem marginBottom
+  });
+
+  // Calculate positions for steps - matching the flex layout
+  const startX = 0.5;
+  const totalWidth = 9;
+  const stepWidth = totalWidth / steps.length;
+  const stepGap = 0.24; // equivalent to 1.5rem gap
+
+  // Add each step
+  steps.forEach((step, idx) => {
+    const x = startX + idx * (stepWidth + stepGap);
+
+    // Add circle background - matching the div circle styles
+    slide.addShape(pptx.ShapeType.ellipse, {
+      x: x + stepWidth / 2 - 0.47, // centering circle (60px equivalent)
+      y: 1.8,
+      w: 0.94, // equivalent to 60px width
+      h: 0.94, // equivalent to 60px height
+      fill: { color: headingColor },
+    });
+
+    // Add icon - matching img styles
+    // if (step.iconSrc) {
+    //   try {
+    //     slide.addImage({
+    //       path: step.iconSrc,
+    //       x: x + stepWidth / 2 - 0.22, // centering icon (28px equivalent)
+    //       y: 2.0,
+    //       w: 0.44, // equivalent to 28px width
+    //       h: 0.44, // equivalent to 28px height
+    //     });
+    //   } catch (error) {
+    //     console.warn(`Failed to add icon for step ${step.heading}`);
+    //   }
+    // }
+
+    // Add heading - matching h3 styles
+    slide.addText(step.heading, {
+      x: x,
+      y: 2.9,
+      w: stepWidth,
+      h: 0.5,
+      fontSize: 18, // equivalent to 1.1rem
+      bold: true,
+      align: "center",
+      color: headingColor,
+      margin: 8, // equivalent to 0.5rem marginBottom
+    });
+
+    // Add description - matching p styles
+    slide.addText(step.description, {
+      x: x,
+      y: 3.5,
+      w: stepWidth,
+      h: 1,
+      fontSize: 14, // equivalent to 0.9rem
+      align: "center",
+      color: subHeadingColor ?? "#555",
+      breakLine: true,
+      wrap: true,
+    });
+  });
+  
+  return slide;
+}
 
 export default SlideBusinessFlow;

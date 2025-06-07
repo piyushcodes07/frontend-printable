@@ -1,13 +1,17 @@
 "use client";
-import SlideForIntroduction from "@/components/Generate/slides/slideForIntroduction";
+import SlideForIntroduction, {
+  generateIntroductionSlide,
+} from "@/components/Generate/slides/slideForIntroduction";
 import { SlideConflictOverview } from "../Generate/slides/slideConflictOverview";
 import SlideCircularProcesss from "../Generate/slides/SlideCircularProcess";
 import SlideValidateIdea from "../Generate/slides/SlideValidateIdea";
-import SlideBusinessFlow from "../Generate/slides/SlideBusinessFlow";
+import SlideBusinessFlow, { generateBusinessFlowSlide } from "../Generate/slides/SlideBusinessFlow";
 import SlideScaleOperations from "../Generate/slides/SlideScaleOperations";
 import SlideLongTermStrategy from "../Generate/slides/SlideLongTermStrategy";
-import TimelineSlide from "../Generate/slides/TimelineSlide";
+import TimelineSlide, {generateTimelineSlide } from "../Generate/slides/TimelineSlide";
 import { useUser } from "@clerk/nextjs";
+import PptxGenJS from "pptxgenjs";
+import { useEffect } from "react";
 
 const slideComponents: Record<string, any> = {
   SlideForIntroduction: SlideForIntroduction,
@@ -18,6 +22,12 @@ const slideComponents: Record<string, any> = {
   SlideScaleOperations: SlideScaleOperations,
   SlideLongTermStrategy: SlideLongTermStrategy,
   TimelineSlide: TimelineSlide,
+};
+
+const slideGenerators: Record<string, any> = {
+  SlideForIntroduction: generateIntroductionSlide,
+  SlideBusinessFlow: generateBusinessFlowSlide,
+  TimelineSlide: generateTimelineSlide
 };
 
 export function SlideDeck({
@@ -88,6 +98,31 @@ export function SlideDeck({
   const user = useUser();
   const authorName = user.user?.username;
   console.log(authorName, "user");
+
+  const handleDownload = async () => {
+    const pptx = new PptxGenJS();
+
+    slides.forEach((slide) => {
+      const SlideGenerator = slideGenerators[slide.type];
+      if (SlideGenerator) {
+        SlideGenerator(pptx, {
+          ...slide.content,
+          backgroundColor: currentTheme?.backgroundColor,
+          headingColor: currentTheme?.headingColor,
+          subHeadingColor: currentTheme?.subHeadingColor,
+          bulletColor: currentTheme?.bulletColor,
+          authorName,
+        });
+      }
+    });
+
+    await pptx.writeFile({ fileName: "CompletePresentation.pptx" });
+  };
+
+  useEffect(() => {
+    handleDownload();
+  }, []);
+
   return (
     <div className="w-full max-h-1/3 flex flex-col items-center justify-center">
       {slides.map((slide, idx) => {

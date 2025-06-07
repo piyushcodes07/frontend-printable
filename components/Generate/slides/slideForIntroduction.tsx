@@ -1,8 +1,9 @@
 import { useFirstPexelsImage } from "@/components/ui/pixelsPhoto";
 import { useUser } from "@clerk/nextjs";
 import React from "react";
+import PptxGenJS from "pptxgenjs";
 
-type SlideProps = {
+export type SlideProps = {
   imageSrc: string;
   title: string;
   overview: string;
@@ -33,10 +34,12 @@ const SlideForIntroduction: React.FC<SlideProps> = ({
   const { photo, error, refresh } = useFirstPexelsImage(title, {
     refreshInterval: 0,
   });
+
   console.log(authorName, "authorName");
   const backgroundStyle = backgroundColor.startsWith("linear-gradient")
     ? { backgroundImage: backgroundColor }
     : { backgroundColor };
+
   return (
     <div
       className="w-full p-6  flex flex-col md:flex-row items-center"
@@ -97,5 +100,87 @@ const SlideForIntroduction: React.FC<SlideProps> = ({
     </div>
   );
 };
+
+export function generateIntroductionSlide(pptx: PptxGenJS, data: SlideProps) {
+  const {
+    imageSrc,
+    title,
+    overview,
+    description,
+    bullets,
+    authorName = "Piyush",
+    lastEdited,
+    backgroundColor = "#f5f0e6",
+    headingColor = "#1f433e",
+    subHeadingColor = "#1f433e",
+    bulletColor = "#1f433e",
+  } = data;
+
+  const slide = pptx.addSlide();
+  slide.background = { color: backgroundColor };
+
+  const imageBox = { x: 0.3, y: 0.6, w: 4.5, h: 3.38 };
+  const contentX = 5.0;
+  let currentY = 0.5;
+
+  if (imageSrc) {
+    slide.addImage({ path: imageSrc, ...imageBox });
+  }
+
+  slide.addText(title, {
+    x: contentX,
+    y: currentY,
+    w: 4.5,
+    fontSize: 24,
+    color: headingColor,
+    bold: true,
+  });
+  currentY += 1.0;
+
+  slide.addText(overview, {
+    x: contentX,
+    y: currentY,
+    w: 4.5,
+    fontSize: 16,
+    color: subHeadingColor,
+    bold: true,
+  });
+  currentY += 0.6;
+
+  slide.addText(description, {
+    x: contentX,
+    y: currentY,
+    w: 4.5,
+    fontSize: 14,
+    color: subHeadingColor,
+  });
+  currentY += 1.2;
+
+  slide.addText(bullets.map((b) => `• ${b}`).join("\n"), {
+    x: contentX,
+    y: currentY,
+    w: 4.5,
+    fontSize: 13,
+    color: bulletColor,
+    lineSpacing: 20,
+  });
+
+  currentY += bullets.length * 0.4 + 0.5;
+
+  slide.addText(`by ${authorName || "Piyush"}`, {
+    x: contentX,
+    y: currentY,
+    fontSize: 12,
+    color: subHeadingColor,
+    italic: true,
+  });
+
+  slide.addText(`Last edited: ${lastEdited}`, {
+    x: 0.3,
+    y: 6.9,
+    fontSize: 10,
+    color: "#666666",
+  });
+}
 
 export default SlideForIntroduction;
