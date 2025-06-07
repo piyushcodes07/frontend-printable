@@ -5,10 +5,7 @@ const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_ROOT_URL}`;
 export default function UseStorage() {
   const { order, dispatch } = useOrder();
 
-  const uploadFile = async (
-    file: File,
-    ownerId: string,
-  ): Promise<DocumentItem | null> => {
+  const uploadFile = async (file: File): Promise<DocumentItem | null> => {
     try {
       const formData = new FormData();
 

@@ -16,8 +16,7 @@ import {
 } from "../components/utils/apiCalls";
 import { Download } from "lucide-react";
 
-const DOMAIN_BASE_URL =
-  process.env.NEXT_PUBLIC_DOMAIN_URL || "http://localhost:3000";
+const DOMAIN_BASE_URL = process.env.NEXT_PUBLIC_DOMAIN_URL || "";
 
 function SignDocument() {
   const searchParams = useSearchParams();
@@ -91,7 +90,6 @@ function SignDocument() {
       const uploadedFileUrl = result.fileUrl.split("/");
       const str = uploadedFileUrl.pop();
       const index = str.indexOf("_");
-
       const fileId = str.slice(0, index);
       const fileName = str.slice(index + 1);
 
