@@ -10,6 +10,7 @@ import TimelineSlide from "../Generate/slides/TimelineSlide";
 import { useUser } from "@clerk/nextjs";
 import PptxGenJS from "pptxgenjs";
 import { useEffect } from "react";
+import { PexelsPhoto } from "../ui/pixelsPhoto";
 
 const slideComponents: Record<string, any> = {
 	SlideForIntroduction: SlideForIntroduction,
@@ -25,6 +26,26 @@ const slideComponents: Record<string, any> = {
 const slideGenerators: Record<string, any> = {
 	SlideForIntroduction: generateIntroductionSlide,
 };
+
+async function getImageUrlFromService(query: string) {
+	const res = await fetch(`https://api.pexels.com/v1/search?` + new URLSearchParams({ query, per_page: "1" }), {
+		headers: {
+			Authorization: process.env.NEXT_PUBLIC_PIXELS || "",
+		},
+		// Always fetch fresh unless you change revalidate
+		next: { revalidate: 0 },
+	});
+	if (!res.ok) {
+		throw new Error(`Pexels API error: ${res.statusText}`);
+	}
+	const data = await res.json();
+	const hits: PexelsPhoto[] = data.photos;
+	if (hits.length === 0) {
+		throw new Error(`No images found for "${query}"`);
+	}
+
+	return hits[0];
+}
 
 export function SlideDeck({ slides }: { slides: { type: string; content: any }[] }) {
 	const templates = [
@@ -93,11 +114,17 @@ export function SlideDeck({ slides }: { slides: { type: string; content: any }[]
 	const handleDownload = async () => {
 		const pptx = new PptxGenJS();
 
-		slides.forEach((slide) => {
+		for (const slide of slides) {
 			const SlideGenerator = slideGenerators[slide.type];
 			if (SlideGenerator) {
+				let imageSrc;
+				const imageData = await getImageUrlFromService(slide.content.title);
+				if (imageData && imageData.src) {
+					imageSrc = imageData.src.landscape;
+				}
 				SlideGenerator(pptx, {
 					...slide.content,
+					imageSrc,
 					backgroundColor: currentTheme?.backgroundColor,
 					headingColor: currentTheme?.headingColor,
 					subHeadingColor: currentTheme?.subHeadingColor,
@@ -105,7 +132,7 @@ export function SlideDeck({ slides }: { slides: { type: string; content: any }[]
 					authorName,
 				});
 			}
-		});
+		}
 
 		await pptx.writeFile({ fileName: "CompletePresentation.pptx" });
 	};
