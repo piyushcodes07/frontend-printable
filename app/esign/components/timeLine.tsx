@@ -73,7 +73,7 @@ export default function DocumentTimeline({
   };
 
   return (
-    <div className="w-full max-w-md bg-white rounded-lg shadow-sm ">
+    <div className="w-[60vh] max-w-md bg-white rounded-lg shadow-sm ">
       {/* Document Status Header */}
       <div
         className={`p-6 ${

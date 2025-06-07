@@ -16,8 +16,6 @@ import {
 } from "../components/utils/apiCalls";
 import { Download } from "lucide-react";
 
-const DOMAIN_BASE_URL = process.env.NEXT_PUBLIC_DOMAIN_URL || "";
-
 function SignDocument() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -135,7 +133,9 @@ function SignDocument() {
     try {
       let result;
       if (documentId) {
-        const link = `${DOMAIN_BASE_URL}/esign/document?id=${documentId}`;
+        const link = `${
+          process.env.NEXT_PUBLIC_DOMAIN_ROOT_URL || ""
+        }/esign/document?id=${documentId}`;
         const payload = {
           requestedBy: user?.id,
           fileIds: [documentId],
@@ -154,7 +154,9 @@ function SignDocument() {
         }
       } else {
         result = await uploadDocument();
-        const link = `${DOMAIN_BASE_URL}/esign/document?id=${result.fileId}`;
+        const link = `${
+          process.env.NEXT_PUBLIC_DOMAIN_ROOT_URL || ""
+        }/esign/document?id=${result.fileId}`;
         const payload = {
           requestedBy: user?.id,
           fileIds: [result.fileId],

@@ -17,7 +17,7 @@ const PdfViewer = dynamic(
   () => import("../components/pdfLoader").then((mod) => mod.default),
   {
     ssr: false,
-  },
+  }
 );
 
 interface FileData {
@@ -62,18 +62,18 @@ export default function SignDocument() {
         resetSign();
 
         toast.success(
-          response.msg || "signed and saved document successfully!!",
+          response.msg || "signed and saved document successfully!!"
         );
-        // Refresh file data to update status
+        // Refresh file data to update statusS
         const FileData = await GetFiles(fileId, user?.id as string);
+        console.log(FileData);
         setFileUrl(FileData.fileUrl);
         const found = FileData.info.find(
           (info: any) =>
-            info.ownerId === user?.id && info.signeeSignStatus === "pending",
+            info.signeeEmail === user?.primaryEmailAddress &&
+            info.signeeSignStatus === "pending"
         );
-
         found ? setToEdit(true) : setToEdit(false);
-
         setFile(FileData.info);
       } else {
         toast.error(response.msg || "Failed to save document.");
@@ -100,7 +100,7 @@ export default function SignDocument() {
           (info: any) =>
             info.ownerId === user?.id &&
             info.signeeEmail === user?.primaryEmailAddress?.emailAddress &&
-            info.signeeSignStatus === "pending",
+            info.signeeSignStatus === "pending"
         );
         console.log("value of :", found);
         found ? setToEdit(true) : setToEdit(false);
