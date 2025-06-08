@@ -134,7 +134,7 @@ export default function LocationSelectionPage() {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       console.log({ ...orderFinal, merchantId: selectedMerchant });
@@ -166,7 +166,7 @@ export default function LocationSelectionPage() {
             draggable: true,
             theme: "light",
             transition: Bounce,
-          }
+          },
         );
       }
     } catch (error) {
@@ -206,9 +206,12 @@ export default function LocationSelectionPage() {
   const userMarkerRef = useRef<google.maps.Marker | null>(null);
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
 
-  const filteredMerchants = nearbyMerchants.filter((merchant) =>
-    merchant.shopName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredMerchants = nearbyMerchants.filter((merchant) => {
+    if (merchant.shopName === null) {
+      return false;
+    }
+    merchant.shopName.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   const getUserLocation = () => {
     setLocationPermission("loading");
@@ -230,7 +233,7 @@ export default function LocationSelectionPage() {
         (async () => {
           try {
             const response = await fetch(
-              `${process.env.NEXT_PUBLIC_BACKEND_ROOT_URL}/api/user/nearest-merchants?lat=${userCoords.lat}&long=${userCoords.lng}`
+              `${process.env.NEXT_PUBLIC_BACKEND_ROOT_URL}/api/user/nearest-merchants?lat=${userCoords.lat}&long=${userCoords.lng}`,
             );
             const data = await response.json();
 
@@ -276,7 +279,7 @@ export default function LocationSelectionPage() {
         enableHighAccuracy: true,
         timeout: 5000,
         maximumAge: 0,
-      }
+      },
     );
   };
 
@@ -293,7 +296,7 @@ export default function LocationSelectionPage() {
         .query({ name: "geolocation" })
         .then((permissionStatus) => {
           setLocationPermission(
-            permissionStatus.state as LocationPermissionStatus
+            permissionStatus.state as LocationPermissionStatus,
           );
 
           if (
@@ -308,7 +311,7 @@ export default function LocationSelectionPage() {
 
           permissionStatus.onchange = () => {
             setLocationPermission(
-              permissionStatus.state as LocationPermissionStatus
+              permissionStatus.state as LocationPermissionStatus,
             );
             if (permissionStatus.state === "granted") {
               getUserLocation();
@@ -321,7 +324,7 @@ export default function LocationSelectionPage() {
         })
         .catch(() => {
           console.warn(
-            "Permissions API failed, falling back to direct geolocation."
+            "Permissions API failed, falling back to direct geolocation.",
           );
           getUserLocation();
         });
@@ -382,7 +385,7 @@ export default function LocationSelectionPage() {
                 `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#06044b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3" fill="#61e987"></circle>
-                </svg>`
+                </svg>`,
               ),
             scaledSize: new window.google.maps.Size(40, 40),
             anchor: new window.google.maps.Point(20, 40),
@@ -416,7 +419,7 @@ export default function LocationSelectionPage() {
             infoWindowRef.current?.open(googleMapRef.current, marker);
 
             const element = document.getElementById(
-              `merchant-${merchant.merchantId}`
+              `merchant-${merchant.merchantId}`,
             );
             if (element) {
               element.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -438,7 +441,7 @@ export default function LocationSelectionPage() {
   useEffect(() => {
     if (selectedMerchant && googleMapRef.current && mapLoaded) {
       const selectedMerchantData = nearbyMerchants.find(
-        (m) => m.merchantId === selectedMerchant
+        (m) => m.merchantId === selectedMerchant,
       );
 
       if (
@@ -454,7 +457,7 @@ export default function LocationSelectionPage() {
         googleMapRef.current?.setZoom(15);
 
         const marker: any = merchantMarkersRef.current.get(
-          selectedMerchant as string
+          selectedMerchant as string,
         ); // Added type assertion
         if (marker && infoWindowRef.current) {
           infoWindowRef.current.close();
@@ -517,7 +520,7 @@ export default function LocationSelectionPage() {
           `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="#06044b" stroke="#ffffff" stroke-width="2">
             <circle cx="12" cy="12" r="10" fill="#06044b" stroke="#ffffff" stroke-width="2"/>
             <circle cx="12" cy="12" r="4" fill="#61e987"/>
-          </svg>`
+          </svg>`,
         ),
       scaledSize: new window.google.maps.Size(30, 30),
       anchor: new window.google.maps.Point(15, 15),
@@ -547,7 +550,7 @@ export default function LocationSelectionPage() {
         `);
           infoWindowRef.current?.open(
             googleMapRef.current!, // Added non-null assertion
-            userMarkerRef.current! // Added non-null assertion
+            userMarkerRef.current!, // Added non-null assertion
           );
         });
       }
@@ -565,8 +568,8 @@ export default function LocationSelectionPage() {
               star <= Math.floor(numericRating)
                 ? "text-yellow-400"
                 : star - 0.5 <= numericRating
-                ? "text-yellow-400"
-                : "text-gray-300"
+                  ? "text-yellow-400"
+                  : "text-gray-300"
             }`}
             fill="currentColor"
             viewBox="0 0 20 20"
@@ -767,7 +770,7 @@ export default function LocationSelectionPage() {
                 "flex-1 py-2 px-4 rounded-full flex items-center justify-center gap-2 transition-colors",
                 deliveryOption === "pickup"
                   ? "bg-white text-[#06044b] shadow-sm"
-                  : "text-[#555555] hover:text-[#06044b]"
+                  : "text-[#555555] hover:text-[#06044b]",
               )}
               onClick={() => setDeliveryOption("pickup")}
             >
@@ -779,7 +782,7 @@ export default function LocationSelectionPage() {
                 "flex-1 py-2 px-4 rounded-full flex items-center justify-center gap-2 transition-colors",
                 deliveryOption === "delivery"
                   ? "bg-white text-[#06044b] shadow-sm"
-                  : "text-[#555555] hover:text-[#06044b]"
+                  : "text-[#555555] hover:text-[#06044b]",
               )}
               onClick={() => setDeliveryOption("delivery")}
             >
@@ -834,7 +837,7 @@ export default function LocationSelectionPage() {
                     "border rounded-lg overflow-hidden transition-all",
                     selectedMerchant === merchant.merchantId
                       ? "border-[#61e987] bg-[#f0fdf4]"
-                      : "border-gray-200 hover:border-[#90f0ab]"
+                      : "border-gray-200 hover:border-[#90f0ab]",
                   )}
                 >
                   <div
