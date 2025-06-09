@@ -201,17 +201,13 @@ export default function LocationSelectionPage() {
 
   const mapRef = useRef<HTMLDivElement | null>(null);
   const googleMapRef = useRef<google.maps.Map | null>(null);
-
   const merchantMarkersRef = useRef<Map<string, google.maps.Marker>>(new Map());
   const userMarkerRef = useRef<google.maps.Marker | null>(null);
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
 
-  const filteredMerchants = nearbyMerchants.filter((merchant) => {
-    if (merchant.shopName === null) {
-      return false;
-    }
-    merchant.shopName.toLowerCase().includes(searchQuery.toLowerCase());
-  });
+  const filteredMerchants = nearbyMerchants.filter((merchant) =>
+    merchant.shopName.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   const getUserLocation = () => {
     setLocationPermission("loading");
@@ -336,26 +332,17 @@ export default function LocationSelectionPage() {
   useEffect(() => {
     const loadGoogleMapsScript = () => {
       if (window.google?.maps) {
-        console.log("Google Maps already loaded.");
-        initializeMap(); // Only initialize map when Google Maps is loaded
+        initializeMap();
         return;
       }
 
-      console.log("Loading Google Maps API...");
       const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${
+        process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_API_KEY"
+      }&libraries=places`;
       script.async = true;
       script.defer = true;
-
-      script.onload = () => {
-        console.log("Google Maps API loaded successfully.");
-        initializeMap(); // Initialize map after script is loaded
-      };
-
-      script.onerror = () => {
-        console.error("Error loading Google Maps API.");
-      };
-
+      script.onload = () => initializeMap();
       document.head.appendChild(script);
     };
 
@@ -402,11 +389,7 @@ export default function LocationSelectionPage() {
           marker.infoWindowContent = `
             <div style="font-family: sans-serif; padding: 5px; text-align: center; color: #06044b;">
               <strong style="font-size: 1.1em;">${merchant.shopName}</strong>
-              ${
-                merchant.address
-                  ? `<p style="font-size: 0.8em; margin-top: 5px; color: #555;">${merchant.address}</p>`
-                  : ""
-              }
+              ${merchant.address ? `<p style="font-size: 0.8em; margin-top: 5px; color: #555;">${merchant.address}</p>` : ""}
             </div>
           `;
 
@@ -453,14 +436,15 @@ export default function LocationSelectionPage() {
           lat: parseFloat(selectedMerchantData.latitude),
           lng: parseFloat(selectedMerchantData.longitude),
         };
-        googleMapRef.current?.panTo(selectedCoords);
-        googleMapRef.current?.setZoom(15);
+        googleMapRef.current.panTo(selectedCoords);
+        googleMapRef.current.setZoom(15);
 
-        const marker: any = merchantMarkersRef.current.get(
+        const marker = merchantMarkersRef.current.get(
           selectedMerchant as string,
         ); // Added type assertion
         if (marker && infoWindowRef.current) {
           infoWindowRef.current.close();
+          //@ts-ignore
           infoWindowRef.current.setContent(marker.infoWindowContent);
           infoWindowRef.current.open(googleMapRef.current, marker);
         }
@@ -500,17 +484,10 @@ export default function LocationSelectionPage() {
   const updateUserLocationOnMap = (location: { lat: number; lng: number }) => {
     if (!googleMapRef.current) return;
 
-    console.log("Ref", googleMapRef.current);
-
-    const map = googleMapRef.current;
-    if (map) {
-      map.panTo?.(location); // use panTo safely too
-
-      const zoom = map.getZoom?.(); // optional chaining to avoid error
-
-      if (zoom !== undefined && zoom < 14) {
-        map.setZoom?.(14); // optional chaining again
-      }
+    googleMapRef.current.panTo(location);
+    //@ts-ignore
+    if (googleMapRef.current.getZoom() < 14) {
+      googleMapRef.current.setZoom(14);
     }
 
     const userIcon = {
@@ -537,23 +514,21 @@ export default function LocationSelectionPage() {
         icon: userIcon,
         zIndex: 1000,
       });
-
-      if (userMarkerRef.current) {
-        userMarkerRef.current.addListener("click", () => {
-          if (infoWindowRef.current) {
-            infoWindowRef.current.close();
-          }
-          infoWindowRef.current?.setContent(`
+      //@ts-ignore
+      userMarkerRef.current.addListener("click", () => {
+        if (infoWindowRef.current) {
+          infoWindowRef.current.close();
+        }
+        infoWindowRef.current?.setContent(`
           <div style="font-family: sans-serif; padding: 5px; text-align: center; color: #06044b;">
             <strong>Your Location</strong>
           </div>
         `);
-          infoWindowRef.current?.open(
-            googleMapRef.current!, // Added non-null assertion
-            userMarkerRef.current!, // Added non-null assertion
-          );
-        });
-      }
+        infoWindowRef.current?.open(
+          googleMapRef.current!, // Added non-null assertion
+          userMarkerRef.current!, // Added non-null assertion
+        );
+      });
     }
   };
 
