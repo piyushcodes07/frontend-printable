@@ -9,7 +9,6 @@ import SlideLongTermStrategy from "../Generate/slides/SlideLongTermStrategy";
 import TimelineSlide from "../Generate/slides/TimelineSlide";
 import { useUser } from "@clerk/nextjs";
 import PptxGenJS from "pptxgenjs";
-import { useEffect } from "react";
 import { PexelsPhoto } from "../ui/pixelsPhoto";
 
 const slideComponents: Record<string, any> = {
@@ -137,30 +136,33 @@ export function SlideDeck({ slides }: { slides: { type: string; content: any }[]
 		await pptx.writeFile({ fileName: "CompletePresentation.pptx" });
 	};
 
-	useEffect(() => {
-		handleDownload();
-	}, []);
-
 	return (
-		<div className="w-full max-h-1/3 flex flex-col items-center justify-center">
-			{slides.map((slide, idx) => {
-				const SlideComp = slideComponents[slide.type];
-				if (!SlideComp) return <div key={idx}>Unknown slide type</div>;
-				// Spread content as props (keys match component props)
-				return (
-					<div key={idx} className="h-1/3 max-w-[1000px]">
-						<SlideComp
-							key={idx}
-							{...slide.content}
-							backgroundColor={currentTheme?.backgroundColor}
-							headingColor={currentTheme?.headingColor}
-							subHeadingColor={currentTheme?.subHeadingColor}
-							bulletColor={currentTheme?.bulletColor}
-						/>
-						;
-					</div>
-				);
-			})}
+		<div className="w-full max-h-1/3 flex flex-col items-center justify-center my-4">
+			<div className="flex flex-col gap-4 mb-4">
+				{slides.map((slide, idx) => {
+					const SlideComp = slideComponents[slide.type];
+					if (!SlideComp) return <div key={idx}>Unknown slide type</div>;
+					// Spread content as props (keys match component props)
+					return (
+						<div key={idx} className="h-1/3 max-w-[1000px]">
+							<SlideComp
+								key={idx}
+								{...slide.content}
+								backgroundColor={currentTheme?.backgroundColor}
+								headingColor={currentTheme?.headingColor}
+								subHeadingColor={currentTheme?.subHeadingColor}
+								bulletColor={currentTheme?.bulletColor}
+							/>
+						</div>
+					);
+				})}
+			</div>
+			<button
+				className="px-4 py-2 bg-[#61e987] rounded-md cursor-pointer hover:scale-105 transition-all"
+				type="button"
+				onClick={handleDownload}>
+				Download PPT
+			</button>
 		</div>
 	);
 }
