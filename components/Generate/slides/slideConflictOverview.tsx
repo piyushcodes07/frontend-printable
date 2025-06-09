@@ -3,6 +3,7 @@ import { z } from "zod";
 import { tool } from "ai";
 import { useFirstPexelsImage } from "@/components/ui/pixelsPhoto";
 import { Rows } from "lucide-react";
+import PptxGenJS from "pptxgenjs";
 
 export const SlideConflictOvervieww = tool({
   description:
@@ -18,7 +19,7 @@ export const SlideConflictOvervieww = tool({
           contents: z
             .array(z.string())
             .describe("Array of paragraph or bullet texts for this section"),
-        }),
+        })
       )
       .describe("List of sections to display on the slide"),
   }),
@@ -54,9 +55,9 @@ export const SlideConflictOverview: React.FC<Props> = ({
   return (
     <div
       style={{
-        height: "450px", // total fixed height
+        height: "450px",
         width: "1000px",
-        maxWidth: "1050px", // to match your screenshot
+        maxWidth: "1050px",
         margin: "0 auto",
         fontFamily: "Georgia, serif",
         backgroundColor,
@@ -155,3 +156,80 @@ export const SlideConflictOverview: React.FC<Props> = ({
     </div>
   );
 };
+
+export function generateConflictOverviewSlide(pptx: PptxGenJS, data: Props) {
+  const {
+    imageSrc,
+    title,
+    sections,
+    backgroundColor = "#f5f0e6",
+    headingColor = "#1f433e",
+    subHeadingColor = "#1f433e",
+    bulletColor = "#1f433e",
+  } = data;
+
+  const slide = pptx.addSlide();
+  slide.background = { color: backgroundColor };
+
+  // Add header image
+  if (imageSrc) {
+    slide.addImage({
+      path: imageSrc,
+      x: 0,
+      y: 0,
+      w: 10,
+      h: 2.5,
+    });
+  }
+
+  // Add title
+  slide.addText(title, {
+    x: 0.5,
+    y: 2.7,
+    w: 9.0,
+    fontSize: 24,
+    color: headingColor,
+    bold: true,
+    align: "left",
+  });
+
+  // Layout setup
+  const numSections = sections.length;
+  const sectionWidth = 9.0 / numSections;
+  const startY = 3.5;
+  const contentPadding = 0.2;
+
+  sections.forEach((section, index) => {
+    const xPos = 0.5 + index * sectionWidth;
+    let yPos = startY;
+
+    // Section heading
+    slide.addText(section.heading, {
+      x: xPos,
+      y: yPos,
+      w: sectionWidth - contentPadding,
+      fontSize: 16,
+      color: subHeadingColor,
+      bold: true,
+      align: "left",
+    });
+    yPos += 0.5;
+
+    // Section bullets
+    const formattedBullets = section.contents.map((content) => `• ${content}`);
+
+    slide.addText(formattedBullets.join("\n"), {
+      x: xPos,
+      y: yPos,
+      w: sectionWidth - contentPadding,
+      fontSize: 11,
+      color: bulletColor,
+      lineSpacing: 16,
+      breakLine: true,
+      align: "left",
+      bullet: { type: "bullet" },
+      valign: "top",
+    });
+  });
+}
+export default SlideConflictOverview;

@@ -1,6 +1,7 @@
 import React from "react";
 import { tool } from "ai";
 import { z } from "zod";
+import PptxGenJS from "pptxgenjs";
 
 export const SlideLongTermStrategyTool = tool({
   description:
@@ -28,6 +29,7 @@ type sudoSlideProps = SlideProps & {
   bulletColor?: string;
 };
 
+// React component after the generate function
 export const SlideLongTermStrategy: React.FC<sudoSlideProps> = ({
   title,
   quadrants,
@@ -107,5 +109,108 @@ export const SlideLongTermStrategy: React.FC<sudoSlideProps> = ({
     </div>
   );
 };
+
+export function generateLongTermStrategySlide(
+  pptx: PptxGenJS,
+  data: sudoSlideProps
+) {
+  const {
+    title,
+    quadrants,
+    backgroundColor = "#fffbe6",
+    headingColor = "#0f172a",
+    subHeadingColor = "#334155",
+    bulletColor = "#2563eb",
+  } = data;
+
+  if (quadrants.length !== 4) {
+    throw new Error("Expected exactly 4 quadrants");
+  }
+
+  const slide = pptx.addSlide();
+  slide.background = { color: backgroundColor };
+
+  // Title
+  slide.addText(title, {
+    x: 0.5,
+    y: 0.3,
+    w: 9,
+    h: 0.75,
+    fontSize: 28,
+    color: headingColor,
+    bold: true,
+    align: "center",
+  });
+
+  // Quadrant layout
+  const startY = 1.0;
+  const quadrantWidth = 4.2;
+  const quadrantHeight = 2.0;
+  const padding = 0.4;
+
+  quadrants.forEach((quadrant, index) => {
+    const row = Math.floor(index / 2);
+    const col = index % 2;
+    const xPos = 0.5 + col * (quadrantWidth + padding);
+    const yPos = startY + row * (quadrantHeight + padding);
+
+    // Background box
+    slide.addShape(pptx.ShapeType.rect, {
+      x: xPos,
+      y: yPos,
+      w: quadrantWidth,
+      h: quadrantHeight,
+      fill: { color: "FFFFFF", transparency: 90 },
+      line: { color: bulletColor, width: 1 },
+    });
+
+    // Number circle
+    slide.addShape(pptx.ShapeType.ellipse, {
+      x: xPos + 0.2,
+      y: yPos + 0.2,
+      w: 0.6,
+      h: 0.6,
+      fill: { color: bulletColor },
+      line: { color: bulletColor },
+    });
+
+    slide.addText(quadrant.id.toString(), {
+      x: xPos + 0.2,
+      y: yPos + 0.2,
+      w: 0.6,
+      h: 0.6,
+      fontSize: 16,
+      color: "FFFFFF",
+      bold: true,
+      align: "center",
+      valign: "middle",
+    });
+
+    // Heading
+    slide.addText(quadrant.heading, {
+      x: xPos + 1.0,
+      y: yPos + 0.3,
+      w: quadrantWidth - 1.2,
+      fontSize: 16,
+      color: headingColor,
+      bold: true,
+    });
+
+    // Description
+    slide.addText(quadrant.description, {
+      x: xPos + 1.0,
+      y: yPos + 0.8,
+      w: quadrantWidth - 1.2,
+      fontSize: 11,
+      color: subHeadingColor,
+      breakLine: true,
+      lineSpacing: 16,
+      align: "left",
+    });
+  });
+
+  return slide;
+}
+
 
 export default SlideLongTermStrategy;

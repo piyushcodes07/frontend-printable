@@ -1,14 +1,12 @@
 "use client";
-import SlideForIntroduction, {
-  generateIntroductionSlide,
-} from "@/components/Generate/slides/slideForIntroduction";
+import SlideForIntroduction from "@/components/Generate/slides/slideForIntroduction";
 import { SlideConflictOverview } from "../Generate/slides/slideConflictOverview";
 import SlideCircularProcesss from "../Generate/slides/SlideCircularProcess";
 import SlideValidateIdea from "../Generate/slides/SlideValidateIdea";
-import SlideBusinessFlow, { generateBusinessFlowSlide } from "../Generate/slides/SlideBusinessFlow";
+import SlideBusinessFlow from "../Generate/slides/SlideBusinessFlow";
 import SlideScaleOperations from "../Generate/slides/SlideScaleOperations";
 import SlideLongTermStrategy from "../Generate/slides/SlideLongTermStrategy";
-import TimelineSlide, {generateTimelineSlide } from "../Generate/slides/TimelineSlide";
+import TimelineSlide from "../Generate/slides/TimelineSlide";
 import { useUser } from "@clerk/nextjs";
 import PptxGenJS from "pptxgenjs";
 import { useEffect } from "react";
@@ -22,12 +20,6 @@ const slideComponents: Record<string, any> = {
   SlideScaleOperations: SlideScaleOperations,
   SlideLongTermStrategy: SlideLongTermStrategy,
   TimelineSlide: TimelineSlide,
-};
-
-const slideGenerators: Record<string, any> = {
-  SlideForIntroduction: generateIntroductionSlide,
-  SlideBusinessFlow: generateBusinessFlowSlide,
-  TimelineSlide: generateTimelineSlide
 };
 
 export function SlideDeck({

@@ -1,9 +1,9 @@
-import { NextApiRequest, NextApiResponse } from "next"; // Typically for Next.js pages/app router, but using Request/Response for broader compatibility
+//  import { NextApiRequest, NextApiResponse } from "next";  Typically for Next.js pages/app router, but using Request/Response for broader compatibility
 import { generateObject } from "ai";
 import { google } from "@ai-sdk/google";
 import { number, z } from "zod";
 
-// --- Schemas for individual slide type parameters ---
+  // --- Schemas for individual slide type parameters ---
 const slideForIntroductionParams = z.object({
   title: z.string().describe("Main heading of the slide"),
   overview: z.string().describe("Sub-heading or overview text"),
@@ -118,115 +118,115 @@ const SlideLongTermStrategyParams = z.object({
     .describe("Four quadrant strategies for long-term growth"),
 });
 
-// --- Schema for a single generated slide (AI chooses one of these) ---
+  // --- Schema for a single generated slide (AI chooses one of these) ---
 const individualGeneratedSlideSchema = z.discriminatedUnion("slideType", [
-  z
-    .object({
-      slideType: z.literal("SlideForIntroduction"),
-      originalRequestIndex: z
-        .number()
-        .describe(
-          "The 0-based index of the original slide request this corresponds to."
-        ),
-      arguments: slideForIntroductionParams,
-    })
-    .describe(
-      "Best for opening/closing slides or when you need to present a clear hierarchy of information with a main message and supporting points. Choose this when the content is primarily text-based and needs a clear title-subtitle-bullets structure."
-    ),
-  z
-    .object({
-      slideType: z.literal("SlideConflictOverview"),
-      originalRequestIndex: z
-        .number()
-        .describe(
-          "The 0-based index of the original slide request this corresponds to."
-        ),
-      arguments: slideConflictOverviewParams,
-    })
-    .describe(
-      "Use when information naturally falls into 3-4 distinct categories or themes. Perfect for comparing different aspects, showing problem-solution pairs, or organizing related concepts into clear groups. Each section supports multiple bullet points."
-    ),
-  z
-    .object({
-      slideType: z.literal("SlideCircularProcesss"),
-      originalRequestIndex: z
-        .number()
-        .describe(
-          "The 0-based index of the original slide request this corresponds to."
-        ),
-      arguments: slideCircularProcesssParams,
-    })
-    .describe(
-      "Ideal for showing cyclical relationships, continuous processes, or iterative workflows. Best when your points represent steps that flow into each other or form a repeating cycle. Most effective for 4-6 interconnected elements that form a loop or cycle."
-    ),
-  z
-    .object({
-      slideType: z.literal("SlideScaleOperations"),
-      originalRequestIndex: z
-        .number()
-        .describe(
-          "The 0-based index of the original slide request this corresponds to."
-        ),
-      arguments: SlideScaleOperationsParams,
-    })
-    .describe(
-      "Perfect for comparing four equal aspects or dimensions of a topic. Use when you need to show different facets of equal importance, like SWOT analysis, four pillars/principles, or key features. Each quadrant should represent a distinct but related concept."
-    ),
-  z
-    .object({
-      slideType: z.literal("SlideBusinessFlow"),
-      originalRequestIndex: z
-        .number()
-        .describe(
-          "The 0-based index of the original slide request this corresponds to."
-        ),
-      arguments: SlideBusinessFlowParams,
-    })
-    .describe(
-      "Best for linear processes, step-by-step instructions, or sequential workflows. Use when your points represent a clear progression from start to finish. Ideal for showing transformations, procedures, or development stages with clear directionality."
-    ),
-  z
-    .object({
-      slideType: z.literal("SlideValidateIdea"),
-      originalRequestIndex: z
-        .number()
-        .describe(
-          "The 0-based index of the original slide request this corresponds to."
-        ),
-      arguments: SlideValidateIdeaParams,
-    })
-    .describe(
-      "Effective for presenting key points alongside visual evidence or illustration. Use when you have 3 main points that benefit from a supporting image, like product features, methodology explanation, or concept validation. The right-side image adds visual context to your points."
-    ),
-  z
-    .object({
-      slideType: z.literal("SlideLongTermStrategy"),
-      originalRequestIndex: z
-        .number()
-        .describe(
-          "The 0-based index of the original slide request this corresponds to."
-        ),
-      arguments: SlideLongTermStrategyParams,
-    })
-    .describe(
-      "Optimal for strategic planning and high-level conceptual frameworks. Use when presenting four interconnected strategic elements, like strategic pillars, core values, or key focus areas. Each quadrant should represent an essential component of the overall strategy."
-    ),
-  z
-    .object({
-      slideType: z.literal("TimelineSlide"),
-      originalRequestIndex: z
-        .number()
-        .describe(
-          "The 0-based index of the original slide request this corresponds to."
-        ),
-      arguments: TimelineSlideParams,
-    })
-    .describe(
-      "Perfect for chronological sequences, historical progression, or phase-based planning. Use when your content has a clear temporal or sequential order, like project phases, historical events, or evolutionary stages. Best for showing progression over time or clear sequential stages."
-    ),
+    z
+      .object({
+        slideType: z.literal("SlideForIntroduction"),
+        originalRequestIndex: z
+          .number()
+          .describe(
+            "The 0-based index of the original slide request this corresponds to."
+          ),
+        arguments: slideForIntroductionParams,
+      })
+      .describe(
+        "Best for opening/closing slides or when you need to present a clear hierarchy of information with a main message and supporting points. Choose this when the content is primarily text-based and needs a clear title-subtitle-bullets structure."
+      ),
+     z
+       .object({
+         slideType: z.literal("SlideConflictOverview"),
+         originalRequestIndex: z
+           .number()
+           .describe(
+             "The 0-based index of the original slide request this corresponds to."
+           ),
+         arguments: slideConflictOverviewParams,
+       })
+       .describe(
+         "Use when information naturally falls into 3-4 distinct categories or themes. Perfect for comparing different aspects, showing problem-solution pairs, or organizing related concepts into clear groups. Each section supports multiple bullet points."
+       ),
+    z
+      .object({
+        slideType: z.literal("SlideCircularProcesss"),
+        originalRequestIndex: z
+          .number()
+          .describe(
+            "The 0-based index of the original slide request this corresponds to."
+          ),
+        arguments: slideCircularProcesssParams,
+      })
+      .describe(
+        "Ideal for showing cyclical relationships, continuous processes, or iterative workflows. Best when your points represent steps that flow into each other or form a repeating cycle. Most effective for 4-6 interconnected elements that form a loop or cycle."
+      ),
+    z
+      .object({
+        slideType: z.literal("SlideScaleOperations"),
+        originalRequestIndex: z
+          .number()
+          .describe(
+            "The 0-based index of the original slide request this corresponds to."
+          ),
+        arguments: SlideScaleOperationsParams,
+      })
+      .describe(
+        "Perfect for comparing four equal aspects or dimensions of a topic. Use when you need to show different facets of equal importance, like SWOT analysis, four pillars/principles, or key features. Each quadrant should represent a distinct but related concept."
+      ),
+    z
+      .object({
+        slideType: z.literal("SlideBusinessFlow"),
+        originalRequestIndex: z
+          .number()
+          .describe(
+            "The 0-based index of the original slide request this corresponds to."
+          ),
+        arguments: SlideBusinessFlowParams,
+      })
+      .describe(
+        "Best for linear processes, step-by-step instructions, or sequential workflows. Use when your points represent a clear progression from start to finish. Ideal for showing transformations, procedures, or development stages with clear directionality."
+      ),
+    z
+      .object({
+        slideType: z.literal("SlideValidateIdea"),
+        originalRequestIndex: z
+          .number()
+          .describe(
+            "The 0-based index of the original slide request this corresponds to."
+          ),
+        arguments: SlideValidateIdeaParams,
+      })
+      .describe(
+        "Effective for presenting key points alongside visual evidence or illustration. Use when you have 3 main points that benefit from a supporting image, like product features, methodology explanation, or concept validation. The right-side image adds visual context to your points."
+      ),
+    z
+      .object({
+       slideType: z.literal("SlideLongTermStrategy"),
+       originalRequestIndex: z
+         .number()
+          .describe(
+            "The 0-based index of the original slide request this corresponds to."
+          ),
+        arguments: SlideLongTermStrategyParams,
+      })
+      .describe(
+        "Optimal for strategic planning and high-level conceptual frameworks. Use when presenting four interconnected strategic elements, like strategic pillars, core values, or key focus areas. Each quadrant should represent an essential component of the overall strategy."
+      ),
+    z
+      .object({
+        slideType: z.literal("TimelineSlide"),
+        originalRequestIndex: z
+          .number()
+          .describe(
+            "The 0-based index of the original slide request this corresponds to."
+          ),
+        arguments: TimelineSlideParams,
+      })
+      .describe(
+        "Perfect for chronological sequences, historical progression, or phase-based planning. Use when your content has a clear temporal or sequential order, like project phases, historical events, or evolutionary stages. Best for showing progression over time or clear sequential stages."
+      ),
 ]);
 
-// --- Schema for the overall AI output (an array of generated slides) ---
+  // --- Schema for the overall AI output (an array of generated slides) ---
 const allGeneratedSlidesSchema = z.object({
   generatedSlides: z
     .array(individualGeneratedSlideSchema)
@@ -343,7 +343,7 @@ IMPORTANT:
       (a, b) => a.originalRequestIndex - b.originalRequestIndex
     );
 
-    // Transform the AI's output into the desired API response format
+      // Transform the AI's output into the desired API response format
     const responseSlides = sortedGeneratedSlides.map((genSlide) => {
       return {
         type: genSlide.slideType,

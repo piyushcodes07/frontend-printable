@@ -1,6 +1,7 @@
 import React from "react";
 import { tool } from "ai";
 import { z } from "zod";
+import PptxGenJS from "pptxgenjs";
 
 export const SlideValidateIdeaTool = tool({
   description:
@@ -102,5 +103,100 @@ export const SlideValidateIdea: React.FC<sudoSlideProps> = ({
     </div>
   );
 };
+export function generateValidateIdeaSlide(
+  pptx: PptxGenJS,
+  data: sudoSlideProps
+) {
+  const {
+    steps,
+    imageUrl,
+    backgroundColor = "#f5f0e6",
+    headingColor = "#1f433e",
+    subHeadingColor = "#1f433e",
+    bulletColor = "#1f433e",
+  } = data;
 
+  const slide = pptx.addSlide();
+  slide.background = { color: backgroundColor };
+
+  const circleSize = 0.28;
+
+  // Title
+  slide.addText("Validate Your Idea", {
+    x: 0.5,
+    y: 0.3,
+    w: 9,
+    h: 0.6,
+    fontSize: 26,
+    bold: true,
+    color: headingColor,
+    align: "left",
+  });
+
+  // Text positioning
+  let contentX = 0.5;
+  let contentW = 6.5;
+
+  // Optional right-side image
+  if (imageUrl) {
+    slide.addImage({
+      path: imageUrl,
+      x: 7.2,
+      y: 1,
+      w: 2.5,
+      h: 3.5,
+    });
+  }
+
+  // Steps rendering
+  steps.forEach((step, i) => {
+    const yBase = 1 + i * 1.2;
+
+    // Number circle
+    slide.addShape(pptx.ShapeType.ellipse, {
+      x: contentX,
+      y: yBase,
+      w: circleSize,
+      h: circleSize,
+      fill: { color: bulletColor },
+      line: { color: bulletColor },
+    });
+
+    // Number text
+    slide.addText(step.number.toString(), {
+      x: contentX,
+      y: yBase,
+      w: circleSize,
+      h: circleSize,
+      align: "center",
+      valign: "middle",
+      fontSize: 10,
+      color: "FFFFFF",
+      bold: true,
+    });
+
+    // Heading text
+    slide.addText(step.heading, {
+      x: contentX + 0.4,
+      y: yBase,
+      w: contentW,
+      fontSize: 12,
+      bold: true,
+      color: headingColor,
+    });
+
+    // Description text
+    slide.addText(step.description, {
+      x: contentX + 0.4,
+      y: yBase + 0.35,
+      w: contentW,
+      fontSize: 10.5,
+      color: subHeadingColor,
+      breakLine: true,
+      lineSpacing: 14,
+    });
+  });
+
+  return slide;
+}
 export default SlideValidateIdea;
