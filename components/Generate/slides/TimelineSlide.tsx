@@ -1,6 +1,7 @@
 import React from "react";
 import { tool } from "ai";
 import { z } from "zod";
+import PptxGenJS from "pptxgenjs";
 
 export const TimelineSlideTool = tool({
   description: "Create a vertical timeline slide for various content types",
@@ -85,5 +86,86 @@ export const TimelineSlide: React.FC<TimelineSlideProps> = ({
     </div>
   );
 };
+
+export function generateTimelineSlide(
+  pptx: PptxGenJS,
+  data: TimelineSlideProps
+) {
+  const {
+    title,
+    subtitle,
+    items,
+    titleColor = "#0f172a",
+    subtitleColor = "#334155",
+    labelColor = "#2563eb",
+  } = data;
+
+  const slide = pptx.addSlide();
+
+  // Set slide background
+  slide.background = { color: "#fffbe6" };
+
+  // Add subtitle
+  slide.addText(subtitle, {
+    x: 0.5,
+    y: 0.5,
+    w: 9,
+    h: 0.4,
+    fontSize: 16,
+    color: subtitleColor,
+    align: "left",
+  });
+
+  // Add main title
+  slide.addText(title, {
+    x: 0.5,
+    y: 1.0,
+    w: 9,
+    h: 0.8,
+    fontSize: 32,
+    bold: true,
+    color: titleColor,
+    align: "left",
+  });
+
+  // Calculate positions for items
+  const startX = 0.5;
+  const totalWidth = 9;
+  const itemWidth = totalWidth / 3;  // Divide into 3 equal parts
+  const contentStartY = 2.2;
+
+  // Add timeline items
+  items.forEach((item, idx) => {
+    const x = startX + (idx * itemWidth);
+
+    // Add year/phase label
+    slide.addText(item.label, {
+      x: x,
+      y: contentStartY,
+      w: itemWidth - 0.2,  // Slight gap between columns
+      h: 0.3,
+      fontSize: 14,
+      bold: true,
+      color: labelColor,
+      align: "left",
+    });
+
+    // Add description
+    slide.addText(item.description, {
+      x: x,
+      y: contentStartY - 0.1,
+      w: itemWidth - 0.2,
+      h: 2,
+      fontSize: 12,
+      color: subtitleColor,
+      align: "left",
+      breakLine: true,
+      wrap: true,
+      lineSpacing: 16,
+    });
+  });
+
+  return slide;
+}
 
 export default TimelineSlide;
