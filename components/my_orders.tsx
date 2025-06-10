@@ -84,7 +84,7 @@ export default function MyOrders() {
       price: apiOrder.totalAmount.toFixed(2),
       copies: document?.copies || 1,
       progress: calculateProgress(apiOrder.status),
-      image: document?.fileUrl || '/pdf_file.png',
+      image: '/pdf_file.png',
       latitude: apiOrder.latitude,
       longitude: apiOrder.longitude,
       showTrack: false,
@@ -123,14 +123,13 @@ export default function MyOrders() {
     setTrackingOrderId(trackingOrderId === orderNo ? null : orderNo);
   };
 
-  // Generate Google Maps URL from latitude and longitude
-  const getMapUrl = (order: Order) => {
-    if (order.latitude && order.longitude) {
-      return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.241280380801!2d${order.longitude}!3d${order.latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${order.latitude},${order.longitude}!5e0!3m2!1sen!2sin!4v1708425086404!5m2!1sen!2sin`;
-    }
-    return `https://www.google.com/maps/embed?q=${encodeURIComponent(order.address)}`;
-  };
-
+  
+ const getMapUrl = (order: Order) => {
+  if (order.latitude && order.longitude) {
+    return `https://www.google.com/maps?q=${order.latitude},${order.longitude}&z=15&output=embed&markers=color:red%7C${order.latitude},${order.longitude}`;
+  }
+  return `https://www.google.com/maps?q=${encodeURIComponent(order.address)}&z=15&output=embed`;
+};
   const filteredOrders = filterStatus === "All" 
     ? ordersData 
     : ordersData.filter(order => order.status === filterStatus);
@@ -298,40 +297,40 @@ export default function MyOrders() {
                           </div>
                         </div>
 
-                        {/* Map */}
                         <div className="bg-white p-4 rounded-lg border border-[#e9eaf0]">
-                          <h3 className="text-lg font-semibold mb-4">Delivery Location</h3>
-                          <div className="h-64 rounded-lg overflow-hidden">
-                            <iframe
-                              src={getMapUrl(order)}
-                              width="100%"
-                              height="100%"
-                              style={{ border: 0 }}
-                              allowFullScreen
-                              loading="lazy"
-                              referrerPolicy="no-referrer-when-downgrade"
-                            ></iframe>
-                          </div>
-                          <div className="mt-2 text-right">
-                            <a 
-                              href={`https://www.google.com/maps/dir/?api=1&destination=${order.latitude},${order.longitude}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
-                            >
-                              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M9 5l7 7-7 7"
-                                />
-                              </svg>
-                              Get Directions
-                            </a>
-                          </div>
-                        </div>
-                      </div>
+          <h3 className="text-lg font-semibold mb-4">Delivery Location</h3>
+          <div className="h-64 rounded-lg overflow-hidden relative">
+            <iframe
+              src={getMapUrl(order)}
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              aria-label={`Map showing delivery location for ${order.address}`}
+            ></iframe>
+            <div className="absolute bottom-4 right-4 bg-white p-2 rounded-lg shadow-md">
+              <a 
+                href={`https://www.google.com/maps/dir/?api=1&destination=${order.latitude},${order.longitude}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+                Get Directions
+              </a>
+            </div>
+          </div>
+                     </div>
+                     </div>
                     )}
                   </div>
                 ))
