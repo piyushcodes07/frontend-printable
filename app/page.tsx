@@ -21,8 +21,10 @@ import CategoriesSection from "@/components/HomePage/CategoriesSection";
 import { Badge } from "@/components/ui/badge";
 import PageCard from "@/components/HomePage/Shopcard";
 import Link from "next/link";
+import Homefooter from "@/components/HomePage/Homefooter";
 import { Span } from "next/dist/trace";
 import { labelDayButton } from "react-day-picker";
+import HomeTools from "@/components/HomePage/HomeTools";
 
 const tools = [
   { label: "AI PDF", img: "/ai-pdf.png", color: "bg-[#61E987]" },
@@ -372,8 +374,15 @@ export default function Page() {
           <div className="ml-[14.1%] mt-[100px]">
             {/* categories section */}
             <CategoriesSection categories={categories} />
-            
-            <PageCard />
+            <div className="bg-[#EFFDF3] ">
+              {/* Content container */}
+              <div className="p-5">
+                <HomeTools />
+              </div>
+              <div className="p-5">
+                <Homefooter />
+              </div>
+            </div>
           </div>
         </div>
       </div>
