@@ -368,23 +368,47 @@ export default function Page() {
 
             {/* Options below center navigation */}
             <Options tools={tools} />
-            {/* Print Shops Card */}
           </div>
 
           <div className="ml-[14.1%] mt-[100px]">
             {/* categories section */}
             <CategoriesSection categories={categories} />
-            <div className="bg-[#EFFDF3] ">
-              {/* Content container */}
-              <div className="p-5">
-                <HomeTools />
-              </div>
-              <div className="p-5">
-                <Homefooter />
-              </div>
+          </div>
+
+          {/* Print Shops Card */}
+          {/* <PageCard /> */}
+
+          {/* NEED HELP */}
+          <div
+            className="flex flex-col justify-center text-center w-[1420px] h-[330px] rounded-[12px] mt-[83] mb-[160]"
+            style={{
+              backgroundImage: "url('/frame.png')",
+              backgroundSize: "cover",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
+            }}
+          >
+            <div className="mb-[35]">
+              <h2 className="text-[#FFFFFF] text-[40px]"> Need Help ? </h2>
+              <h4 className="text-[#FFFFFF] text-base mt-[10]">
+                {" "}
+                Our support team is here to help{" "}
+              </h4>
+            </div>
+            <div>
+              <button className="bg-[#FFFFFF] text-base py-[10px] px-[20px] rounded-[12px]">
+                {" "}
+                Get Support{" "}
+              </button>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* FOOTER */}
+      <div className="w-full bg-[#EFFDF3]">
+        <HomeTools />
+        <Homefooter />
       </div>
     </div>
   );
