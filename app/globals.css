@@ -171,3 +171,19 @@ input[type="color"] {
 .animate-fade-slide {
     animation: fade-slide 0.3s ease-out forwards;
 }
+
+.glass-box {
+    backdrop-filter: blur(30px);
+    background-color: rgba(255, 255, 255, 0.2);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 10px;
+    transition: all 0.4s ease-in-out;
+    border: 1px solid rgba(97, 233, 135, 0.5);
+    cursor: pointer;
+}
+  
+.glass-box:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}

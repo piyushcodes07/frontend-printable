@@ -83,9 +83,9 @@ export function NavBar() {
   };
 
   return (
-    <header className="bg-[#06044b] text-white w-full">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <header className="bg-[#06044b] text-white w-full h-[80px]">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-[80px]">
           {/* Logo and Desktop Navigation */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
@@ -93,7 +93,7 @@ export function NavBar() {
                 <MainLogo />
               </Link>
             </div>
-            <nav className="hidden md:ml-8 md:flex md:space-x-8">
+            <nav className="hidden md:ml-8 md:flex md:space-x-5">
               {/* Tools Drop Down */}
               <ToolsDropDown
                 isOpen={activeDropdown === "tools"}
@@ -106,16 +106,23 @@ export function NavBar() {
               />
               <Link
                 href="/esign"
-                className="px-3 py-2 text-sm font-medium hover:text-[#61e987]"
+                className="px-3 py-2 text-lg font-medium hover:text-[#61e987]"
               >
                 E - Sign
               </Link>
               <Link
                 href={`/print-and-deliver/${User.user?.id}`}
-                className="px-3 py-2 text-sm font-medium hover:text-[#61e987]"
+                className="px-3 py-2 text-lg font-medium hover:text-[#61e987]"
               >
                 {" "}
                 Print & Deliver
+              </Link>
+              <Link
+                href={`/resource`}
+                className="px-3 py-2 text-lg font-medium hover:text-[#61e987]"
+              >
+                {" "}
+                Resource
               </Link>
             </nav>
           </div>
@@ -129,7 +136,7 @@ export function NavBar() {
               <Input
                 type="text"
                 placeholder="Search"
-                className="pl-10 pr-4 py-2 bg-white text-black rounded-full w-64 focus:outline-none focus:ring-2 focus:ring-[#61e987]"
+                className="h-[50px] w-64 pl-10 pr-4 py-2 bg-white text-black rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#61e987]"
               />
             </div>
             <Button

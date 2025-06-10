@@ -271,9 +271,30 @@ export default function ConvertDropdown({
     <div className="relative hover:text-[#61e987]">
       <button
         onClick={() => onToggle(!isOpen)}
-        className="px-3 py-2 text-sm font-medium flex items-center hover:cursor-pointer hover:underline"
+        className="px-3 py-2 text-lg font-medium flex gap-1 items-center hover:cursor-pointer hover:underline"
       >
-        Convert ▼
+        Convert
+        <span
+          className={`transform transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        >
+          <svg
+            width="10"
+            height="6"
+            viewBox="0 0 10 6"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M1 1L5 5L9 1"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
       </button>
       <AnimatePresence>
         {isOpen && (

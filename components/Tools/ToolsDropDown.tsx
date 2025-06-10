@@ -681,7 +681,7 @@ export default function ToolsDropDown({
     <div className="relative hover:text-[#61e987]">
       <button
         onClick={() => onToggle(!isOpen)}
-        className="px-3 py-2 text-sm font-medium flex items-center gap-1 hover:cursor-pointer"
+        className="px-3 py-2 text-lg font-medium flex items-center gap-1 hover:cursor-pointer"
       >
         Tool
         <span

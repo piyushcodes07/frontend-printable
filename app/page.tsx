@@ -12,12 +12,17 @@ import {
   FaSignature,
   FaTruck,
 } from "react-icons/fa";
+// HomePage UI Components
 import { Card, CardContent } from "@/components/ui/card";
+import CenterNavigation from "@/components/HomePage/CenterNavigation";
+import Options from "@/components/HomePage/Options";
+import CategoriesSection from "@/components/HomePage/CategoriesSection";
+
 import { Badge } from "@/components/ui/badge";
 import PageCard from "@/components/HomePage/Shopcard";
-import UplodeBox from "../components/HomePage/UplodeBox";
 import Link from "next/link";
 import { Span } from "next/dist/trace";
+import { labelDayButton } from "react-day-picker";
 
 const tools = [
   { label: "AI PDF", img: "/ai-pdf.png", color: "bg-[#61E987]" },
@@ -45,7 +50,7 @@ const tools = [
   },
   {
     label: "AI Scan",
-    img: "/ai-scan.png",
+    img: "/Camera.png",
     color: "bg-gradient-to-b from-[#BDC2E8] to-[#E6DEE9E6]",
   },
   {
@@ -54,6 +59,16 @@ const tools = [
     color: "bg-gradient-to-b from-[#517FA4] to-[#243949]",
   },
   { label: "More", color: "bg-[#000000] text-white" },
+];
+
+const categories = [
+  { label: "Business Cards", img: "/Categories/Mockup.png" },
+  { label: "Postcards & Advertising", img: "/Categories/Thumbnail.png" },
+  { label: "Banners & Posters", img: "/Categories/banner.png" },
+  { label: "Packaging", img: "/Categories/coffee_cup.png" },
+  { label: "Promotional Products", img: "/Categories/coffeecan.png" },
+  { label: "Stationary & Invitations", img: "/Categories/Stationary.png" },
+  { label: "View All", img: "/Categories/solidcover.png" },
 ];
 
 const routeMap = [
@@ -264,7 +279,8 @@ export default function Page() {
     <div className="flex flex-col items-center bg-[#F3F4F6] min-h-screen">
       <div className="w-full max-w-6xl mx-auto">
         <div className="w-full flex flex-col items-center py-10 px-4 font-[Poppins]">
-          <div className="w-full max-w-6xl flex justify-center mb-8 px-4">
+          {/* AI SEARCH BAR */}
+          {/* <div className="w-full max-w-6xl flex justify-center mb-8 px-4">
             <div className="w-full max-w-5xl flex items-center gap-3 bg-gray-100 rounded-full px-6 py-3 shadow-inner transition-all duration-100 ease-in-out hover:bg-[#E2E2E2] hover:border-2 hover:border-[#06044B] hover:shadow-2xl">
               <span className="text-2xl text-[#06044B] font-bold">🔍</span>
               <input
@@ -275,11 +291,10 @@ export default function Page() {
                 value={inputText}
               />
             </div>
-          </div>
+          </div> */}
           {inputText != "" && !service && (
             <div className="text-black">Your prompt is not clear enough!!</div>
           )}
-
           {service && (
             <div className="w-full max-w-4xl mb-8 px-4">
               <div className="mb-4">
@@ -335,38 +350,31 @@ export default function Page() {
             </div>
           )}
 
-          <UplodeBox
-            dropdownOpen={dropdownOpen}
-            setDropdownOpen={setDropdownOpen}
-            dropdownMenuRef={dropdownMenuRef}
-            fileInputRef={fileInputRef}
-            handleFromDeviceClick={handleFromDeviceClick}
-            handleFromDriveClick={handleFromDriveClick}
-          />
+          {/* home page */}
+          <div>
+            {/* greeting */}
+            <div>
+              <h1 className="text-5xl">Good Evening, Jay</h1>
+              <h3 className="text-[#61E987] text-[20px] mb-[42px] mt-[7px] ml-[5px]">
+                {" "}
+                Let's get your printing done—faster, smarter, and locally.
+              </h3>
+            </div>
 
-          <div className="flex flex-wrap justify-center mt-28 gap-4 px-4">
-            {tools.map((tool, idx) => (
-              <div key={idx} className="flex flex-col items-center gap-1 group">
-                <div
-                  className={`w-14 h-14 rounded-full ${tool.color} flex items-center justify-center shadow-md 
-                  group-hover:scale-110 transform transition duration-300 ease-in-out cursor-pointer`}
-                >
-                  {tool.img && (
-                    <img
-                      src={tool.img || "/placeholder.svg"}
-                      alt={tool.label}
-                      className="w-8 h-8 object-contain transition duration-300 group-hover:scale-125"
-                    />
-                  )}
-                </div>
-                <div className="text-[11px] font-medium text-center">
-                  {tool.label}
-                </div>
-              </div>
-            ))}
+            {/* main navigation panel */}
+            <CenterNavigation />
+
+            {/* Options below center navigation */}
+            <Options tools={tools} />
+            {/* Print Shops Card */}
           </div>
 
-          <PageCard />
+          <div className="ml-[14.1%] mt-[100px]">
+            {/* categories section */}
+            <CategoriesSection categories={categories} />
+            
+            <PageCard />
+          </div>
         </div>
       </div>
     </div>
