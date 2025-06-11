@@ -12,24 +12,23 @@ function Homefooter() {
           <div className="mb-6">
             <div className="flex">
               <Image
-                src="/PrintableLogo.svg"
+                src="/footerlogo.png"
                 alt="Printable Logo"
-                width={75}
-                height={20}
-                className="mb-4"
+                width={65}
+                height={55}
               />
               <Image
                 src="/Printable.svg"
                 alt="Printable Logo"
                 width={150}
                 height={50}
-                className="mb-4"
+                className="mb-2"
               />
             </div>
             <p className="text-lg text-black">Print • Anytime • Anywhere</p>
           </div>
           <div className="mt-4">
-            <p className="text-base text-gray-600 mb-4">Printable Mobile App</p>
+            <p className="text-base text-gray-600 mb-3">Printable Mobile App</p>
             <div className="flex space-x-4">
               <Image
                 src="playstore.svg"
