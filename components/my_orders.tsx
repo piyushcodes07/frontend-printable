@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -32,9 +31,20 @@ interface Order {
   latitude?: string;
   longitude?: string;
   showTrack?: boolean;
+  merchantId?: string;
 }
 
-// Timeline steps configuration
+interface Merchant {
+  id: string;
+  name: string;
+  shopName: string;
+  address: string;
+  latitude: string;
+  longitude: string;
+  city: string;
+  state: string;
+}
+
 const timelineSteps = [
   { status: 'Processing', label: 'Order Placed', progress: 20 },
   { status: 'Shipped', label: 'Shipped', progress: 60 },
@@ -43,14 +53,40 @@ const timelineSteps = [
 
 export default function MyOrders() {
   const [ordersData, setOrdersData] = useState<Order[]>([]);
+  const [merchants, setMerchants] = useState<Record<string, Merchant>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useUser();
   const [filterStatus, setFilterStatus] = useState<"All" | OrderStatus>("All");
   const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
 
-  // Transform API data to Order interface
-  function transformApiOrder(apiOrder: any): Order {
+  // Fetch merchant details
+  const fetchMerchant = async (merchantId: string): Promise<Merchant | null> => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/merchant/${merchantId}`);
+      if (!response.ok) throw new Error('Merchant not found');
+      const data = await response.json();
+      
+      if (!data.success) throw new Error('Failed to fetch merchant');
+      
+      return {
+        id: data.data.id,
+        name: data.data.name,
+        shopName: data.data.shopName,
+        address: data.data.address,
+        latitude: data.data.latitude,
+        longitude: data.data.longitude,
+        city: data.data.city,
+        state: data.data.state
+      };
+    } catch (error) {
+      console.error(`Error fetching merchant ${merchantId}:`, error);
+      return null;
+    }
+  };
+
+  // Transform API order data
+  const transformApiOrder = (apiOrder: any): Order => {
     const document = apiOrder.documents?.[0];
     
     const mapStatus = (status: string): OrderStatus => {
@@ -61,11 +97,6 @@ export default function MyOrders() {
         case 'cancelled': return 'Cancelled';
         default: return 'Processing';
       }
-    };
-
-    const calculateProgress = (status: string): number => {
-      const step = timelineSteps.find(step => step.status === mapStatus(status));
-      return step ? step.progress : 0;
     };
 
     return {
@@ -85,54 +116,85 @@ export default function MyOrders() {
       copies: document?.copies || 1,
       progress: calculateProgress(apiOrder.status),
       image: '/pdf_file.png',
+      merchantId: apiOrder.merchantId,
       latitude: apiOrder.latitude,
       longitude: apiOrder.longitude,
-      showTrack: false,
     };
-  }
+  };
 
-  // Fetch orders from API
+  const calculateProgress = (status: string): number => {
+    const step = timelineSteps.find(step => step.status.toLowerCase() === status.toLowerCase());
+    return step ? step.progress : 0;
+  };
+
+  // Fetch all data
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAllData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/order/user/user_2xxPGCjYNgyeR8rHP4gp27Q82CY', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        if (!response.ok) {
-          throw new Error('Failed to fetch orders');
-        }
-        const data = await response.json();
-        const transformedOrders = data.map(transformApiOrder);
+        setLoading(true);
+        
+        // 1. Fetch orders
+        const ordersRes = await fetch('http://localhost:5000/api/order/user/user_2xxPGCjYNgyeR8rHP4gp27Q82CY');
+        if (!ordersRes.ok) throw new Error('Failed to fetch orders');
+        const ordersData = await ordersRes.json();
+        
+        const transformedOrders = ordersData.map(transformApiOrder);
         setOrdersData(transformedOrders);
+
+        // 2. Fetch unique merchants
+        const uniqueMerchantIds = [...new Set(transformedOrders.map(o => o.merchantId))];
+        const merchantsData = await Promise.all(
+          uniqueMerchantIds.map(id => id ? fetchMerchant(id) : Promise.resolve(null))
+        );
+
+        // Create merchants map
+        const merchantsMap = merchantsData.reduce((acc, merchant) => {
+          if (merchant) acc[merchant.id] = merchant;
+          return acc;
+        }, {} as Record<string, Merchant>);
+
+        setMerchants(merchantsMap);
       } catch (err) {
-        console.error('Error fetching order details:', err);
+        console.error('Error fetching data:', err);
         setError(err instanceof Error ? err.message : 'Unknown error occurred');
       } finally {
         setLoading(false);
       }
     };
-    
-    fetchData();
+
+    fetchAllData();
   }, []);
 
-  // Toggle tracking view for an order
+  // Combine order with merchant data
+  const getEnhancedOrders = () => {
+    return ordersData.map(order => {
+      const merchant = order.merchantId ? merchants[order.merchantId] : null;
+      return {
+        ...order,
+        shop: merchant?.shopName || `Merchant ${order.merchantId}`,
+        address: merchant 
+          ? `${merchant.address}, ${merchant.city}, ${merchant.state}`
+          : order.address,
+        latitude: merchant?.latitude || order.latitude,
+        longitude: merchant?.longitude || order.longitude,
+      };
+    });
+  };
+
+  const getMapUrl = (order: Order) => {
+    if (order.latitude && order.longitude) {
+      return `https://www.google.com/maps?q=${order.latitude},${order.longitude}&z=15&output=embed&markers=color:red%7C${order.latitude},${order.longitude}`;
+    }
+    return `https://www.google.com/maps?q=${encodeURIComponent(order.address)}&z=15&output=embed`;
+  };
+
   const toggleTracking = (orderNo: string) => {
     setTrackingOrderId(trackingOrderId === orderNo ? null : orderNo);
   };
 
-  
- const getMapUrl = (order: Order) => {
-  if (order.latitude && order.longitude) {
-    return `https://www.google.com/maps?q=${order.latitude},${order.longitude}&z=15&output=embed&markers=color:red%7C${order.latitude},${order.longitude}`;
-  }
-  return `https://www.google.com/maps?q=${encodeURIComponent(order.address)}&z=15&output=embed`;
-};
   const filteredOrders = filterStatus === "All" 
-    ? ordersData 
-    : ordersData.filter(order => order.status === filterStatus);
+    ? getEnhancedOrders() 
+    : getEnhancedOrders().filter(order => order.status === filterStatus);
 
   if (loading) return <div className="min-h-screen bg-[#e9eaf0] py-10 px-10 flex items-center justify-center">Loading orders...</div>;
   if (error) return <div className="min-h-screen bg-[#e9eaf0] py-10 px-10 flex items-center justify-center">Error: {error}</div>;
