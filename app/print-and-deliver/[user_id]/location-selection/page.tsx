@@ -26,6 +26,7 @@ import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useUser } from "@clerk/nextjs";
 // --- End React Toastify Imports ---
+import { useRouter } from "next/navigation";
 
 interface Merchant {
   merchantId: string;
@@ -100,6 +101,7 @@ declare global {
 
 export default function LocationSelectionPage() {
   const { user } = useUser();
+  const router = useRouter();
   const handelOrderSubmit = async () => {
     if (!selectedMerchant) {
       toast.error("Please select a merchant.", {
@@ -154,6 +156,8 @@ export default function LocationSelectionPage() {
           transition: Bounce,
         });
         // Optionally, you can redirect or clear the form here
+
+        router.push("/orders");
       } else {
         toast.error(
           res.message || "Order submission failed. Please try again.",
