@@ -65,7 +65,7 @@ export default function MyOrders() {
   ): Promise<Merchant | null> => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/merchant/${merchantId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_ROOT_URL}/api/merchant/${merchantId}`,
       );
       if (!response.ok) throw new Error("Merchant not found");
       const data = await response.json();
