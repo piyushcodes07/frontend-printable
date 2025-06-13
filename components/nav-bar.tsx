@@ -111,7 +111,7 @@ export function NavBar() {
                 E - Sign
               </Link>
               <Link
-                href={`/print-and-deliver/${User.user?.id}`}
+                href={`/print-and-deliver/print`}
                 className="px-3 py-2 text-sm font-medium hover:text-[#61e987]"
               >
                 {" "}
@@ -235,7 +235,7 @@ export function NavBar() {
                 className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
                 onClick={() =>
                   handleMobileSectionClick(
-                    mobileActiveSection === "tools" ? null : "tools"
+                    mobileActiveSection === "tools" ? null : "tools",
                   )
                 }
               >
@@ -268,7 +268,7 @@ export function NavBar() {
                 className="block w-full text-left px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
                 onClick={() =>
                   handleMobileSectionClick(
-                    mobileActiveSection === "convert" ? null : "convert"
+                    mobileActiveSection === "convert" ? null : "convert",
                   )
                 }
               >
@@ -305,7 +305,7 @@ export function NavBar() {
                 E - Sign
               </Link>
               <Link
-                href={`/print-and-deliver/${User.user?.id}`}
+                href={`/print-and-deliver/print`}
                 className="block px-3 py-2 text-base font-medium hover:bg-[#06044b]/50 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >

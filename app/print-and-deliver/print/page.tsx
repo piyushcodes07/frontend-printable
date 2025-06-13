@@ -28,7 +28,7 @@ export default function PrintablePage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
 
   const [statusMessage, setStatusMessage] = useState<{
     text: string;
@@ -325,12 +325,12 @@ export default function PrintablePage() {
             <Button
               className="bg-[#06044b] hover:bg-[#06044b]/90 text-white px-6 uppercase text-xs font-semibold tracking-wider"
               onClick={() =>
-                router.push(`/print-and-deliver/${User.user?.id}/print-options`)
+                router.push(`/print-and-deliver/print/print-options`)
               }
               disabled={
                 isUploading ||
                 order.documents.length === 0 ||
-                order.documents.some((f) => f.uploading || f.error)
+                order.documents.some((f) => f.uploading || f.error || !isLoaded)
               }
             >
               {isUploading ? (

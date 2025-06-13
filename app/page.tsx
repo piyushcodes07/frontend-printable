@@ -18,6 +18,7 @@ import PageCard from "@/components/HomePage/Shopcard";
 import UplodeBox from "../components/HomePage/UplodeBox";
 import Link from "next/link";
 import { Span } from "next/dist/trace";
+import { useRouter } from "next/navigation";
 
 const tools = [
   { label: "AI PDF", img: "/ai-pdf.png", color: "bg-[#61E987]" },
@@ -157,7 +158,7 @@ function levenshteinTwoMatrixRows(str1: string, str2: string) {
           Math.min(
             currRow[j - 1], // Insert
             prevRow[j], // Remove
-            prevRow[j - 1] // Replace
+            prevRow[j - 1], // Replace
           );
       }
     }
@@ -205,7 +206,7 @@ const getRouteFromQuery = (query: string) => {
   let suggested_route = null;
   for (const route of routeMap) {
     const intersection = route.keywords.filter((value) =>
-      tokens.includes(value)
+      tokens.includes(value),
     );
     const match_percentage = intersection.length / route.keywords.length;
     const prev = matchAccuracy;
@@ -220,6 +221,7 @@ const getRouteFromQuery = (query: string) => {
 };
 
 export default function Page() {
+  const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const dropdownMenuRef = useRef<HTMLDivElement | null>(null);
@@ -247,6 +249,7 @@ export default function Page() {
   };
 
   useEffect(() => {
+    router.push("/print-and-deliver/print");
     function handleClickOutside(event: MouseEvent) {
       if (
         dropdownMenuRef.current &&
@@ -348,7 +351,7 @@ export default function Page() {
             {tools.map((tool, idx) => (
               <div key={idx} className="flex flex-col items-center gap-1 group">
                 <div
-                  className={`w-14 h-14 rounded-full ${tool.color} flex items-center justify-center shadow-md 
+                  className={`w-14 h-14 rounded-full ${tool.color} flex items-center justify-center shadow-md
                   group-hover:scale-110 transform transition duration-300 ease-in-out cursor-pointer`}
                 >
                   {tool.img && (
