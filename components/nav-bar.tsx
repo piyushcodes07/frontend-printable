@@ -36,7 +36,7 @@ export function NavBar() {
                 <MainLogo />
               </Link>
             </div>
-            <nav className="hidden md:ml-8 md:flex md:space-x-8">
+            <nav className="hidden  md:flex md:space-x-4">
               {/* Tools Drop Down */}
               <ToolsDropDown
                 isOpen={activeDropdown === "tools"}
@@ -49,13 +49,13 @@ export function NavBar() {
               />
               <Link
                 href="/esign"
-                className="px-3 py-2 text-sm font-medium hover:text-[#61e987]"
+                className="px-1 py-2 text-sm font-medium hover:text-[#61e987]"
               >
                 E - Sign
               </Link>
               <Link
                 href={`/print-and-deliver/${User.user?.id}`}
-                className="px-3 py-2 text-sm font-medium hover:text-[#61e987]"
+                className="px-1 py-2 text-sm font-medium hover:text-[#61e987]"
               >
                 {" "}
                 Print & Deliver
@@ -64,7 +64,7 @@ export function NavBar() {
           </div>
 
           {/* Search and User Actions */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-2">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-4 w-4 text-gray-400" />
@@ -110,8 +110,8 @@ export function NavBar() {
                 </SignInButton>
                 <SignUpButton>
                   <Button
-                    variant="outline"
-                    className="text-white hover:bg-[#06044b]/50 border-white hover:cursor-pointer"
+                    variant="ghost"
+                    className="!text-white hover:bg-[white]/50 border-white hover:cursor-pointer"
                   >
                     Sign Up
                   </Button>

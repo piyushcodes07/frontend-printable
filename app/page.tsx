@@ -19,6 +19,11 @@ import UplodeBox from "../components/HomePage/UplodeBox";
 import Link from "next/link";
 import { Span } from "next/dist/trace";
 
+import Categories from "@/components/HomePage/Categories";
+import Activity from "@/components/HomePage/Activity";
+import HelpSection from "@/components/HomePage/HelpSection";
+import Footer from "@/components/Footer/page";
+
 const tools = [
   { label: "AI PDF", img: "/ai-pdf.png", color: "bg-[#61E987]" },
   { label: "Convert", img: "/convert.png", color: "bg-[#06044B]" },
@@ -261,114 +266,126 @@ export default function Page() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center bg-[#F3F4F6] min-h-screen">
-      <div className="w-full max-w-6xl mx-auto">
-        <div className="w-full flex flex-col items-center py-10 px-4 font-[Poppins]">
-          <div className="w-full max-w-6xl flex justify-center mb-8 px-4">
-            <div className="w-full max-w-5xl flex items-center gap-3 bg-gray-100 rounded-full px-6 py-3 shadow-inner transition-all duration-100 ease-in-out hover:bg-[#E2E2E2] hover:border-2 hover:border-[#06044B] hover:shadow-2xl">
-              <span className="text-2xl text-[#06044B] font-bold">🔍</span>
-              <input
-                type="text"
-                placeholder="Search print, AI tools, convert and more……"
-                className="flex-grow px-2 py-2 rounded-full bg-transparent outline-none text-sm text-[#06044B]"
-                onChange={handleInput}
-                value={inputText}
-              />
-            </div>
-          </div>
-          {inputText != "" && !service && (
-            <div className="text-black">Your prompt is not clear enough!!</div>
-          )}
-
-          {service && (
-            <div className="w-full max-w-4xl mb-8 px-4">
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold text-[#06044B] mb-2">
-                  Suggested Service
-                </h3>
+    <div>
+      <div className="flex flex-col items-center bg-[#F3F4F6] min-h-screen">
+        <div className="w-full max-w-6xl mx-auto">
+          <div className="w-full flex flex-col items-center py-10 px-4 font-[Poppins]">
+            <div className="w-full max-w-6xl flex justify-center mb-8 px-4">
+              <div className="w-full max-w-5xl flex items-center gap-3 bg-gray-100 rounded-full px-6 py-3 shadow-inner transition-all duration-100 ease-in-out hover:bg-[#E2E2E2] hover:border-2 hover:border-[#06044B] hover:shadow-2xl">
+                <span className="text-2xl text-[#06044B] font-bold">🔍</span>
+                <input
+                  type="text"
+                  placeholder="Search print, AI tools, convert and more……"
+                  className="flex-grow px-2 py-2 rounded-full bg-transparent outline-none text-sm text-[#06044B]"
+                  onChange={handleInput}
+                  value={inputText}
+                />
               </div>
+            </div>
+            {inputText != "" && !service && (
+              <div className="text-black">
+                Your prompt is not clear enough!!
+              </div>
+            )}
 
-              <Link href={service.path} className="block">
-                <Card className="group hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 border-0 overflow-hidden">
-                  <CardContent className="p-0">
-                    <div
-                      className={`bg-gradient-to-r ${service.gradient} p-6 text-white relative overflow-hidden`}
-                    >
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
-                      <div className="relative z-10 flex items-center gap-4">
-                        <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 group-hover:scale-110 transition-transform duration-300">
-                          <service.icon className="w-8 h-8 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="text-xl font-bold mb-1">
-                            {service.title}
-                          </h4>
-                          <p className="text-white/90 text-sm">
-                            {service.description}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge
-                            variant="secondary"
-                            className="bg-white/20 text-white border-white/30 hover:bg-white/30"
-                          >
-                            Quick Access
-                          </Badge>
-                          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300">
-                            <FaChevronDown className="w-4 h-4 text-white rotate-[-90deg]" />
+            {service && (
+              <div className="w-full max-w-4xl mb-8 px-4">
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-[#06044B] mb-2">
+                    Suggested Service
+                  </h3>
+                </div>
+
+                <Link href={service.path} className="block">
+                  <Card className="group hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 border-0 overflow-hidden">
+                    <CardContent className="p-0">
+                      <div
+                        className={`bg-gradient-to-r ${service.gradient} p-6 text-white relative overflow-hidden`}
+                      >
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+                        <div className="relative z-10 flex items-center gap-4">
+                          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 group-hover:scale-110 transition-transform duration-300">
+                            <service.icon className="w-8 h-8 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-xl font-bold mb-1">
+                              {service.title}
+                            </h4>
+                            <p className="text-white/90 text-sm">
+                              {service.description}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              variant="secondary"
+                              className="bg-white/20 text-white border-white/30 hover:bg-white/30"
+                            >
+                              Quick Access
+                            </Badge>
+                            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform duration-300">
+                              <FaChevronDown className="w-4 h-4 text-white rotate-[-90deg]" />
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="p-4 bg-white">
-                      <div className="flex items-center justify-between text-sm text-gray-600">
-                        <span>Click to access this service</span>
-                        <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
-                          {service.keywords.join(", ")}
-                        </span>
+                      <div className="p-4 bg-white">
+                        <div className="flex items-center justify-between text-sm text-gray-600">
+                          <span>Click to access this service</span>
+                          <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
+                            {service.keywords.join(", ")}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            </div>
-          )}
-
-          <UplodeBox
-            dropdownOpen={dropdownOpen}
-            setDropdownOpen={setDropdownOpen}
-            dropdownMenuRef={dropdownMenuRef}
-            fileInputRef={fileInputRef}
-            handleFromDeviceClick={handleFromDeviceClick}
-            handleFromDriveClick={handleFromDriveClick}
-          />
-
-          <div className="flex flex-wrap justify-center mt-28 gap-4 px-4">
-            {tools.map((tool, idx) => (
-              <div key={idx} className="flex flex-col items-center gap-1 group">
-                <div
-                  className={`w-14 h-14 rounded-full ${tool.color} flex items-center justify-center shadow-md 
-                  group-hover:scale-110 transform transition duration-300 ease-in-out cursor-pointer`}
-                >
-                  {tool.img && (
-                    <img
-                      src={tool.img || "/placeholder.svg"}
-                      alt={tool.label}
-                      className="w-8 h-8 object-contain transition duration-300 group-hover:scale-125"
-                    />
-                  )}
-                </div>
-                <div className="text-[11px] font-medium text-center">
-                  {tool.label}
-                </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               </div>
-            ))}
-          </div>
+            )}
 
-          <PageCard />
+            <UplodeBox
+              dropdownOpen={dropdownOpen}
+              setDropdownOpen={setDropdownOpen}
+              dropdownMenuRef={dropdownMenuRef}
+              fileInputRef={fileInputRef}
+              handleFromDeviceClick={handleFromDeviceClick}
+              handleFromDriveClick={handleFromDriveClick}
+            />
+
+            <div className="flex flex-wrap justify-center mt-28 gap-4 px-4">
+              {tools.map((tool, idx) => (
+                <div
+                  key={idx}
+                  className="flex flex-col items-center gap-1 group"
+                >
+                  <div
+                    className={`w-14 h-14 rounded-full ${tool.color} flex items-center justify-center shadow-md 
+                  group-hover:scale-110 transform transition duration-300 ease-in-out cursor-pointer`}
+                  >
+                    {tool.img && (
+                      <img
+                        src={tool.img || "/placeholder.svg"}
+                        alt={tool.label}
+                        className="w-8 h-8 object-contain transition duration-300 group-hover:scale-125"
+                      />
+                    )}
+                  </div>
+                  <div className="text-[11px] font-medium text-center">
+                    {tool.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <Categories />
+
+            <PageCard />
+          </div>
+          <Activity />
+          <HelpSection />
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
