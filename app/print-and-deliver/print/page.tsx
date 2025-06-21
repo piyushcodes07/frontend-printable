@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   FileText,
   Printer,
@@ -36,6 +36,9 @@ export default function PrintablePage() {
   } | null>(null);
   const router = useRouter();
   const { deleteFile, uploadFile } = UseStorage();
+  useEffect(() => {
+    console.log(order);
+  }, [order]);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -46,7 +49,11 @@ export default function PrintablePage() {
       setStatusMessage(null);
 
       const results = await Promise.all(
+<<<<<<< HEAD:app/print-and-deliver/print/page.tsx
         acceptedFiles.map((file) => uploadFile(file)),
+=======
+        acceptedFiles.map((file) => uploadFile(file))
+>>>>>>> 39d6af8bc786f740a3810023cbd77d0a79b8b393:app/print-and-deliver/[user_id]/page.tsx
       );
 
       const successCount = results.filter(Boolean).length;

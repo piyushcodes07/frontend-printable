@@ -1,20 +1,20 @@
 "use client";
+import { useUser } from "@clerk/nextjs";
+import { Download } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import DocumentView from "../components/documentView";
 import SingerDetailsForm from "../components/signeeForm";
 import SigningTool from "../components/signTool";
-import DocumentView from "../components/documentView";
-import { useUser } from "@clerk/nextjs";
-import { useSignUrl } from "../useSign";
-import { ToastContainer, toast } from "react-toastify";
-import { drawSignatureOnPdf } from "../components/utils/pdfUtils";
-import "react-toastify/dist/ReactToastify.css";
-import { useSearchParams, useRouter } from "next/navigation";
 import {
   SaveSignDocument,
   sendSignRequestEmail,
   UploadDocument,
 } from "../components/utils/apiCalls";
-import { Download } from "lucide-react";
+import { drawSignatureOnPdf } from "../components/utils/pdfUtils";
+import { useSignUrl } from "../useSign";
 
 function SignDocument() {
   const searchParams = useSearchParams();
@@ -22,7 +22,7 @@ function SignDocument() {
   const file = window
     ? JSON.parse(sessionStorage.getItem("file") as string)
     : null;
-  const [fileName, setFileName] = useState(file.fileName);
+  const [fileName, setFileName] = useState(file?.fileName || null);
   const [documentId, setDocumentId] = useState("");
   useEffect(() => {
     setFileName((searchParams.get("fileName") as string) || file.fileName);
@@ -210,7 +210,14 @@ function SignDocument() {
 
     return (
       <button
-        className={`border-1 flex gap-2 text-[18px] rounded-xl cursor-pointer border-[#06044B] p-3 hover:bg-[#06044B] hover:text-${buttonColor}-500`}
+        className={`border-1 flex gap-2 text-[18px] rounded-xl cursor-pointer border-[#06044B] p-3
+      justify-center items-center
+      ${
+        buttonColor === "yellow"
+          ? "hover:text-green-400"
+          : `hover:text-${buttonColor}-500`
+      }
+      hover:bg-[#06044B]`}
         onClick={onClick}
         disabled={loading}
       >
@@ -235,7 +242,7 @@ function SignDocument() {
             <span className="sr-only">Loading...</span>
           </div>
         ) : (
-          <p>{label}</p>
+          <p className="w-full text-center">{label}</p>
         )}
       </button>
     );
@@ -379,7 +386,7 @@ function SignDocument() {
             {(!signers_email || signers_email.length === 0) &&
               signs &&
               signs.length > 0 &&
-              renderButton("Save", handleSaveSign, "yellow")}
+              renderButton("Sign Document", handleSaveSign, "yellow")}
           </div>
         </div>
       </div>

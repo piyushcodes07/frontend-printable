@@ -1,8 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
-import { useSignUrl } from "../useSign";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const PdfViewer = dynamic(
   () => import("./pdfLoader").then((mod) => mod.default),

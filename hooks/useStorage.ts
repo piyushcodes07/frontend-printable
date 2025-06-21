@@ -22,6 +22,7 @@ export default function UseStorage() {
       }
 
       const data = await response.json();
+      console.log(data.fileUrl);
 
       // Ensure new documents default to "All" pages
       const newDoc: DocumentItem = {

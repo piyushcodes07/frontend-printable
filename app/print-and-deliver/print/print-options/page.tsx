@@ -35,11 +35,14 @@ export default function PrintOptionsPage() {
     isError?: boolean;
   } | null>(null);
   const [expandedDocId, setExpandedDocId] = useState<string | null>(null);
+  useEffect(() => {
+    console.log(order);
+  }, [order]);
 
   // --- Effects and Handlers (Upload, Delete, Expand, Update) remain the same ---
   useEffect(() => {
     const currentExpandedDocExists = order.documents.some(
-      (doc) => doc.id === expandedDocId,
+      (doc) => doc.id === expandedDocId
     );
     if (
       (!currentExpandedDocExists || !expandedDocId) &&
@@ -78,7 +81,7 @@ export default function PrintOptionsPage() {
         docToRemove.id,
         docToRemove.fileName,
         indexToRemove,
-        setStatusMessage,
+        setStatusMessage
       );
     } else {
       console.error("Document not found for deletion:", id);
@@ -89,7 +92,7 @@ export default function PrintOptionsPage() {
   const handleDocumentUpdate = (
     index: number,
     field: keyof DocumentItem,
-    value: any,
+    value: any
   ) => {
     const currentDoc = order.documents[index];
     if (!currentDoc) return;
@@ -283,7 +286,7 @@ export default function PrintOptionsPage() {
                     expandedDocId === file.id
                       ? "bg-[#f0fdf4] border-b border-[#e0e0e0]"
                       : "bg-white hover:bg-gray-50",
-                    file.error ? "border-l-4 border-red-500" : "",
+                    file.error ? "border-l-4 border-red-500" : ""
                   )}
                   onClick={() => !file.error && toggleDocumentOptions(file.id)}
                 >
@@ -348,7 +351,7 @@ export default function PrintOptionsPage() {
                             "h-5 w-5 text-[#999999] transition-transform",
                             expandedDocId === file.id
                               ? "transform rotate-180"
-                              : "",
+                              : ""
                           )}
                         />
                       )}
@@ -377,7 +380,7 @@ export default function PrintOptionsPage() {
                             handleDocumentUpdate(
                               index,
                               "pagesToPrint",
-                              e.target.value,
+                              e.target.value
                             )
                           }
                           placeholder="All, 1, 3-5, 7" // Add placeholder
@@ -405,7 +408,7 @@ export default function PrintOptionsPage() {
                               handleDocumentUpdate(
                                 index,
                                 "colorType",
-                                e.target.value,
+                                e.target.value
                               )
                             }
                             className={selectElementClass} // Use select class
@@ -436,7 +439,7 @@ export default function PrintOptionsPage() {
                               handleDocumentUpdate(
                                 index,
                                 "pageDirection",
-                                e.target.value,
+                                e.target.value
                               )
                             }
                             className={selectElementClass} // Use select class
@@ -469,7 +472,7 @@ export default function PrintOptionsPage() {
                               handleDocumentUpdate(
                                 index,
                                 "printType",
-                                e.target.value,
+                                e.target.value
                               )
                             }
                             className={selectElementClass} // Use select class
@@ -502,7 +505,7 @@ export default function PrintOptionsPage() {
                             handleDocumentUpdate(
                               index,
                               "copies",
-                              e.target.value,
+                              e.target.value
                             )
                           }
                           min="1"
@@ -528,7 +531,7 @@ export default function PrintOptionsPage() {
                               handleDocumentUpdate(
                                 index,
                                 "paperSize",
-                                e.target.value,
+                                e.target.value
                               )
                             }
                             className={selectElementClass} // Use select class
@@ -581,10 +584,16 @@ export default function PrintOptionsPage() {
               order.documents.length === 0 ||
                 order.documents.some((doc) => !!doc.error) // Also disable if any document has an error
                 ? "bg-gray-400 cursor-not-allowed" // Disabled style
-                : "bg-[#06044b] hover:bg-[#06044b]/90", // Enabled style
+                : "bg-[#06044b] hover:bg-[#06044b]/90" // Enabled style
             )}
             onClick={() =>
+<<<<<<< HEAD:app/print-and-deliver/print/print-options/page.tsx
               router.push(`/print-and-deliver/print/location-selection`)
+=======
+              router.push(
+                `/print-and-deliver/${User.user?.id}/location-selection`
+              )
+>>>>>>> 39d6af8bc786f740a3810023cbd77d0a79b8b393:app/print-and-deliver/[user_id]/print-options/page.tsx
             } // TODO: Add onClick handler for navigation
             disabled={
               order.documents.length === 0 ||
