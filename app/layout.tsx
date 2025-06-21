@@ -41,11 +41,7 @@ export default function RootLayout({
         >
           <NavBar />
           <FileProvider>
-<<<<<<< HEAD
-          {children}
-=======
-            <OrderProvider> {children}</OrderProvider>
->>>>>>> 39d6af8bc786f740a3810023cbd77d0a79b8b393
+            <OrderProvider>{children}</OrderProvider>{" "}
           </FileProvider>
         </body>
       </html>

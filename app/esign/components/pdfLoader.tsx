@@ -1,8 +1,5 @@
 "use client";
-
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 import { useEffect, useRef, useState } from "react";
-import { useSignUrl } from "../useSign";
 import PdfCanvasPage from "./pdfCanvasPage";
 import { drawSignatureOnPdf } from "./utils/pdfUtils";
 

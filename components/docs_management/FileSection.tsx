@@ -99,7 +99,7 @@ const FileSection: React.FC<FileSectionProps> = ({
     if (isPageTransition && order.documents.length > 0) {
       console.log(order);
       setPageTrasition(false);
-      router.push(`/print-and-deliver/${user?.id}/print-options`);
+      router.push(`/print-and-deliver/print/print-options`);
     }
   }, [order.documents, isPageTransition]);
   useEffect(() => {

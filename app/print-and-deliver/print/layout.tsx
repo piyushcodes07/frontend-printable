@@ -9,7 +9,7 @@ export default function PrintAndDeliverLayout({
 }) {
   return (
     <section>
-      <Protect>{children}</Protect>
+      <Protect> {children}</Protect>
     </section>
   );
 }

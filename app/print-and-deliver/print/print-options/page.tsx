@@ -587,13 +587,7 @@ export default function PrintOptionsPage() {
                 : "bg-[#06044b] hover:bg-[#06044b]/90" // Enabled style
             )}
             onClick={() =>
-<<<<<<< HEAD:app/print-and-deliver/print/print-options/page.tsx
               router.push(`/print-and-deliver/print/location-selection`)
-=======
-              router.push(
-                `/print-and-deliver/${User.user?.id}/location-selection`
-              )
->>>>>>> 39d6af8bc786f740a3810023cbd77d0a79b8b393:app/print-and-deliver/[user_id]/print-options/page.tsx
             } // TODO: Add onClick handler for navigation
             disabled={
               order.documents.length === 0 ||

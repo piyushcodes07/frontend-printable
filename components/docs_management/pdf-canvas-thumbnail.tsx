@@ -4,7 +4,7 @@ import { convertPdfToImage } from "./pdf-to-thumbnail";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 
 // Ensure the worker is set
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@2.14.305/build/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js`;
 
 interface PDFThumbnailProps {
   url: string;
