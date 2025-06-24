@@ -141,7 +141,7 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="relative w-full min-h-screen bg-[#e8e8ec] flex flex-col items-center">
+    <div className="relative w-full  h-screen overflow-hidden  bg-[#e8e8ec] flex flex-col items-center">
       {/* Top White Bar */}
       <div className="w-full bg-white h-10 shadow-md flex items-center justify-start mb-6 px-4">
         <p className="text-sm font-semibold text-black">Compress PDF</p>
@@ -294,7 +294,7 @@ export default function UploadPage() {
           </div>
 
           {/* Compress Button – triggers the API call */}
-          <div className="mt-auto pt-4">
+          <div className="mt-auto">
             <button
               className={`w-full border border-[#06044B] text-[#06044B] py-2 rounded-md transition duration-200 hover:bg-[#06044B] hover:text-white ${
                 !selectedCompression ? "opacity-50 cursor-not-allowed" : ""
