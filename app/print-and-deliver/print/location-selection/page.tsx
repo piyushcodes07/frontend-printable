@@ -1,5 +1,4 @@
 "use client";
-/// <reference types="google.maps" />
 
 import { useOrder, DocumentItem } from "@/context/orderContext";
 import { useState, useEffect, useRef } from "react";
@@ -639,14 +638,13 @@ export default function LocationSelectionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#dffbe7] flex flex-col">
-      {/* --- ToastContainer --- */}
+    <div className="min-h-screen bg-[white] flex flex-col items-center py-12 px-4">
       <ToastContainer
         position="top-center"
         autoClose={5000}
         hideProgressBar={false}
         newestOnTop={false}
-        closeOnClick={false} // Kept as per your example, though true is more common
+        closeOnClick={false}
         rtl={false}
         pauseOnFocusLoss
         draggable
@@ -654,99 +652,26 @@ export default function LocationSelectionPage() {
         theme="light"
         transition={Bounce}
       />
-      {/* --- End ToastContainer --- */}
 
-      {/* <NavBar /> */}
-      <div className="flex-1 flex flex-col items-center py-12 px-4">
-        <div className="max-w-3xl w-full text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">
-            Print Your Documents with
-            <span className="block text-[#61e987]">Printable</span>
-          </h1>
-          <p className="text-center max-w-xl mx-auto">
-            Seamlessly upload your files, customize your print job, and have it
-            delivered or ready for pickup
-          </p>
-        </div>
-
-        <div className="flex justify-center items-center w-full max-w-2xl mb-12 overflow-x-auto py-4">
-          <div className="flex flex-col items-center flex-shrink-0">
-            <div className="w-16 h-16 rounded-full bg-[#61e987] flex items-center justify-center">
-              <Check className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-xs mt-2 whitespace-nowrap">
-              Upload Document
-            </span>
+      <div className="bg-white rounded-xl p-8 w-full max-w-5xl   mb-8">
+        <div className="flex items-center mb-6">
+          <div className="w-12 h-12 rounded-full bg-[#f0fdf4] flex items-center justify-center mr-4">
+            <MapPin className="h-6 w-6 text-[#06044b]" />
           </div>
-          <div className="h-[2px] w-16 bg-[#61e987] flex-shrink-0"></div>
-          <div className="flex flex-col items-center flex-shrink-0">
-            <div className="w-16 h-16 rounded-full bg-[#61e987] flex items-center justify-center">
-              <Check className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-xs mt-2 whitespace-nowrap">
-              Print Options
-            </span>
-          </div>
-          <div className="h-[2px] w-16 bg-[#61e987] flex-shrink-0"></div>
-          <div className="flex flex-col items-center flex-shrink-0">
-            <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center">
-              <MapPin className="h-6 w-6 text-[#06044b]" />
-            </div>
-            <span className="text-xs mt-2 whitespace-nowrap">
-              Select Location
-            </span>
-          </div>
-          <div className="h-[2px] w-16 bg-[#e6e6ed] flex-shrink-0"></div>
-          <div className="flex flex-col items-center flex-shrink-0">
-            <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect
-                  width="18"
-                  height="14"
-                  x="3"
-                  y="5"
-                  rx="2"
-                  stroke="#06044b"
-                  strokeWidth="2"
-                />
-                <path d="M3 10H21" stroke="#06044b" strokeWidth="2" />
-                <path
-                  d="M7 15H13"
-                  stroke="#06044b"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-            <span className="text-xs mt-2 whitespace-nowrap">Review & Pay</span>
+          <div>
+            <h2 className="text-2xl font-semibold">Location Selection</h2>
+            <p className="text-sm text-[#555555]">
+              Choose a merchant and delivery option
+            </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-8 w-full max-w-2xl border border-[#90f0ab] mb-6">
-          <div className="flex items-center mb-6">
-            <div className="w-12 h-12 rounded-full bg-[#f0fdf4] flex items-center justify-center mr-4">
-              <MapPin className="h-6 w-6 text-[#06044b]" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold">Location Selection</h2>
-              <p className="text-sm text-[#555555]">
-                Choose a merchant and delivery option
-              </p>
-            </div>
-          </div>
-
-          {renderLocationPermissionMessage()}
-
-          <div className="bg-[#f0fdf4] rounded-full p-1 flex mb-6">
+        {renderLocationPermissionMessage()}
+        <div>
+          <div className="bg-[#F4F7FA] rounded-full p-1 flex w-full justify-start items-start max-w-md  mb-6">
             <button
               className={cn(
-                "flex-1 py-2 px-4 rounded-full flex items-center justify-center gap-2 transition-colors",
+                "flex-1 py-2 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium",
                 deliveryOption === "pickup"
                   ? "bg-white text-[#06044b] shadow-sm"
                   : "text-[#555555] hover:text-[#06044b]",
@@ -754,11 +679,11 @@ export default function LocationSelectionPage() {
               onClick={() => setDeliveryOption("pickup")}
             >
               <Store className="h-4 w-4" />
-              <span>Store Pickup</span>
+              Store Pickup
             </button>
             <button
               className={cn(
-                "flex-1 py-2 px-4 rounded-full flex items-center justify-center gap-2 transition-colors",
+                "flex-1 py-2 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium",
                 deliveryOption === "delivery"
                   ? "bg-white text-[#06044b] shadow-sm"
                   : "text-[#555555] hover:text-[#06044b]",
@@ -766,164 +691,159 @@ export default function LocationSelectionPage() {
               onClick={() => setDeliveryOption("delivery")}
             >
               <Home className="h-4 w-4" />
-              <span>Home delivery</span>
+              Home Delivery
             </button>
           </div>
+        </div>
 
-          <h3 className="font-medium mb-3">Select Printing Location</h3>
+        <h3 className="font-medium mb-3">Select Location</h3>
 
-          <div className="relative mb-4">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-gray-400" />
-            </div>
-            <Input
-              type="text"
-              placeholder="Search by name, address or specialty"
-              className="pl-10 pr-4 py-2 bg-[#f0fdf4] text-black rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#61e987] border-[#e0e0e0]"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+        <div className="relative mb-4">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-gray-400" />
           </div>
+          <Input
+            type="text"
+            placeholder="Search by name, address or specialty"
+            className="pl-10 pr-4 py-2 bg-white shadow-sm text-sm text-black rounded-lg w-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#61e987]"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
 
-          <div
-            ref={mapRef}
-            className="w-full h-[200px] rounded-lg mb-4 bg-gray-100 overflow-hidden"
-          ></div>
+        <div
+          ref={mapRef}
+          className="w-full h-[200px] rounded-lg mb-4 bg-gray-100 overflow-hidden"
+        />
 
-          <div className="flex items-center my-6">
-            <div className="flex-grow h-px bg-gray-200"></div>
-            <span className="px-4 text-sm text-gray-500">Or</span>
-            <div className="flex-grow h-px bg-gray-200"></div>
+        <div className="flex items-center my-6">
+          <div className="flex-grow h-px bg-gray-200" />
+          <span className="px-4 text-sm text-gray-500">Or</span>
+          <div className="flex-grow h-px bg-gray-200" />
+        </div>
+
+        {isLoadingMerchants &&
+        !userLocation &&
+        locationPermission !== "unsupported" ? (
+          <div className="flex flex-col items-center justify-center py-8">
+            <Loader2 className="h-8 w-8 text-[#61e987] animate-spin mb-4" />
+            <p className="text-[#06044b]">Finding merchants near you...</p>
+            <p className="text-sm text-gray-500 mt-1">This may take a moment</p>
           </div>
-
-          <div className="space-y-4">
-            {isLoadingMerchants &&
-            !userLocation &&
-            locationPermission !== "unsupported" ? (
-              <div className="flex flex-col items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 text-[#61e987] animate-spin mb-4" />
-                <p className="text-[#06044b]">Finding merchants near you...</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  This may take a moment
-                </p>
-              </div>
-            ) : filteredMerchants.length > 0 ? (
-              filteredMerchants.map((merchant) => (
+        ) : filteredMerchants.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredMerchants.map((merchant) => (
+              <div
+                key={merchant.merchantId}
+                className={cn(
+                  "border rounded-xl shadow-sm bg-white transition-all hover:shadow-md",
+                  selectedMerchant === merchant.merchantId
+                    ? "border-[#61e987] ring-2 ring-[#90f0ab]"
+                    : "border-gray-200",
+                )}
+              >
                 <div
-                  key={merchant.merchantId}
-                  id={`merchant-${merchant.merchantId}`}
-                  className={cn(
-                    "border rounded-lg overflow-hidden transition-all",
-                    selectedMerchant === merchant.merchantId
-                      ? "border-[#61e987] bg-[#f0fdf4]"
-                      : "border-gray-200 hover:border-[#90f0ab]",
-                  )}
+                  onClick={() => setSelectedMerchant(merchant.merchantId)}
+                  className="cursor-pointer"
                 >
-                  <div
-                    className="flex cursor-pointer p-4"
-                    onClick={() => setSelectedMerchant(merchant.merchantId)}
-                  >
-                    <div className="w-24 h-20 rounded overflow-hidden mr-4 flex-shrink-0">
-                      <img
-                        src={merchant.MerchantImages[0] || "/placeholder.svg"}
-                        alt={merchant.shopName}
-                        className="w-full h-full object-cover"
-                      />
+                  <img
+                    src={merchant.MerchantImages[0] || "/placeholder.svg"}
+                    alt={merchant.shopName}
+                    className="w-full h-40 object-cover rounded-t-xl"
+                  />
+                  <div className="p-4">
+                    <div className="flex justify-between items-start mb-1">
+                      <h4 className="text-base font-semibold text-[#06044b] leading-tight">
+                        {merchant.shopName}
+                      </h4>
+                      <span className="text-sm font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+                        {parseFloat(merchant.averageRating).toFixed(1)} ★
+                      </span>
                     </div>
-
-                    <div className="flex-grow">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-medium text-[#06044b]">
-                          {merchant.shopName}
-                        </h4>
-                        <div className="w-5 h-5 rounded-full border-2 border-[#06044b] flex-shrink-0 flex items-center justify-center">
-                          {selectedMerchant === merchant.merchantId && (
-                            <div className="w-3 h-3 rounded-full bg-[#06044b]"></div>
-                          )}
-                        </div>
+                    <p className="text-sm text-gray-500 truncate mb-2">
+                      {merchant.address}
+                    </p>
+                    <div className="flex items-center text-xs text-gray-500 gap-3 mb-2">
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        <span>{merchant.duration}</span>
                       </div>
-
-                      <div className="flex items-center mb-1">
-                        {renderStars(parseFloat(merchant.averageRating))}
-                        <span className="text-xs text-gray-500 ml-1">
-                          ({merchant.ratingCount})
+                      <span>· {merchant.googleDistance}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {(merchant.services || []).map((service, i) => (
+                        <span
+                          key={i}
+                          className="bg-gray-100 text-gray-600 text-[11px] px-2 py-0.5 rounded-full"
+                        >
+                          {service}
                         </span>
-                        <div className="flex items-center ml-3 text-xs text-gray-500">
-                          <Clock className="h-3 w-3 mr-1" />
-                          <span>{merchant.duration}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <div className="rounded px-1 py-1">
-                          <p className="text-[12px] text-gray-400">
-                            Distance : {merchant.googleDistance}
-                          </p>
-                        </div>
-
-                        <div>
-                          <p className="text-[12px] text-gray-400">
-                            Traffic : {merchant.durationInTraffic}
-                          </p>
-                        </div>
-                      </div>
+                      ))}
                     </div>
+                    <button
+                      onClick={() => setSelectedMerchant(merchant.merchantId)}
+                      className={cn(
+                        "w-full text-sm font-medium py-2 border rounded-lg transition",
+                        selectedMerchant === merchant.merchantId
+                          ? "border-[#61e987] bg-[#f0fdf4] text-[#06044b]"
+                          : "border-gray-300 bg-white text-gray-700 hover:border-[#61e987]",
+                      )}
+                    >
+                      Select Shop
+                    </button>
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-8">
-                <MapPinOff className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-500">
-                  No merchants found matching your search.
-                </p>
-                {locationPermission !== "granted" &&
-                  !isLoadingMerchants &&
-                  MERCHANTS.length > 0 && ( // Check MERCHANTS.length to show fallback message correctly
-                    <p className="text-sm text-gray-500 mt-2">
-                      Showing all available merchants instead.
-                    </p>
-                  )}
               </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <MapPinOff className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+            <p className="text-gray-500">
+              No merchants found matching your search.
+            </p>
+            {locationPermission !== "granted" && !isLoadingMerchants && (
+              <p className="text-sm text-gray-500 mt-2">
+                Showing all available merchants instead.
+              </p>
             )}
           </div>
+        )}
 
-          <Button
-            className="w-full mt-6 bg-[#61e987] hover:bg-[#61e987]/90 text-[#06044b] font-medium"
-            disabled={!selectedMerchant || isLoadingMerchants}
-            onClick={handelOrderSubmit}
-          >
-            Confirm Selection
-          </Button>
-        </div>
-
-        <div className="flex justify-between w-full max-w-2xl">
-          <Link href="/print-options">
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 border-[#d0d0d0] text-[#555555]"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Back
-            </Button>
-          </Link>
-          <Link
-            href={
-              selectedMerchant
-                ? `/checkout?merchant=${selectedMerchant}&option=${deliveryOption}`
-                : "#"
-            }
-          >
-            <Button
-              className="bg-[#06044b] hover:bg-[#06044b]/90 text-white px-6 uppercase text-xs font-semibold tracking-wider"
-              disabled={!selectedMerchant || isLoadingMerchants}
-            >
-              Continue To Payment
-            </Button>
-          </Link>
-        </div>
+        <Button
+          className="w-full mt-6 bg-[#06044b] hover:bg-[#06044b]/90 text-white text-sm font-semibold uppercase tracking-wide py-3 rounded-lg"
+          disabled={!selectedMerchant || isLoadingMerchants}
+          onClick={handelOrderSubmit}
+        >
+          Confirm Selection
+        </Button>
       </div>
-      {/* <NavBar /> */}
+
+      <div className="flex justify-between w-full max-w-5xl mt-4">
+        <Link href="/print-and-deliver/print">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 border-[#d0d0d0] text-[#555555] py-2 px-4 rounded-lg"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back
+          </Button>
+        </Link>
+        <Link
+          href={
+            selectedMerchant
+              ? `/checkout?merchant=${selectedMerchant}&option=${deliveryOption}`
+              : "#"
+          }
+        >
+          <Button
+            className="bg-[#06044b] hover:bg-[#06044b]/90 text-white px-6 py-3 uppercase text-xs font-semibold tracking-wider rounded-lg"
+            disabled={!selectedMerchant || isLoadingMerchants}
+          >
+            Continue To Payment
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }

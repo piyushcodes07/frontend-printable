@@ -1,4 +1,4 @@
-import { useOrder, DocumentItem } from "@/context/orderContext"; // Ensure DocumentItem is imported
+import { useOrder, type DocumentItem } from "@/context/orderContext";
 
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_ROOT_URL}`;
 
@@ -8,8 +8,8 @@ export default function UseStorage() {
   const uploadFile = async (file: File): Promise<DocumentItem | null> => {
     try {
       const formData = new FormData();
-
       formData.append("file", file);
+
       const response = await fetch(`${API_BASE_URL}/api/file/upload`, {
         method: "POST",
         body: formData,
@@ -17,31 +17,31 @@ export default function UseStorage() {
 
       if (!response.ok) {
         throw new Error(
-          `Upload failed: ${response.status} ${response.statusText}`, // Corrected template literal
+          `Upload failed: ${response.status} ${response.statusText}`,
         );
       }
 
       const data = await response.json();
       console.log(data.fileUrl);
 
-      // Ensure new documents default to "All" pages
       const newDoc: DocumentItem = {
         id: data.fileId,
         fileName: file.name,
         fileUrl: data.fileUrl,
         copies: 1,
-        colorType: "black and white", // Match exact type string
-        paperSize: "A4 (8.27 x 11.69 inches)", // Match exact type string
+        colorType: "black and white",
+        paperSize: "A4 (8.27 x 11.69 inches)",
         printType: "front",
         pageDirection: "vertical",
-        pagesToPrint: "All", // <<<---- ADDED DEFAULT
+        pagesToPrint: "All",
         size: file.size,
       };
+
       dispatch({ type: "ADD_DOCUMENT", payload: newDoc });
       return newDoc;
     } catch (err: any) {
       console.error("Upload error:", err);
-      // Also add default in error case if the doc is added to the list
+
       const errorDoc: DocumentItem = {
         id: `error-${Date.now()}`,
         fileName: file.name,
@@ -51,13 +51,13 @@ export default function UseStorage() {
         paperSize: "A4 (8.27 x 11.69 inches)",
         printType: "front",
         pageDirection: "vertical",
-        pagesToPrint: "All", // <<<---- ADDED DEFAULT FOR ERROR CASE
+        pagesToPrint: "All",
         size: file.size,
         error: err.message || String(err),
       };
-      // Check if your logic adds error docs to the list - if so, dispatch
+
       dispatch({ type: "ADD_DOCUMENT", payload: errorDoc });
-      return null; // Or return errorDoc if you handle it differently
+      return null;
     }
   };
 
@@ -67,7 +67,7 @@ export default function UseStorage() {
     index: number,
     setStatusMessage: (
       status: { text: string; isError?: boolean } | null,
-    ) => void, // More specific type
+    ) => void,
   ) => {
     try {
       const response = await fetch(
@@ -77,22 +77,20 @@ export default function UseStorage() {
 
       if (!response.ok) {
         throw new Error(
-          `Delete failed: ${response.status} ${response.statusText}`, // Corrected template literal
+          `Delete failed: ${response.status} ${response.statusText}`,
         );
       }
 
-      await response.json(); // Assuming response confirms deletion
+      await response.json();
       dispatch({ type: "REMOVE_DOCUMENT", index });
       setStatusMessage({ text: `${fileName} was successfully deleted.` });
       setTimeout(() => setStatusMessage(null), 3000);
     } catch (err: any) {
       console.error("Delete error:", err);
       setStatusMessage({
-        text: `Failed to delete ${fileName}. ${err.message || ""}`.trim(), // Add error message
+        text: `Failed to delete ${fileName}. ${err.message || ""}`.trim(),
         isError: true,
       });
-      // Don't auto-hide error messages immediately, or make duration longer
-      // setTimeout(() => setStatusMessage(null), 5000);
     }
   };
 
