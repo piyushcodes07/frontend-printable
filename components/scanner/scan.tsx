@@ -199,7 +199,7 @@ export default function Scanner() {
     {/* Compress */}
     <div>
       <Image
-        src="/compress.png"
+        src="/compress1.png"
         alt="Compress"
         width={56}
         height={56}
@@ -214,7 +214,7 @@ export default function Scanner() {
     {/* Convert */}
     <div>
       <Image
-        src="/convert.png"
+        src="/convert1.png"
         alt="Convert"
         width={56}
         height={56}
