@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import {
-  HomeIcon,
-  DocumentTextIcon,
+  ChatBubbleLeftEllipsisIcon,
   ClockIcon,
-  WalletIcon,
   CloudIcon,
   Cog6ToothIcon,
+  DocumentTextIcon,
+  HomeIcon,
+  QuestionMarkCircleIcon,
+  WalletIcon,
 } from "@heroicons/react/24/outline";
+import { useState } from "react";
+import { TbLogout2 } from "react-icons/tb";
 
 type OrderStatus = "Shipped" | "Delivered";
 type Priority = "High" | "Normal";
@@ -67,53 +70,60 @@ export default function MyOrders() {
 
   return (
     <div className="min-h-screen bg-[#e9eaf0] py-10 px-10 flex flex-col">
-  <div className="flex max-w-7xl mx-auto gap-6">
-    {/* Sidebar */}
-    <aside className="w-80 bg-white rounded-2xl shadow-md p-6 flex flex-col" style={{ height: "calc(100vh - 5rem)" }}>
-      <div className="flex flex-col border-b border-[#e9eaf0] pb-4">
-        <div className="flex items-center gap-4">
-          <img
-            src={user?.imageUrl || "/default-avatar.png"}
-            alt={`${user?.firstName || "User"}'s Avatar`}
-            className="w-12 h-12 rounded-full object-cover"
-          />
-          <div>
-            <div className="font-semibold text-gray-800 text-base">{user?.firstName} {user?.lastName}</div>
-            <div className="text-xs text-gray-500">{user?.primaryEmailAddress?.emailAddress}</div>
+      <div className="flex max-w-7xl mx-auto gap-6">
+        {/* Sidebar */}
+        <aside className="w-80 bg-white rounded-2xl shadow-md p-6 flex flex-col" style={{ height: "calc(100vh - 5rem)" }}>
+          <div className="flex flex-col border-b border-[#e9eaf0] pb-4">
+            <div className="flex items-center gap-4">
+              <img
+                src={user?.imageUrl || "/default-avatar.png"}
+                alt={`${user?.firstName || "User"}'s Avatar`}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+              <div>
+                <div className="font-semibold text-gray-800 text-base">{user?.firstName} {user?.lastName}</div>
+                <div className="text-xs text-gray-500">{user?.primaryEmailAddress?.emailAddress}</div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <nav className="flex flex-col gap-1 mt-6">
-        <SidebarLink icon={HomeIcon} label="My Account" />
-        <SidebarLink icon={DocumentTextIcon} label="My Orders" active />
-        <SidebarLink icon={ClockIcon} label="History" />
-        <SidebarLink icon={WalletIcon} label="My Walt" />
-        <SidebarLink icon={CloudIcon} label="My Drive" />
-        <SidebarLink icon={Cog6ToothIcon} label="Settings" />
-      </nav>
-    </aside>
+          <div>
+            <nav className="flex flex-col gap-1 mt-6">
+              <SidebarLink icon={HomeIcon} label="My Account" />
+              <SidebarLink icon={DocumentTextIcon} label="My Orders" active />
+              <SidebarLink icon={ClockIcon} label="History" />
+              <SidebarLink icon={WalletIcon} label="My Wallet" />
+              <SidebarLink icon={CloudIcon} label="My Drive" />        
+              <hr className="my-4 border-t border-[#C9C9C9]" />
+              <SidebarLink icon={ChatBubbleLeftEllipsisIcon} label="Chat" />
+            </nav>
+            <nav className="flex flex-col gap-1 mt-6">
+              <SidebarLink icon={Cog6ToothIcon} label="Settings" />
+              <SidebarLink icon={QuestionMarkCircleIcon} label="Help & Support" />
+              <SidebarLink icon={TbLogout2} label="Log out" className="text-red-500 bg-red-100 hover:bg-red-200" />
+            </nav>
+          </div>
+        </aside>
 
-    {/* Main Content */}
-    <main className="flex-1 bg-white rounded-2xl shadow-md p-8 overflow-y-auto" style={{ height: "calc(100vh - 5rem)" }}>
-      <div className="max-w-6xl mx-auto">
-        <div className="border-b border-[#e9eaf0] pb-4 mb-6">
-          <h1 className="text-2xl font-bold">My Orders</h1>
-        </div>
-        <div className="flex gap-2 mb-6">
-          <OrderTab label="All" active={filterStatus === "All"} onClick={() => setFilterStatus("All")} />
-          <OrderTab label="Shipped" active={filterStatus === "Shipped"} onClick={() => setFilterStatus("Shipped")} />
-          <OrderTab label="Delivered" active={filterStatus === "Delivered"} onClick={() => setFilterStatus("Delivered")} />
-        </div>
-        <div className="flex flex-col gap-4">
-          {filteredOrders.map((order, idx) => (
-            <OrderCard key={idx} {...order} />
-          ))}
-        </div>
+        {/* Main Content */}
+        <main className="flex-1 bg-white rounded-2xl shadow-md p-8 overflow-y-auto" style={{ height: "calc(100vh - 5rem)" }}>
+          <div className="max-w-6xl mx-auto">
+            <div className="border-b border-[#e9eaf0] pb-4 mb-6">
+              <h1 className="text-2xl font-bold">My Orders</h1>
+            </div>
+            <div className="flex gap-2 mb-6">
+              <OrderTab label="All" active={filterStatus === "All"} onClick={() => setFilterStatus("All")} />
+              <OrderTab label="Shipped" active={filterStatus === "Shipped"} onClick={() => setFilterStatus("Shipped")} />
+              <OrderTab label="Delivered" active={filterStatus === "Delivered"} onClick={() => setFilterStatus("Delivered")} />
+            </div>
+            <div className="flex flex-col gap-4">
+              {filteredOrders.map((order, idx) => (
+                <OrderCard key={idx} {...order} />
+              ))}
+            </div>
+          </div>
+        </main>
       </div>
-    </main>
-  </div>
-</div>
-
+    </div>
   );
 }
 
@@ -121,10 +131,12 @@ function SidebarLink({
   icon: Icon,
   label,
   active = false,
+  className = "",
 }: {
   icon: React.ElementType;
   label: string;
   active?: boolean;
+  className?: string;
 }) {
   return (
     <div
@@ -132,7 +144,7 @@ function SidebarLink({
         active
           ? "bg-[#e9eaf0] text-[#23235b] font-semibold"
           : "text-gray-600 hover:bg-[#f4f5f7]"
-      }`}
+      } ${className}`}
     >
       <Icon className="w-5 h-5" />
       <span>{label}</span>
