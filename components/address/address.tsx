@@ -180,7 +180,7 @@ const { isLoaded } = useLoadScript({
 
           <p className="text-xs text-gray-500 mb-1">DELIVERING YOUR ORDER TO</p>
           <div className="border rounded-md p-3 mb-2">
-            <p className="font-semibold">
+            <p className="font-semibold text-black">
               <FaMapMarkerAlt className="inline-block mr-1 text-green-500" />
               Signet mall, Mota varacha, surat, india
             </p>
