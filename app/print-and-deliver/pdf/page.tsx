@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { FaFilePdf, FaPlus } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
-import { v4 as uuidv4 } from "uuid";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
@@ -20,13 +19,15 @@ interface UploadedFile {
 
 export default function PrintOptionsPage() {
   const [files, setFiles] = useState<UploadedFile[]>([]);
-  const [selectedFileIds, setSelectedFileIds] = useState<Set<string>>(new Set());
+  const [selectedFileIds, setSelectedFileIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [isToggled, setIsToggled] = useState(false);
   const [copies, setCopies] = useState<number>(1);
   const [printColor, setPrintColor] = useState<"bw" | "color" | null>(null);
-  const [orientation, setOrientation] = useState<"landscape" | "portrait" | null>(
-    null
-  );
+  const [orientation, setOrientation] = useState<
+    "landscape" | "portrait" | null
+  >(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -56,7 +57,7 @@ export default function PrintOptionsPage() {
   const isSelected = (id: string) => selectedFileIds.has(id);
 
   const handleFilesChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const selectedFiles = event.target.files;
     if (!selectedFiles) return;
@@ -65,7 +66,7 @@ export default function PrintOptionsPage() {
 
     for (const file of Array.from(selectedFiles)) {
       const size = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
-      const id = uuidv4();
+      const id = crypto.randomUUID();
 
       if (file.type === "application/pdf") {
         const { thumbnail, pages } = await generatePdfThumbnail(file);
@@ -104,7 +105,7 @@ export default function PrintOptionsPage() {
   };
 
   const generatePdfThumbnail = async (
-    file: File
+    file: File,
   ): Promise<{ thumbnail: string | null; pages: number }> => {
     if (typeof window === "undefined") return { thumbnail: null, pages: 0 };
 
@@ -177,89 +178,90 @@ export default function PrintOptionsPage() {
     // Example: Send copies, printColor, orientation, and selected files to backend
   };
 
-  
-
   const totalPages = files.reduce((sum, file) => sum + (file.pages || 0), 0);
-  
 
   return (
     <div className="min-h-screen bg-[#f8f9fb] px-6 py-10 sm:px-16 ">
       <div className="max-w-6xl mx-aut ml-[250px]">
-        <h1 className="text-2xl font-semibold text-black mb-6">Print Options</h1>
+        <h1 className="text-2xl font-semibold text-black mb-6">
+          Print Options
+        </h1>
 
-      <div className="max-w-4xl flex flex-wrap gap-6">
-        {files.map((file) => (
-          <div key={file.id} className="flex flex-col">
-            <div
-              onClick={() => toggleSelect(file.id)}
-              className={`relative w-48 h-65 cursor-pointer select-none transition-all duration-200 rounded-xl px-2.5 py-2.5 border border-gray-300 overflow-hidden ${
-                isSelected(file.id) ? "bg-[#B2B1C7] outline-[1px] outline-black" : "bg-white"
-              }`}
-              role="button"
-              aria-label={`Select file ${file.name}`}
-            >
-              {file.thumbnail ? (
-                <Image
-                  src={file.thumbnail}
-                  alt={file.name}
-                  width={192}
-                  height={288}
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                  <FaFilePdf size={48} className="text-red-600" />
-                </div>
-              )}
-
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeFile(file.id);
-                }}
-                className="absolute top-0 right-0 w-6 h-7 flex items-center justify-center rounded-tr-xl  rounded-bl-lg bg-white text-black cursor-pointer select-none shadow-[0_0_3px_#000000]"
-                aria-label={`Remove file ${file.name}`}
+        <div className="max-w-4xl flex flex-wrap gap-6">
+          {files.map((file) => (
+            <div key={file.id} className="flex flex-col">
+              <div
+                onClick={() => toggleSelect(file.id)}
+                className={`relative w-48 h-65 cursor-pointer select-none transition-all duration-200 rounded-xl px-2.5 py-2.5 border border-gray-300 overflow-hidden ${
+                  isSelected(file.id)
+                    ? "bg-[#B2B1C7] outline-[1px] outline-black"
+                    : "bg-white"
+                }`}
+                role="button"
+                aria-label={`Select file ${file.name}`}
               >
-                <IoClose size={20} />
-              </button>
+                {file.thumbnail ? (
+                  <Image
+                    src={file.thumbnail}
+                    alt={file.name}
+                    width={192}
+                    height={288}
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                    <FaFilePdf size={48} className="text-red-600" />
+                  </div>
+                )}
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeFile(file.id);
+                  }}
+                  className="absolute top-0 right-0 w-6 h-7 flex items-center justify-center rounded-tr-xl  rounded-bl-lg bg-white text-black cursor-pointer select-none shadow-[0_0_3px_#000000]"
+                  aria-label={`Remove file ${file.name}`}
+                >
+                  <IoClose size={20} />
+                </button>
+              </div>
+
+              <p className="mt-2 text-sm font-semibold text-black truncate">
+                {file.name}
+              </p>
+              <p className="text-xs text-gray-500 self-start mt-1 ml-1">
+                {file.size}{" "}
+                {file.pages ? (
+                  <span className="text-gray-400">
+                    ({file.pages} page{file.pages > 1 ? "s" : ""})
+                  </span>
+                ) : null}
+              </p>
             </div>
+          ))}
 
-            <p className="mt-2 text-sm font-semibold text-black truncate">
-              {file.name}
-            </p>
-            <p className="text-xs text-gray-500 self-start mt-1 ml-1">
-              {file.size}{" "}
-              {file.pages ? (
-                <span className="text-gray-400">
-                  ({file.pages} page{file.pages > 1 ? "s" : ""})
-                </span>
-              ) : null}
-            </p>
+          {/* Add Files Card */}
+          <div
+            onClick={handleAddFiles}
+            className="w-48 h-65 bg-[#DFFBE7] border-dashed border-2 border-[#93e6c1] flex flex-col items-center justify-center rounded-2xl cursor-pointer hover:bg-[#c9f2da] transition"
+            role="button"
+            aria-label="Add files"
+          >
+            <FaPlus className="text-xl text-[#008000]" />
+            <span className="mt-2 text-sm font-medium text-[#008000]">
+              Add Files
+            </span>
+            <input
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              multiple
+              onChange={handleFilesChange}
+              ref={inputRef}
+              className="hidden"
+              aria-label="Upload files"
+            />
           </div>
-        ))}
-
-        {/* Add Files Card */}
-        <div
-          onClick={handleAddFiles}
-          className="w-48 h-65 bg-[#DFFBE7] border-dashed border-2 border-[#93e6c1] flex flex-col items-center justify-center rounded-2xl cursor-pointer hover:bg-[#c9f2da] transition"
-          role="button"
-          aria-label="Add files"
-        >
-          <FaPlus className="text-xl text-[#008000]" />
-          <span className="mt-2 text-sm font-medium text-[#008000]">
-            Add Files
-          </span>
-          <input
-            type="file"
-            accept=".pdf,.jpg,.jpeg,.png"
-            multiple
-            onChange={handleFilesChange}
-            ref={inputRef}
-            className="hidden"
-            aria-label="Upload files"
-          />
         </div>
-      </div>
       </div>
 
       <div className="bg-[#f5f8fa] min-h-screen flex flex-col items-center justify-center p-4 space-y-6">
@@ -354,7 +356,12 @@ export default function PrintOptionsPage() {
                             d="M7.40426 3.13443C7.68474 1.50149 9.23587 0.405108 10.8688 0.685587L21.8611 2.57366C23.4941 2.85414 24.5905 4.40527 24.31 6.03822L19.398 34.6358C18.5961 39.3042 14.1616 42.4386 9.49322 41.6367V41.6367C4.82483 40.8349 1.69039 36.4004 2.49225 31.732L7.40426 3.13443Z"
                             fill="black"
                           />
-                          <circle cx="10.6641" cy="32.7646" r="3" fill="white" />
+                          <circle
+                            cx="10.6641"
+                            cy="32.7646"
+                            r="3"
+                            fill="white"
+                          />
                         </svg>
                       </div>
                     </button>
@@ -394,7 +401,12 @@ export default function PrintOptionsPage() {
                             d="M7.40426 3.13443C7.68474 1.50149 9.23587 0.405108 10.8688 0.685587L21.8611 2.57366C23.4941 2.85414 24.5905 4.40527 24.31 6.03822L19.398 34.6358C18.5961 39.3042 14.1616 42.4386 9.49322 41.6367V41.6367C4.82483 40.8349 1.69039 36.4004 2.49225 31.732L7.40426 3.13443Z"
                             fill="#C53232"
                           />
-                          <circle cx="10.6641" cy="32.7646" r="3" fill="black" />
+                          <circle
+                            cx="10.6641"
+                            cy="32.7646"
+                            r="3"
+                            fill="black"
+                          />
                         </svg>
                       </div>
                     </button>
