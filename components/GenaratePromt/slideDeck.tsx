@@ -23,7 +23,6 @@ import SlideLongTermStrategy, {
 
 import SlideCircularProcesss from "../Generate/slides/SlideCircularProcess";
 import { useUser } from "@clerk/nextjs";
-import PptxGenJS from "pptxgenjs";
 import { PexelsPhoto } from "../ui/pixelsPhoto";
 import { useState } from "react";
 
@@ -141,57 +140,9 @@ export function SlideDeck({
   const authorName = user.user?.username;
   console.log(authorName, "user");
 
-  const handleDownload = async () => {
-    setLoading(true);
-    try {
-      const pptx = new PptxGenJS();
-
-      for (const slide of slides) {
-        const SlideGenerator = slideGenerators[slide.type];
-        if (SlideGenerator) {
-          let imageSrc;
-          const imageData = await getImageUrlFromService(slide.content.title);
-          if (imageData && imageData.src) {
-            imageSrc = imageData.src.landscape;
-          }
-
-          SlideGenerator(pptx, {
-            ...slide.content,
-            imageSrc,
-            backgroundColor: currentTheme?.backgroundColor,
-            headingColor: currentTheme?.headingColor,
-            subHeadingColor: currentTheme?.subHeadingColor,
-            bulletColor: currentTheme?.bulletColor,
-            authorName,
-          });
-        }
-      }
-
-      await pptx.writeFile({ fileName: "CompletePresentation.pptx" });
-    } catch (error) {
-      console.error("Error generating PPT:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="flex flex-col">
       {/* Download button aligned top-left */}
-      <div className="w-full mt-2 ml-2 flex justify-start mb-4">
-        <button
-          className="px-4 py-2 bg-[#61e987] rounded-md cursor-pointer flex items-center justify-center gap-2 hover:scale-105 transition-all min-w-[140px] disabled:opacity-50"
-          type="button"
-          onClick={handleDownload}
-          disabled={loading}
-        >
-          {loading ? (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          ) : (
-            "Download PPT"
-          )}
-        </button>
-      </div>
 
       {/* Slide previews */}
       <div className="w-full flex flex-col items-center justify-center">

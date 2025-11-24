@@ -25,7 +25,7 @@ export default function PromptEditor() {
 
   const toggleEditMode = (id: number) => {
     setGlobalSlides(
-      globalSlides.map((card) => {
+      globalSlides.map((card: any) => {
         if (card.id === id) {
           return { ...card, isEditing: !card.isEditing };
         }
@@ -57,7 +57,7 @@ export default function PromptEditor() {
           if (line.trim()) {
             try {
               const slide: Slide = JSON.parse(line);
-              setGlobalSlides((prev) => [...prev, slide]);
+              setGlobalSlides((prev: any) => [...prev, slide]);
             } catch (e) {
               console.error("Error parsing slide:", e);
             }
@@ -76,7 +76,7 @@ export default function PromptEditor() {
   const addCard = () => {
     const newId =
       globalSlides.length > 0
-        ? Math.max(...globalSlides.map((card) => card.id)) + 1
+        ? Math.max(...globalSlides.map((card: any) => card.id)) + 1
         : 1;
     const newCard = {
       id: newId,
@@ -89,13 +89,13 @@ export default function PromptEditor() {
 
   // Add function to delete a card
   const deleteCard = (id: number) => {
-    globalSlides.filter((card) => card.id !== id);
+    globalSlides.filter((card: any) => card.id !== id);
   };
 
   // Add function to update card content
   const updateCard = (id: number, title: any, content: any) => {
     setGlobalSlides(
-      globalSlides.map((card) => {
+      globalSlides.map((card: any) => {
         if (card.id === id) {
           return { ...card, title, content, isEditing: false };
         }

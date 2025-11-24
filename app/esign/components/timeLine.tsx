@@ -81,8 +81,8 @@ export default function DocumentTimeline({
           latestItem.signeeSignStatus.toLowerCase() === "completed"
             ? "bg-green-50"
             : latestItem.signeeSignStatus.toLowerCase() === "pending"
-            ? "bg-yellow-50"
-            : "bg-gray-50"
+              ? "bg-yellow-50"
+              : "bg-gray-50"
         } rounded-t-lg `}
       >
         <div className="flex items-center justify-between mb-4">
@@ -143,8 +143,8 @@ export default function DocumentTimeline({
               latestItem.signeeSignStatus.toLowerCase() === "completed"
                 ? "bg-green-100"
                 : latestItem.signeeSignStatus.toLowerCase() === "pending"
-                ? "bg-yellow-100"
-                : "bg-gray-100"
+                  ? "bg-yellow-100"
+                  : "bg-gray-100"
             } rounded-full p-2`}
           >
             <FileText
@@ -153,15 +153,15 @@ export default function DocumentTimeline({
                 latestItem.signeeSignStatus.toLowerCase() === "completed"
                   ? "text-green-700"
                   : latestItem.signeeSignStatus.toLowerCase() === "pending"
-                  ? "text-yellow-700"
-                  : "text-gray-700"
+                    ? "text-yellow-700"
+                    : "text-gray-700"
               }`}
             />
           </div>
           <div>
             <p className="font-medium">{latestItem.fileName}</p>
             <p className="text-sm text-gray-600">
-              {latestItem.signeeEmail.split("@")[0]} •{" "}
+              {latestItem.signeeEmail.split("@")[0]} • {/* @ts-ignore */}
               {formatDate(latestItem.signedAt || latestItem.createdAt)}
             </p>
           </div>
@@ -174,8 +174,8 @@ export default function DocumentTimeline({
               latestItem.signeeSignStatus.toLowerCase() === "completed"
                 ? "bg-green-100"
                 : latestItem.signeeSignStatus.toLowerCase() === "pending"
-                ? "bg-yellow-100"
-                : "bg-gray-100"
+                  ? "bg-yellow-100"
+                  : "bg-gray-100"
             } rounded-full p-2`}
           >
             {latestItem.signeeSignStatus.toLowerCase() === "signed" ||
@@ -236,7 +236,7 @@ export default function DocumentTimeline({
                   </p>
                   <Badge
                     className={`mt-1 font-normal ${getStatusColor(
-                      item.signeeSignStatus
+                      item.signeeSignStatus,
                     )}`}
                     variant="outline"
                   >

@@ -1,9 +1,5 @@
 import { useUser } from "@clerk/nextjs";
-import {
-  ChevronDown,
-  ChevronUp,
-  Trash2,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSignUrl } from "../useSign";
 
@@ -60,7 +56,7 @@ function EditCard({ index, type }: { index: number; type: string }) {
             className="w-3 h-3"
             fill="#fff"
           >
-            <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/>
+            <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
           </svg>
         </button>
       </div>
@@ -87,7 +83,7 @@ function EditCard({ index, type }: { index: number; type: string }) {
             />
           </div>
         </div>
-  
+
         <div
           className="delete flex-1 center border border-[#C9C9C9] border-t-transparent border-b-transparent cursor-pointer gap-1 px-2 py-1 hover:bg-gray-100 rounded"
           onClick={() => removeSign(index)}
@@ -131,7 +127,8 @@ function EditCard({ index, type }: { index: number; type: string }) {
                       width: 20,
                       height: 20,
                       backgroundColor: color,
-                      boxShadow: textColor === color ? "0 0 0 2px #888" : "none",
+                      boxShadow:
+                        textColor === color ? "0 0 0 2px #888" : "none",
                     }}
                     onClick={() => {
                       setTextColor(color);
@@ -146,22 +143,25 @@ function EditCard({ index, type }: { index: number; type: string }) {
         )}
 
         {type === "date" && (
-          <div className="border flex flex-1 items-center outline-none border-[#C9C9C9] border-t-transparent border-b-transparent border-r-transparent px-1 py-3 relative"
-          style={{ minWidth: 100 }}>
+          <div
+            className="border flex flex-1 items-center outline-none border-[#C9C9C9] border-t-transparent border-b-transparent border-r-transparent px-1 py-3 relative"
+            style={{ minWidth: 100 }}
+          >
             {/* Styled text input for look */}
             <input
               type="text"
               placeholder="dd/mm/yyyy"
               value={
                 signs[index].value
-                  ? new Date(signs[index].value as string).toLocaleDateString("en-GB")
+                  ? new Date(signs[index].value as string).toLocaleDateString(
+                      "en-GB",
+                    )
                   : ""
               }
               readOnly
               className="w-full bg-transparent outline-none text-black text-base font-normal placeholder:text-black placeholder:opacity-70"
               style={{ letterSpacing: "1px", cursor: "pointer" }}
               onClick={() => {
-                document.getElementById(`date-native-${index}`)?.showPicker?.();
                 document.getElementById(`date-native-${index}`)?.focus();
               }}
             />
