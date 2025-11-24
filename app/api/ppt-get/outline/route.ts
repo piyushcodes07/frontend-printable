@@ -25,7 +25,7 @@ export async function GET(request: Request) {
   const language = searchParams.get("language");
   const cards = searchParams.get("cards");
   const { elementStream } = streamObject({
-    model: google("gemini-1.5-flash"),
+    model: google("gemini-2.0-flash"),
     prompt: `Create an outline for a presentation on "${topic}". Include slide titles and bullet points. Number of slides to generate = ${cards}, language = ${language}
             each slide must use one of these templates:
 
